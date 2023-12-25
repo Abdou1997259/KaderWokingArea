@@ -1,6 +1,4 @@
-﻿using Kader_System.Domain.DTOs.Response.HR;
-
-namespace Kader_System.Services.Services.HR;
+﻿namespace Kader_System.Services.Services.HR;
 
 public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> sharLocalizer, IMapper mapper) : IQualificationService
 {
@@ -8,7 +6,7 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
     private readonly IStringLocalizer<SharedResource> _sharLocalizer = sharLocalizer;
     private readonly IMapper _mapper = mapper;
 
-    #region Allowance
+    #region Qualification
 
     public async Task<Response<IEnumerable<SelectListResponse>>> ListOfQualificationsAsync(string lang)
     {
@@ -17,7 +15,7 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
                 select: x => new SelectListResponse
                 {
                     Id = x.Id,
-                    Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en
+                    Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
                 }, orderBy: x =>
                   x.OrderByDescending(x => x.Id));
 
@@ -54,7 +52,7 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
                  select: x => new QualificationData
                  {
                      Id = x.Id,
-                     Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en
+                     Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
                  }, orderBy: x =>
                    x.OrderByDescending(x => x.Id))).ToList()
         };
@@ -84,8 +82,8 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
     public async Task<Response<HrCreateQualificationRequest>> CreateQualificationAsync(HrCreateQualificationRequest model)
     {
         bool exists = false;
-        exists = await _unitOfWork.Qualifications.ExistAsync(x => x.Name_ar.Trim() == model.Name_ar
-        && x.Name_en.Trim() == model.Name_en.Trim());
+        exists = await _unitOfWork.Qualifications.ExistAsync(x => x.NameAr.Trim() == model.Name_ar
+        && x.NameEn.Trim() == model.Name_en.Trim());
 
         if (exists)
         {
@@ -101,8 +99,8 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
 
         await _unitOfWork.Qualifications.AddAsync(new()
         {
-            Name_en = model.Name_en,
-            Name_ar = model.Name_ar
+            NameEn = model.Name_en,
+            NameAr = model.Name_ar
         });
         await _unitOfWork.CompleteAsync();
 
@@ -135,8 +133,8 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
             Data = new()
             {
                 Id = id,
-                Name_ar = obj.Name_ar,
-                Name_en = obj.Name_en
+                Name_ar = obj.NameAr,
+                Name_en = obj.NameEn
             },
             Check = true
         };
@@ -159,8 +157,8 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
             };
         }
 
-        obj.Name_ar = model.Name_ar;
-        obj.Name_en = model.Name_en;
+        obj.NameAr = model.Name_ar;
+        obj.NameEn = model.Name_en;
 
         _unitOfWork.Qualifications.Update(obj);
         await _unitOfWork.CompleteAsync();

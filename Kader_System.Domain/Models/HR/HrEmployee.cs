@@ -69,6 +69,6 @@ public class HrEmployee : BaseEntity
     public int Job_id { get; set; }
     [ForeignKey(nameof(Job_id))]
     public HrJob Job { get; set; } = default!;
-
+    public long? AccountNo { get; set; }
     public ICollection<HrEmployeeAttachment> ListOfAttachments { get; set; } = [];
 }

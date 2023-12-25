@@ -35,3 +35,4 @@ global using Kader_System.Services.IServices.Trans;
 global using Kader_System.Domain.DTOs.Response.HR;
 global using Kader_System.Domain.Dtos.Request.HR;
 global using Kader_System.Domain.Models.HR;
+global using Kader_System.Domain.DTOs.Request.HR;

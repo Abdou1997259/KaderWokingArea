@@ -207,6 +207,7 @@ builder.Services.AddScoped<IBenefitService, BenefitService>();
 builder.Services.AddScoped<IDeductionService, DeductionService>();
 builder.Services.AddScoped<IQualificationService, QualificationService>();
 builder.Services.AddScoped<IShiftService, ShiftService>();
+builder.Services.AddScoped<IHrJobService, HrJobService>();
 
 #endregion
  

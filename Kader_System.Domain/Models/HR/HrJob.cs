@@ -5,8 +5,8 @@ public class HrJob : BaseEntity
 {
     [Key]
     public int Id { get; set; }
-    public required string Name_en { get; set; }
-    public required string Name_ar { get; set; }
-    public bool Has_need_license { get; set; }
-    public bool Has_additional_time { get; set; }
+    public required string NameEn { get; set; }
+    public required string NameAr { get; set; }
+    public bool HasNeedLicense { get; set; }
+    public bool HasAdditionalTime { get; set; }
 }

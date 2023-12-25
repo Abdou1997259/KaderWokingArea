@@ -192,7 +192,15 @@ public static class SD
             public const string GetQualificationById = "qualification/getById/{id}";
             public const string DeleteQualification = "qualification/delete/{id}";
         }
-
+        public class Job
+        {
+            public const string ListOfJobs = "Job/getListOfJobs";
+            public const string GetAllJobs = "Job/getAll";
+            public const string CreateJob = "Job/create";
+            public const string UpdateJob = "Job/update/{id}";
+            public const string GetJobById = "Job/getById/{id}";
+            public const string DeleteJob = "Job/delete/{id}";
+        }
         public class Shift
         {
             public const string ListOfShifts = "shift/getListOfShifts";

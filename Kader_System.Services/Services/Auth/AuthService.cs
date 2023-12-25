@@ -62,21 +62,21 @@ public class AuthService : IAuthService
                 Check = false
             };
 
-        //if (!user.IsActive)
-        //{
-        //    string resultMsg = string.Format(_sharLocalizer[Localization.NotActive],
-        //        _sharLocalizer[Localization.User], model.UserName);
+        if (!user.IsActive)
+        {
+            string resultMsg = string.Format(_sharLocalizer[Localization.NotActive],
+                _sharLocalizer[Localization.User], model.UserName);
 
-        //    return new()
-        //    {
-        //        Data = new()
-        //        {
-        //            UserName = model.UserName
-        //        },
-        //        Error = resultMsg,
-        //        Msg = resultMsg
-        //    };
-        //}
+            return new()
+            {
+                Data = new()
+                {
+                    UserName = model.UserName
+                },
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
 
 
         //if (model.DeviceId != null)

@@ -2,14 +2,12 @@
 
 public class PermissionAuthorizationHandlerService(IHttpContextAccessor accessor) : AuthorizationHandler<PermissionRequirementService>
 {
-    private readonly IHttpContextAccessor _accessor = accessor;
-
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirementService requirement)
     {
         if (context.User == null)
             return;
 
-        if (_accessor!.HttpContext!.Request.Path == Shared.Notify)
+        if (accessor!.HttpContext!.Request.Path == Shared.Notify)
         {
             context.Succeed(requirement);
             return;
