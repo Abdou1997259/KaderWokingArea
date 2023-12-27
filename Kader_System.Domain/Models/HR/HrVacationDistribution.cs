@@ -5,15 +5,15 @@ public class HrVacationDistribution : BaseEntity
 {
     [Key]
     public int Id { get; set; }
-    public required string Name_en { get; set; }
-    public required string Name_ar { get; set; }
-    public int Days_count { get; set; }
+    public required string NameEn { get; set; }
+    public required string NameAr { get; set; }
+    public int DaysCount { get; set; }
 
-    public int AccountingWay_id { get; set; }
-    [ForeignKey(nameof(AccountingWay_id))]
-    public HrAccountingWay AccountingWay { get; set; } = default!;
+    public int SalaryCalculatorId { get; set; }
+    [ForeignKey(nameof(SalaryCalculatorId))]
+    public HrSalaryCalculator SalaryCalculator { get; set; } = default!;
 
-    public int Vacation_id { get; set; }
-    [ForeignKey(nameof(Vacation_id))]
+    public int VacationId { get; set; }
+    [ForeignKey(nameof(VacationId))]
     public HrVacation Vacation { get; set; } = default!;
 }

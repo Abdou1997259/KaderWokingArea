@@ -65,7 +65,7 @@ public static class ModelBuilderExtensions
            new() { Id = 3, Name = "من تاريخ الاستحقاق", NameInEnglish = "After hiring days"}
            );
 
-        modelBuilder.Entity<HrAccountingWay>()
+        modelBuilder.Entity<HrSalaryCalculator>()
             .HasData(
            new() { Id = 1, Name = "كل الاتب", NameInEnglish = "All salary" },
            new() { Id = 2, Name = "الراتب الرئيسى", NameInEnglish = "Main salary" },

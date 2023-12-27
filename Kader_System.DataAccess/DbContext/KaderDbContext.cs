@@ -16,7 +16,7 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<StAction> Actions { get; set; }
     public DbSet<StSubMainScreenAction> SubMainScreenActions { get; set; }
 
-    public DbSet<HrAccountingWay> AccountingWays { get; set; }
+    public DbSet<HrSalaryCalculator> AccountingWays { get; set; }
     public DbSet<HrAllowance> Allowances { get; set; }
     public DbSet<HrBenefit> Benefits { get; set; }
     public DbSet<HrCompany> Companys { get; set; }
@@ -59,7 +59,7 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
    
         modelBuilder.SeedData();
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
-        modelBuilder.AddQueryFilterToAllEntitiesAssignableFrom<BaseEntity>(x => x.IsDeleted == false);
+        //modelBuilder.AddQueryFilterToAllEntitiesAssignableFrom<BaseEntity>(x => x.IsDeleted == false);
         modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()).ToList().ForEach(x => x.DeleteBehavior = DeleteBehavior.NoAction);
 
         modelBuilder.Entity<ApplicationUser>().ToTable("Auth_Users", "dbo");

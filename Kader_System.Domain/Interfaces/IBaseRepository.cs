@@ -25,6 +25,16 @@
         string includeProperties = null!
     );
 
+    Task<IEnumerable<TResult>> GetGrouped<TKey, TResult>(
+        Expression<Func<T, TKey>> groupingKey,
+        Expression<Func<IGrouping<TKey, T>, TResult>> resultSelector,
+        string includeProperties = null!,
+        int? skip = null,
+        int? take = null,
+        Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!);
+    Task<IEnumerable<T>> GetWithJoinAsync(Expression<Func<T, bool>> predicate
+        , string includeProperties);
     Task<T> AddAsync(T entity);
 
     Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities);

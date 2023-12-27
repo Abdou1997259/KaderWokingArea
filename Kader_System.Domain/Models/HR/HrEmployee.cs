@@ -56,7 +56,7 @@ public class HrEmployee : BaseEntity
 
     public int AccountingWay_id { get; set; }
     [ForeignKey(nameof(AccountingWay_id))]
-    public HrAccountingWay AccountingWay { get; set; } = default!;
+    public HrSalaryCalculator AccountingWay { get; set; } = default!;
 
     public int Vacation_id { get; set; }
     [ForeignKey(nameof(Vacation_id))]

@@ -208,10 +208,10 @@ builder.Services.AddScoped<IDeductionService, DeductionService>();
 builder.Services.AddScoped<IQualificationService, QualificationService>();
 builder.Services.AddScoped<IShiftService, ShiftService>();
 builder.Services.AddScoped<IHrJobService, HrJobService>();
-
+builder.Services.AddScoped<IVacationService, VacationService>();
 #endregion
- 
- var app = builder.Build();
+
+var app = builder.Build();
  
  # region To take an instance from specific repository
  

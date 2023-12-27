@@ -201,6 +201,15 @@ public static class SD
             public const string GetJobById = "Job/getById/{id}";
             public const string DeleteJob = "Job/delete/{id}";
         }
+        public class Vacation
+        {
+            public const string ListOfVacations = "Vacation/getListOfVacations";
+            public const string GetAllVacations = "Vacation/getAll";
+            public const string CreateVacation = "Vacation/create";
+            public const string UpdateVacation = "Vacation/update/{id}";
+            public const string GetVacationById = "Vacation/getById/{id}";
+            public const string DeleteVacation = "Vacation/delete/{id}";
+        }
         public class Shift
         {
             public const string ListOfShifts = "shift/getListOfShifts";
@@ -236,7 +245,7 @@ public static class SD
         public const string ThisAmountCannotBeTransferedFromTheBranchTreasuryDueToItsAvailability = "ThisAmountCannotBeTransferedFromTheBranchTreasuryDueToItsAvailability";
         public const string ThisAmountCannotBeReceitedAsThisClientHasNotPrice = "ThisAmountCannotBeReceitedAsThisClientHasNotPrice";
         public const string ItIsNecessaryThatAmountMoreThanZero = "ItIsNecessaryThatAmountMoreThanZero";
-
+        public const string Used = "Used";
         public const string CannotBeFound = "CannotBeFound";
         public const string Departments = "Departments";
 
@@ -318,7 +327,7 @@ public static class SD
         public const string Benefit = "Benefit";
         public const string Qualification = "Qualification";
         public const string Deduction = "Deduction";
-
+        public const string Vacation = "Vacation";
         public const string Image = "Image";
         public const string CompanyIsNotActive = "Company is not active";
         public const string NotActive = "NotActive";

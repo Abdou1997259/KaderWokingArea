@@ -1,11 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
-
+﻿
 namespace Kader_System.DataAccess.Repositories;
 
 public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> where T : class
 {
-    protected KaderDbContext _context = context;
     internal DbSet<T> dbSet = context.Set<T>();
 
     public async Task<T> GetByIdAsync(int id) =>
@@ -44,6 +41,44 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
         return await query.Select(select).ToListAsync();
     }
 
+
+    public async Task<IEnumerable<TResult>> GetGrouped<TKey, TResult>(
+        Expression<Func<T, TKey>> groupingKey,
+        Expression<Func<IGrouping<TKey, T>, TResult>> resultSelector,
+        string includeProperties = null!,
+        int? skip = null,
+        int? take = null,
+        Expression<Func<T, bool>>? filter = null,
+    Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!)
+    {
+        var query = dbSet.AsQueryable();
+
+        if (includeProperties != null)
+        {
+            query.AsSplitQuery();
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' },
+                         StringSplitOptions.RemoveEmptyEntries))
+                query = query.Include(includeProperty).DefaultIfEmpty().IgnoreQueryFilters();
+        }
+
+        if (filter != null)
+            query = query.Where(filter);
+        if (orderBy != null)
+            query = orderBy(query);
+
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+        if (take.HasValue)
+            query = query.Take(take.Value);
+
+        return await query.GroupBy(groupingKey).Select(resultSelector).ToListAsync();
+    }
+
+
+
+
+
+
     public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter = null!,
      Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!, Expression<Func<T, bool>> includeFilter = null!,
      string includeProperties = null!,
@@ -71,6 +106,8 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
 
         return await query.ToListAsync();
     }
+
+
 
     public async Task<bool> ExistAsync(int id) =>
         await dbSet.FindAsync(id) is not null;
@@ -109,6 +146,18 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
         return (await query.FirstOrDefaultAsync())!;
     }
 
+    public async Task<IEnumerable<T>> GetWithJoinAsync(Expression<Func<T, bool>> predicate
+        , string includeProperties)
+    {
+        IQueryable<T> query = dbSet;
+
+        foreach (var includeProperty in includeProperties.Split(','))
+        {
+            query = query.Include(includeProperty).DefaultIfEmpty();
+        }
+
+        return await query.Where(predicate).ToListAsync();
+    }
 
     public async Task<T> AddAsync(T entity)
     {
@@ -137,6 +186,8 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
     public async Task<int> CountAsync(Expression<Func<T, bool>> filter = null!, string includeProperties = null!)
     {
         IQueryable<T> query = dbSet.AsNoTracking();
+
+       var xx= query.ToList();
 
         if (filter != null)
             query = query.Where(filter);
