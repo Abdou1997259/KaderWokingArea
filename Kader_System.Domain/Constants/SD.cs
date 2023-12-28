@@ -31,6 +31,7 @@ public static class SD
     {
         public const string SpecialChar = @"|!#$%&[]=?»«@£§€{};<>";
         public const int Length = 50;
+        public const string AllowedExtension = ".jpg,.png,.jpeg";
     }
     public static class Modules
     {

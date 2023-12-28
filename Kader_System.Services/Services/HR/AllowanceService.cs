@@ -82,8 +82,8 @@ public class AllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
     public async Task<Response<HrCreateAllowanceRequest>> CreateAllowanceAsync(HrCreateAllowanceRequest model)
     {
         bool exists = false;
-        exists = await _unitOfWork.Companies.ExistAsync(x => x.Name_ar.Trim() == model.Name_ar
-        && x.Name_en.Trim() == model.Name_en.Trim());
+        exists = await _unitOfWork.Companies.ExistAsync(x => x.NameAr.Trim() == model.Name_ar
+        && x.NameEn.Trim() == model.Name_en.Trim());
 
         if (exists)
         {

@@ -20,6 +20,8 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<HrAllowance> Allowances { get; set; }
     public DbSet<HrBenefit> Benefits { get; set; }
     public DbSet<HrCompany> Companys { get; set; }
+    public DbSet<HrCompanyContract> CompanyContracts { get; set; }
+    public DbSet<CompanyLicense> CompanyLicenses { get; set; }
     public DbSet<HrCompanyType> CompanyTypes { get; set; }
     public DbSet<HrContract> Contracts { get; set; }
     public DbSet<HrContractAllowancesDetail> ContractAllowancesDetails { get; set; }
@@ -52,11 +54,11 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     #endregion
     //
 
-  
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-   
+
         modelBuilder.SeedData();
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
         //modelBuilder.AddQueryFilterToAllEntitiesAssignableFrom<BaseEntity>(x => x.IsDeleted == false);
@@ -104,10 +106,18 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
             }
             if (entityEntry.State == EntityState.Deleted)
             {
-                entityEntry.State = EntityState.Modified;
-                ((BaseEntity)entityEntry.Entity).DeleteDate = dateNow;
-                ((BaseEntity)entityEntry.Entity).DeleteBy = userId;
-                ((BaseEntity)entityEntry.Entity).IsDeleted = true;
+                if (((BaseEntity)entityEntry.Entity).IsDeleted)
+                {
+                    entityEntry.State = EntityState.Deleted;
+                }
+                else
+                {
+                    entityEntry.State = EntityState.Modified;
+                    ((BaseEntity)entityEntry.Entity).DeleteDate = dateNow;
+                    ((BaseEntity)entityEntry.Entity).DeleteBy = userId;
+                    ((BaseEntity)entityEntry.Entity).IsDeleted = true;
+                }
+
             }
         }
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);

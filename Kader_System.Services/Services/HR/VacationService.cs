@@ -94,7 +94,7 @@ namespace Kader_System.Services.Services.HR
         }
 
 
-        public async Task<Response<GetAllVacationResponse>> _GetAllVacationsAsync(string lang, GetAllFilterationFoVacationRequest model)
+        public async Task<Response<GetAllVacationResponse>> GetAllVacationsWithJoinAsync(string lang, GetAllFilterationFoVacationRequest model)
         {
             Expression<Func<HrVacation, bool>> filter = x => x.IsDeleted == model.IsDeleted;
 

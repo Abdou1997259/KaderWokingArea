@@ -4,7 +4,8 @@ public static class DateTimeExtensions
 {
     public static DateTime NowEg(this DateTime dateToCheck) => 
         DateTime.UtcNow.AddHours(2);
-
+    public static DateTime NowKsa(this DateTime dateToCheck) =>
+        DateTime.UtcNow.AddHours(3);
     public static IEnumerable<DateTime> GetDatesBetween(DateTime startDate, DateTime endDate)
     {
         var allDates = new List<DateTime>();

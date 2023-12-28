@@ -19,6 +19,8 @@ public class UnitOfWork : IUnitOfWork
     public IAllowanceRepository Allowances { get; private set; }
     public IBenefitRepository Benefits { get; private set; }
     public ICompanyRepository Companies { get; private set; }
+    public ICompanyContractsRepository CompanyContracts { get; private set; }
+    public ICompanyLicenseRepository CompanyLicenses { get; private set; }
     public ICompanyTypeRepository CompanyTypes { get; private set; }
     public IContractAllowancesDetailRepository ContractAllowancesDetails { get; private set; }
     public IContractRepository Contracts { get; private set; }
@@ -66,6 +68,8 @@ public class UnitOfWork : IUnitOfWork
         Allowances = new AllowanceRepository(_context);
         Benefits = new BenefitRepository(_context);
         Companies = new CompanyRepository(_context);
+        CompanyContracts=new CompanyContractsRepository(_context);
+        CompanyLicenses = new CompanyLicenseRepository(_context);
         CompanyTypes = new CompanyTypeRepository(_context);
         ContractAllowancesDetails = new ContractAllowancesDetailRepository(_context);
         Contracts = new ContractRepository(_context);

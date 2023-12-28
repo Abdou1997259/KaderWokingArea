@@ -19,6 +19,8 @@ public interface IUnitOfWork : IDisposable
     IAllowanceRepository Allowances { get; }
     IBenefitRepository Benefits { get; }
     ICompanyRepository Companies { get; }
+    ICompanyContractsRepository CompanyContracts { get; }
+    ICompanyLicenseRepository CompanyLicenses { get; }
     ICompanyTypeRepository CompanyTypes { get; }
     IContractAllowancesDetailRepository ContractAllowancesDetails { get; }
     IContractRepository Contracts { get; }

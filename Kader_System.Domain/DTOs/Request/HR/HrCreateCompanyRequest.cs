@@ -2,8 +2,6 @@
 
 public class HrCreateCompanyRequest 
 {
-    public int Id { get; set; }
-
     [Display(Name = Annotations.NameInEnglish), Required(ErrorMessage = Annotations.FieldIsRequired)]
     public required string Name_en { get; set; }
 
@@ -16,10 +14,10 @@ public class HrCreateCompanyRequest
     [AllowedValues(1, 2), Display(Name = Annotations.CompanyOwner)]
     public int Company_type { get; set; }
 
-    [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length)]
-    public IFormFile? Company_licenses { get; set; }
+    [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length), FileExtensionValidation(FileSettings.AllowedExtension)]
+    public IFormFileCollection? Company_licenses { get; set; }
 
 
-    [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length)]
-    public IFormFileCollection Company_contracts { get; set; } = default!;
+    [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length), FileExtensionValidation(FileSettings.AllowedExtension)]
+    public IFormFileCollection? Company_contracts { get; set; } = default!;
 }

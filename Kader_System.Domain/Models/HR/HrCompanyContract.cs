@@ -5,10 +5,10 @@ public class HrCompanyContract : BaseEntity
 {
     [Key]
     public int Id { get; set; }
-    public string? Company_contracts { get; set; }
-    public string? Company_contracts_extension { get; set; }
+    public string? CompanyContracts { get; set; }
+    public string? CompanyContractsExtension { get; set; }
 
-    public int Company_id { get; set; }
-    [ForeignKey(nameof(Company_id))]
-    public HrCompany CompanyType { get; set; } = default!;
+    public int CompanyId { get; set; }
+    [ForeignKey(nameof(CompanyId))]
+    public HrCompany Company { get; set; } = default!;
 }

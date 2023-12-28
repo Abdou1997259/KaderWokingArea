@@ -22,7 +22,7 @@ namespace Kader_System.Api.Areas.HR.Controllers
 
         [HttpGet(ApiRoutes.Vacation.GetAllVacations)]
         public async Task<IActionResult> GetAllVacationsAsync([FromQuery] GetAllFilterationFoVacationRequest model) =>
-            Ok(await service._GetAllVacationsAsync(GetCurrentRequestLanguage(), model));
+            Ok(await service.GetAllVacationsWithJoinAsync(GetCurrentRequestLanguage(), model));
 
 
         [HttpGet(ApiRoutes.Vacation.GetVacationById)]

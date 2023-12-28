@@ -1,28 +1,28 @@
 ﻿namespace Kader_System.Services.Services.HR;
 
-public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> sharLocalizer, IMapper mapper) : ICompanyService
+public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> shareLocalizer, IMapper mapper) : ICompanyService
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IStringLocalizer<SharedResource> _sharLocalizer = sharLocalizer;
-    private readonly IMapper _mapper = mapper;
+    private HrCompany _instance;
 
-    #region Company
+
+
+    #region Retrieve
 
     public async Task<Response<IEnumerable<HrListOfCompaniesResponse>>> ListOfCompaniesAsync(string lang)
     {
         var result =
-                await _unitOfWork.Companies.GetSpecificSelectAsync(null!,
+                await unitOfWork.Companies.GetSpecificSelectAsync(null!,
                 select: x => new HrListOfCompaniesResponse
                 {
                     Id = x.Id,
-                    Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en,
+                    Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
                     Company_licenses = x.Company_licenses,
                 }, orderBy: x =>
                   x.OrderByDescending(x => x.Id));
 
         if (!result.Any())
         {
-            string resultMsg = _sharLocalizer[Localization.NotFoundData];
+            string resultMsg = shareLocalizer[Localization.NotFoundData];
 
             return new()
             {
@@ -45,9 +45,9 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
 
         var result = new HrGetAllCompaniesResponse
         {
-            TotalRecords = await _unitOfWork.Companies.CountAsync(filter: filter),
+            TotalRecords = await unitOfWork.Companies.CountAsync(filter: filter),
 
-            Items = (await _unitOfWork.Companies.GetSpecificSelectAsync(filter: filter,
+            Items = (await unitOfWork.Companies.GetSpecificSelectAsync(filter: filter,
                  take: model.PageSize,
                  skip: (model.PageNumber - 1) * model.PageSize,
                  select: x => new CompanyData
@@ -55,16 +55,16 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
                      Id = x.Id,
                      Added_by = x.Added_by,
                      Add_date = x.Add_date.ToGetFullyDate(),
-                     Company_owner = x.Company_owner,
+                     Company_owner = x.CompanyOwner,
                      Company_type_name = lang == Localization.Arabic ? x.CompanyType.Name : x.CompanyType.NameInEnglish,
-                     Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en
+                     Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
                  }, orderBy: x =>
                    x.OrderByDescending(x => x.Id))).ToList()
         };
 
         if (result.TotalRecords is 0)
         {
-            string resultMsg = _sharLocalizer[Localization.NotFoundData];
+            string resultMsg = shareLocalizer[Localization.NotFoundData];
 
             return new()
             {
@@ -84,69 +84,14 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
         };
     }
 
-    public async Task<Response<HrCreateCompanyRequest>> CreateCompanyAsync(HrCreateCompanyRequest model)
-    {
-        bool exists = false;
-        exists = await _unitOfWork.Companies.ExistAsync(x => x.Name_ar.Trim() == model.Name_ar
-        && x.Name_en.Trim() == model.Name_en.Trim());
-
-        if (exists)
-        {
-            string resultMsg = string.Format(_sharLocalizer[Localization.IsExist],
-                _sharLocalizer[Localization.Company]);
-
-            return new()
-            {
-                Error = resultMsg,
-                Msg = resultMsg
-            };
-        }
-
-        string imageName = null!, imageExtension = null!;
-        if (model.Company_licenses is not null)
-        {
-            var fileObj = ManageFilesHelper.UploadFile(model.Company_licenses, GoRootPath.HRImagesPath);
-            imageName = fileObj.FileName;
-            imageExtension = fileObj.FileExtension;
-        }
-
-        List<GetFileNameAndExtension> getFileNameAnds = [];
-        if (model.Company_contracts.Any())
-        {
-            getFileNameAnds = ManageFilesHelper.UploadFiles(model.Company_contracts, GoRootPath.HRFilesPath);
-        }
-
-        await _unitOfWork.Companies.AddAsync(new()
-        {
-            Name_en = model.Name_en,
-            Name_ar = model.Name_ar,
-            Company_owner = model.Company_owner,
-            Company_licenses = imageName,
-            Company_licenses_extension = imageExtension,
-            Company_type = model.Company_type,
-            ListOfsContract = getFileNameAnds.Select(y => new HrCompanyContract
-            {
-                Company_contracts = y.FileName,
-                Company_contracts_extension = y.FileExtension
-            }).ToList()
-        });
-        await _unitOfWork.CompleteAsync();
-
-        return new()
-        {
-            Msg = _sharLocalizer[Localization.Done],
-            Check = true,
-            Data = model
-        };
-    }
 
     public async Task<Response<HrGetCompanyByIdResponse>> GetCompanyByIdAsync(int id)
     {
-        var obj = await _unitOfWork.Companies.GetByIdAsync(id);
+        var obj = await unitOfWork.Companies.GetByIdAsync(id);
 
         if (obj is null)
         {
-            string resultMsg = _sharLocalizer[Localization.NotFoundData];
+            string resultMsg = shareLocalizer[Localization.NotFoundData];
 
             return new()
             {
@@ -161,35 +106,188 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
             Data = new()
             {
                 Id = id,
-                Name_ar = obj.Name_ar,
-                Name_en = obj.Name_en,
-                Company_owner = obj.Company_owner,
-                Company_type = obj.Company_type,
-                Company_licenses = obj.Company_licenses is not null ? string.Concat(ReadRootPath.HRImagesPath, obj.Company_licenses) : null,
-                Company_licenses_extension = obj.Company_licenses_extension            },
+                Name_ar = obj.NameAr,
+                Name_en = obj.NameEn,
+                Company_owner = obj.CompanyOwner,
+                Company_type = obj.CompanyTypeId,
+            },
             Check = true
         };
     }
 
-    public Task<Response<HrUpdateCompanyRequest>> UpdateCompanyAsync(int id, HrUpdateCompanyRequest model)
+    #endregion
+
+
+    #region Insert
+
+    public async Task<Response<HrCreateCompanyRequest>> CreateCompanyAsync(HrCreateCompanyRequest model)
     {
-        throw new NotImplementedException();
+        var exists = await unitOfWork.Companies.ExistAsync(x => x.NameAr.Trim() == model.Name_ar
+                                                                && x.NameEn.Trim() == model.Name_en.Trim());
+
+        if (exists)
+        {
+            string resultMsg = string.Format(shareLocalizer[Localization.IsExist],
+                shareLocalizer[Localization.Company]);
+
+            return new()
+            {
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+
+
+
+        List<GetFileNameAndExtension> getFileNameAnds = [];
+        if (model.Company_contracts is not null && model.Company_contracts.Any())
+        {
+            getFileNameAnds = ManageFilesHelper.UploadFiles(model.Company_contracts, GoRootPath.HRFilesPath);
+        }
+        List<GetFileNameAndExtension> getLicenseFileNameAnds = [];
+        if (model.Company_licenses is not null && model.Company_licenses.Any())
+        {
+            getLicenseFileNameAnds = ManageFilesHelper.UploadFiles(model.Company_licenses, GoRootPath.HRFilesPath);
+        }
+
+        await unitOfWork.Companies.AddAsync(new()
+        {
+            NameEn = model.Name_en,
+            NameAr = model.Name_ar,
+            CompanyOwner = model.Company_owner,
+            CompanyTypeId = model.Company_type,
+            Licenses = getLicenseFileNameAnds?.Select(l => new CompanyLicense()
+            {
+                LicenseExtension = l.FileExtension,
+                LicenseName = l.FileName,
+            }).ToList(),
+            ListOfsContract = getFileNameAnds?.Select(y => new HrCompanyContract
+            {
+                CompanyContracts = y.FileName,
+                CompanyContractsExtension = y.FileExtension
+            }).ToList()
+        });
+        await unitOfWork.CompleteAsync();
+
+        return new()
+        {
+            Msg = shareLocalizer[Localization.Done],
+            Check = true,
+            Data = model
+        };
+    }
+    #endregion
+
+    #region Update
+
+
+    public async Task<Response<HrUpdateCompanyRequest>> UpdateCompanyAsync(int id, HrUpdateCompanyRequest model)
+    {
+        Expression<Func<HrCompany, bool>> filter = x => x.IsDeleted == false && x.Id == id;
+        var obj = await unitOfWork.Companies.GetFirstOrDefaultAsync(filter, includeProperties: $"{nameof(_instance.Licenses) + "," + nameof(_instance.ListOfsContract)}");
+
+        if (obj is null)
+        {
+
+            string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
+                shareLocalizer[Localization.Company]);
+
+            return new()
+            {
+                Data = model,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        using var transaction = unitOfWork.BeginTransaction();
+        try
+        {
+
+
+            if (obj.ListOfsContract.Any())
+            {
+                ManageFilesHelper.RemoveFiles(obj.ListOfsContract.Select(l => GoRootPath.HRFilesPath + l.CompanyContracts).ToList());
+                unitOfWork.CompanyContracts.RemoveRange(obj.ListOfsContract);
+            }
+            if (obj.Licenses.Any())
+            {
+                ManageFilesHelper.RemoveFiles(obj.Licenses.Select(l => GoRootPath.HRFilesPath + l.LicenseName).ToList());
+                unitOfWork.CompanyLicenses.RemoveRange(obj.Licenses);
+            }
+            List<GetFileNameAndExtension> getFileNameAnds = [];
+            if (model.Company_contracts is not null && model.Company_contracts.Any())
+            {
+                getFileNameAnds = ManageFilesHelper.UploadFiles(model.Company_contracts, GoRootPath.HRFilesPath);
+            }
+            List<GetFileNameAndExtension> getLicenseFileNameAnds = [];
+            if (model.Company_licenses is not null && model.Company_licenses.Any())
+            {
+                getLicenseFileNameAnds = ManageFilesHelper.UploadFiles(model.Company_licenses, GoRootPath.HRFilesPath);
+            }
+
+            obj.NameEn = model.Name_en;
+            obj.NameAr = model.Name_ar;
+            obj.CompanyOwner = model.Company_owner;
+            obj.CompanyTypeId = model.Company_type;
+            obj.Licenses = getLicenseFileNameAnds?.Select(l => new CompanyLicense()
+            {
+                LicenseExtension = l.FileExtension,
+                LicenseName = l.FileName,
+            }).ToList();
+            obj.ListOfsContract = getFileNameAnds?.Select(y => new HrCompanyContract
+            {
+                CompanyContracts = y.FileName,
+                CompanyContractsExtension = y.FileExtension
+            }).ToList();
+
+            await unitOfWork.CompleteAsync();
+            transaction.Commit();
+
+            return new()
+            {
+                Msg = shareLocalizer[Localization.Done],
+                Check = true,
+                Data = model
+            };
+
+
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            return new()
+            {
+                Data = model,
+                Error = ex.Message,
+                Msg = ex.Message
+            };
+        }
+
+
+
     }
 
     public Task<Response<string>> UpdateActiveOrNotCompanyAsync(int id)
     {
         throw new NotImplementedException();
     }
+    #endregion
+
+
+    #region Delete
 
     public async Task<Response<string>> DeleteCompanyAsync(int id)
     {
         {
-            var obj = await _unitOfWork.Companies.GetByIdAsync(id);
+            Expression<Func<HrCompany, bool>> filter = x => x.Id == id;
+            var obj = await unitOfWork.Companies.GetFirstOrDefaultAsync(filter, includeProperties: $"{nameof(_instance.Licenses)},{nameof(_instance.ListOfsContract)}");
 
             if (obj == null)
             {
-                string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
-                    _sharLocalizer[Localization.Company]);
+                string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
+                    shareLocalizer[Localization.Company]);
 
                 return new()
                 {
@@ -199,14 +297,24 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
                 };
             }
 
-            _unitOfWork.Companies.Remove(obj);
-            await _unitOfWork.CompleteAsync();
+            if (obj.Licenses.Any())
+            {
+                unitOfWork.CompanyLicenses.RemoveRange(obj.Licenses);
+            }
+
+            if (obj.ListOfsContract.Any())
+            {
+                unitOfWork.CompanyContracts.RemoveRange(obj.ListOfsContract);
+            }
+
+            unitOfWork.Companies.Remove(obj);
+            await unitOfWork.CompleteAsync();
 
             return new()
             {
                 Check = true,
                 Data = string.Empty,
-                Msg = _sharLocalizer[Localization.Deleted]
+                Msg = shareLocalizer[Localization.Deleted]
             };
         }
     }

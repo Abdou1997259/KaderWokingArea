@@ -4,6 +4,7 @@
 [ApiExplorerSettings(GroupName = Modules.HR)]
 [ApiController]
 [Route("api/v1/")]
+[AllowAnonymous]
 public class CompaniesController(ICompanyService service) : ControllerBase
 {
     #region Retreive
