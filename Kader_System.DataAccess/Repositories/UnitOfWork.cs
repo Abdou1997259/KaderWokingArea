@@ -47,11 +47,12 @@ public class UnitOfWork : IUnitOfWork
     public ITransCovenantRepository TransCovenants { get; private set; }
     public ITransDeductionRepository TransDeductions { get; private set; }
 
-
+    public IManagementRepository Managements { get; private set; }
     public UnitOfWork(KaderDbContext context, IConfiguration config)
     {
         _context = context;
         _config = config;
+      
 
         Users = new UserRepository(_context);
         RoleClaims = new RoleClaimRepository(_context);
@@ -68,7 +69,8 @@ public class UnitOfWork : IUnitOfWork
         Allowances = new AllowanceRepository(_context);
         Benefits = new BenefitRepository(_context);
         Companies = new CompanyRepository(_context);
-        CompanyContracts=new CompanyContractsRepository(_context);
+        Managements = new ManagementRepository(_context);
+        CompanyContracts =new CompanyContractsRepository(_context);
         CompanyLicenses = new CompanyLicenseRepository(_context);
         CompanyTypes = new CompanyTypeRepository(_context);
         ContractAllowancesDetails = new ContractAllowancesDetailRepository(_context);

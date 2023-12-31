@@ -34,6 +34,7 @@ public interface IUnitOfWork : IDisposable
     IQualificationRepository Qualifications { get; }
     ISalaryPaymentWayRepository SalaryPaymentWays { get; }
     ISectionDepartmentRepository SectionDepartments { get; }
+    IManagementRepository Managements { get; }
     ISectionRepository Sections { get; }
     IShiftRepository Shifts { get; }
     IVacationDistributionRepository VacationDistributions { get; }
