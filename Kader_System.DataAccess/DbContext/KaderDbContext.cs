@@ -50,6 +50,7 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<TransVacation> TransVacations { get; set; }
     public DbSet<HrJob> HrJobs { get; set; }
     public DbSet<HrQualification> HrQualifications { get; set; }
+    public DbSet<HrManagement> Managements { get; set; }
 
     #endregion
     //

@@ -3,8 +3,8 @@
 [Table("Hr_Sections")]
 public class HrSection : SelectList
 {
-    public int Company_id { get; set; }
-    [ForeignKey(nameof(Company_id))]
+    public int CompanyId { get; set; }
+    [ForeignKey(nameof(CompanyId))]
     public HrCompany Company { get; set; } = default!;
 
     public ICollection<HrSectionDepartment> ListOfDepartments { get; set; } = [];
