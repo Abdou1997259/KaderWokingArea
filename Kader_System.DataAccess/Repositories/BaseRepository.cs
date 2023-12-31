@@ -141,7 +141,7 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
         if (includeProperties != null)
             foreach (var includeProperty in includeProperties.Split(new char[] { ',' },
                 StringSplitOptions.RemoveEmptyEntries))
-                query = query.Include(includeProperty).AsSplitQuery().AsNoTracking();
+                query = query.Include(includeProperty).IgnoreQueryFilters().AsSplitQuery().AsNoTracking();
 
         return (await query.FirstOrDefaultAsync())!;
     }
