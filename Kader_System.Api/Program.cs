@@ -209,6 +209,9 @@ builder.Services.AddScoped<IQualificationService, QualificationService>();
 builder.Services.AddScoped<IShiftService, ShiftService>();
 builder.Services.AddScoped<IHrJobService, HrJobService>();
 builder.Services.AddScoped<IVacationService, VacationService>();
+builder.Services.AddScoped<IManagementService, ManagementService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
 #endregion
 
 var app = builder.Build();

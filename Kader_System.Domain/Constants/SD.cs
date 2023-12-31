@@ -164,6 +164,24 @@ public static class SD
             public const string GetAllowanceById = "allowance/getById/{id}";
             public const string DeleteAllowance = "allowance/delete/{id}";
         }
+        public class Management
+        {
+            public const string ListOfManagements = "management/getListOfManagements";
+            public const string GetAllManagements = "management/getAll";
+            public const string CreateManagement = "management/create";
+            public const string UpdateManagement = "management/update/{id}";
+            public const string GetManagementById = "management/getById/{id}";
+            public const string DeleteManagement = "management/delete/{id}";
+        }
+        public class Department
+        {
+            public const string ListOfDepartments = "department/getListOfDepartments";
+            public const string GetAllDepartments = "department/getAll";
+            public const string CreateDepartment = "department/create";
+            public const string UpdateDepartment = "department/update/{id}";
+            public const string GetDepartmentById = "department/getById/{id}";
+            public const string DeleteDepartment = "department/delete/{id}";
+        }
         public class Benefit
         {
             public const string ListOfBenefits = "benefit/getListOfBenefits";
@@ -324,6 +342,7 @@ public static class SD
         public const string Email_Password_Incorrect = "Email_Password_Incorrect";
         public const string UserDataIsIncorrect = "UserDataIsIncorrect";
         public const string Company = "Company";
+        public const string Management = "Management";
         public const string Allowance = "Allowance";
         public const string Benefit = "Benefit";
         public const string Qualification = "Qualification";
@@ -449,6 +468,7 @@ public static class SD
         public const string NameInArabic = "Name in Arabic";
         public const string NameInEnglish = "Name in English";
         public const string CompanyOwner = "Company owner";
+        public const string ManagementId = "Management ID";
         public const string PersonalEmail = "Personal Email";
         public const string PhoneNumber = "Phone number";
         public const string HireDate = "Hire date";
