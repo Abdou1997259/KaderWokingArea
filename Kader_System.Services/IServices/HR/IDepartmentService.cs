@@ -2,11 +2,11 @@
 
 public interface IDepartmentService
 {
-    Task<Response<IEnumerable<StSelectListForMainScreenCategoryResponse>>> ListOfMainScreensCategoriesAsync(string lang);
-    Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model);
-    Task<Response<StCreateMainScreenCategoryRequest>> CreateMainScreenCategoryAsync(StCreateMainScreenCategoryRequest model);
-    Task<Response<StGetMainScreenCategoryByIdResponse>> GetMainScreenCategoryByIdAsync(int id);
-    Task<Response<StUpdateMainScreenCategoryRequest>> UpdateMainScreenCategoryAsync(int id, StUpdateMainScreenCategoryRequest model);
-    Task<Response<string>> UpdateActiveOrNotMainScreenCategoryAsync(int id);
-    Task<Response<string>> DeleteMainScreenCategoryAsync(int id);
+    Task<Response<IEnumerable<ListOfDepartmentsResponse>>> ListOfDepartmentsAsync(string lang);
+    Task<Response<GetAllDepartmentsResponse>> GetAllDepartmentsAsync(string lang, GetAllFiltrationsForDepartmentsRequest model);
+    Task<Response<CreateDepartmentRequest>> CreateDepartmentAsync(CreateDepartmentRequest model);
+    Task<Response<GetDepartmentByIdResponse>> GetDepartmentByIdAsync(int id, string lang);
+    Task<Response<CreateDepartmentRequest>> UpdateDepartmentAsync(int id, CreateDepartmentRequest model);
+    Task<Response<string>> UpdateActiveOrNotDepartmentAsync(int id);
+    Task<Response<string>> DeleteDepartmentAsync(int id);
 }
