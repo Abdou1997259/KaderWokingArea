@@ -72,6 +72,11 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
         modelBuilder.Entity<ApplicationUserLogin>().ToTable("Auth_UserLogins", "dbo");
         modelBuilder.Entity<ApplicationRoleClaim>().ToTable("Auth_RoleClaims", "dbo");
         modelBuilder.Entity<ApplicationUserToken>().ToTable("Auth_UserTokens", "dbo");
+        modelBuilder.Entity<HrEmployee>().Property(e => e.FullNameAr)
+            .HasComputedColumnSql("[FirstNameAr]+' '+[FatherNameAr]+' '+[GrandFatherNameAr]+' '+[FamilyNameAr]");
+        modelBuilder.Entity<HrEmployee>().Property(e => e.FullNameEn)
+            .HasComputedColumnSql("[FirstNameEn]+' '+[FatherNameEn]+' '+[GrandFatherNameEn]+' '+[FamilyNameEn]");
+      
 
         #region Fluent Api
 
