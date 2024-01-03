@@ -345,7 +345,7 @@ namespace Kader_System.Services.Services.HR
                 };
             }
 
-            var vacationIsUsed = await unitOfWork.Employees.AnyAsync(e => e.Vacation_id == id);
+            var vacationIsUsed = await unitOfWork.Employees.AnyAsync(e => e.VacationId == id);
             if (vacationIsUsed)
             {
                 string resultMsg = string.Format(sharLocalizer[Localization.Used],

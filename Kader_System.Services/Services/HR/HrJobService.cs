@@ -186,7 +186,7 @@
                     Msg = resultMsg
                 };
             }
-            Expression<Func<HrEmployee, bool>> filter = x => x.Job_id==id;
+            Expression<Func<HrEmployee, bool>> filter = x => x.JobId==id;
             var isUsed = await unitOfWork.Employees.GetFirstOrDefaultAsync(filter);
             if (isUsed == null)
             {

@@ -58,7 +58,7 @@
                         CompanyId = x.CompanyId,
                         ManagerId = x.ManagerId,
                         CompanyName = lang == Localization.Arabic ? x.Company.NameAr : x.Company.NameEn,
-                        ManagerName = lang == Localization.Arabic ? x.Manager.Employee_name_ar : x.Manager.Employee_name_en
+                        ManagerName = lang == Localization.Arabic ? x.Manager.FullNameAr : x.Manager.FullNameEn
                     }, orderBy: x =>
                         x.OrderByDescending(x => x.Id))).ToList()
             };
@@ -114,7 +114,7 @@
                     CompanyId = obj.CompanyId,
                     ManagerId = obj.ManagerId,
                     CompanyName = lang == Localization.Arabic ? obj.Company.NameAr : obj.Company.NameEn,
-                    ManagerName = lang == Localization.Arabic ? obj.Manager?.Employee_name_ar : obj.Manager?.Employee_name_en
+                    ManagerName = lang == Localization.Arabic ? obj.Manager?.FullNameAr : obj.Manager?.FullNameEn
                 },
                 Check = true
             };
