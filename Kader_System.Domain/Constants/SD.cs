@@ -8,11 +8,12 @@ public static class SD
         public const string SettingFilesPath = "/wwwroot/Files/Setting/";
         public const string SettingAudiosPath = "/wwwroot/Audios/Setting/";
         public const string SettingVideosPath = "/wwwroot/Videos/Setting/";
-
+        public const string EmployeeImagesPath = "/wwwroot/Images/HR/Employees/";
         public const string HRImagesPath = "/wwwroot/Images/HR/";
         public const string HRFilesPath = "/wwwroot/Files/HR/";
         public const string HRAudiosPath = "/wwwroot/Audios/HR/";
         public const string HRVideosPath = "/wwwroot/Videos/HR/";
+
     }
     public static class ReadRootPath
     {
@@ -20,6 +21,7 @@ public static class SD
         public const string SettingFilesPath = "Files/Setting/";
         public const string SettingAudiosPath = "Audios/Setting/";
         public const string SettingVideosPath = "Videos/Setting/";
+        public const string EmployeeImagesPath = "Images/HR/Employees/";
 
         public const string HRImagesPath = "Images/HR/";
         public const string HRFilesPath = "Files/HR/";
@@ -201,7 +203,15 @@ public static class SD
             public const string GetDeductionById = "deduction/getById/{id}";
             public const string DeleteDeduction = "deduction/delete/{id}";
         }
-
+        public class Employee
+        {
+            public const string ListOfEmployees = "employee/getListOfEmployees";
+            public const string GetAllEmployees = "employee/getAll";
+            public const string CreateEmployee = "employee/create";
+            public const string UpdateEmployee = "employee/update/{id}";
+            public const string GetEmployeeById = "employee/getById/{id}";
+            public const string DeleteEmployee = "employee/delete/{id}";
+        }
         public class Qualification
         {
             public const string ListOfQualifications = "qualification/getListOfQualifications";
