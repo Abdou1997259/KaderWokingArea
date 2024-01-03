@@ -3,8 +3,7 @@
 [Table("Hr_Employees")]
 public class HrEmployee : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
+    [Key] public int Id { get; set; }
     public required string FirstNameAr { get; set; }
     public required string FirstNameEn { get; set; }
     public required string FatherNameAr { get; set; }
@@ -13,12 +12,30 @@ public class HrEmployee : BaseEntity
     public required string GrandFatherNameEn { get; set; }
     public required string FamilyNameAr { get; set; }
     public required string FamilyNameEn { get; set; }
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string FullNameAr => $"{FirstNameAr} {FatherNameAr} {GrandFatherNameAr} {FamilyNameAr}";
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string FullNameEn => $"{FirstNameEn} {FatherNameEn} {GrandFatherNameEn} {FamilyNameEn}";
 
-    public int MaritalStatusId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public string FullNameAr
+    {
+        get { return $"{FirstNameAr} {FatherNameAr} {GrandFatherNameAr} {FamilyNameAr}"; }
+        private set
+        {
+        }
+    }
+
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public string FullNameEn
+    {
+        get
+        {
+            return $"{FirstNameEn} {FatherNameEn} {GrandFatherNameEn} {FamilyNameEn}";
+        }
+        private set
+        {
+        }
+    }
+
+
+public int MaritalStatusId { get; set; }
     [ForeignKey(nameof(MaritalStatusId))]
     public HrMaritalStatus MaritalStatus { get; set; } = default!;
 

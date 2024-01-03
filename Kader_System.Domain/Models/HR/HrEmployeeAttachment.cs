@@ -8,7 +8,7 @@ public class HrEmployeeAttachment : BaseEntity
     public required string FileName { get; set; }
     public required string FileExtension { get; set; }
 
-    public int Employee_id { get; set; }
-    [ForeignKey(nameof(Employee_id))]
+    public int EmployeeId { get; set; }
+    [ForeignKey(nameof(EmployeeId))]
     public HrEmployee Employee { get; set; } = default!;
 }
