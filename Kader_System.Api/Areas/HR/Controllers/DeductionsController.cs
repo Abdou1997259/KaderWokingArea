@@ -3,6 +3,7 @@
 [Area(Modules.HR)]
 [ApiExplorerSettings(GroupName = Modules.HR)]
 [ApiController]
+[AllowAnonymous]
 [Route("api/v1/")]
 public class DeductionsController(IDeductionService service) : ControllerBase
 {

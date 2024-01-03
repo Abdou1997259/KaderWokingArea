@@ -1,4 +1,7 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+
 namespace Kader_System.DataAccess.Repositories;
 
 public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> where T : class
@@ -182,7 +185,7 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
         dbSet.Update(entity);
         return entity;
     }
-
+  
     public async Task<int> CountAsync(Expression<Func<T, bool>> filter = null!, string includeProperties = null!)
     {
         IQueryable<T> query = dbSet.AsNoTracking();

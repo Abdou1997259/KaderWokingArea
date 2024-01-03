@@ -211,6 +211,8 @@ builder.Services.AddScoped<IHrJobService, HrJobService>();
 builder.Services.AddScoped<IVacationService, VacationService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 
 #endregion
 

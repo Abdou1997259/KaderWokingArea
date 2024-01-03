@@ -23,7 +23,7 @@ public class VacationRepository(KaderDbContext context) : BaseRepository<HrVacat
             .GroupJoin(
                 context.Set<HrEmployee>(),
                 v => v.Id,
-                e => e.Vacation_id,
+                e => e.VacationId,
                 (v, employees) => new { Vacation = v, Employees = employees })
             .SelectMany(
                 x => x.Employees.DefaultIfEmpty(),
