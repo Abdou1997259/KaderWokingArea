@@ -2,11 +2,11 @@
 
 public interface IEmployeeService
 {
-    Task<Response<IEnumerable<StSelectListForMainScreenCategoryResponse>>> ListOfMainScreensCategoriesAsync(string lang);
-    Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model);
-    Task<Response<StCreateMainScreenCategoryRequest>> CreateMainScreenCategoryAsync(StCreateMainScreenCategoryRequest model);
-    Task<Response<StGetMainScreenCategoryByIdResponse>> GetMainScreenCategoryByIdAsync(int id);
-    Task<Response<StUpdateMainScreenCategoryRequest>> UpdateMainScreenCategoryAsync(int id, StUpdateMainScreenCategoryRequest model);
-    Task<Response<string>> UpdateActiveOrNotMainScreenCategoryAsync(int id);
-    Task<Response<string>> DeleteMainScreenCategoryAsync(int id);
+    Task<Response<IEnumerable<ListOfEmployeesResponse>>> ListOfEmployeesAsync(string lang);
+    Task<Response<GetAllEmployeesResponse>> GetAllEmployeesAsync(string lang, GetAllEmployeesFilterRequest model);
+    Task<Response<CreateEmployeeRequest>> CreateEmployeeAsync(CreateEmployeeRequest model);
+    Task<Response<GetEmployeeByIdResponse>> GetEmployeeByIdAsync(int id);
+    Task<Response<CreateEmployeeRequest>> UpdateEmployeeAsync(int id, CreateEmployeeRequest model);
+    Task<Response<string>> UpdateActiveOrNotEmployeeAsync(int id);
+    Task<Response<string>> DeleteEmployeeAsync(int id);
 }
