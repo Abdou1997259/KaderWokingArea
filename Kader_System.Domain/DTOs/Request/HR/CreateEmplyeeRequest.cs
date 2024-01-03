@@ -18,7 +18,7 @@
         public  string FamilyNameAr { get; set; }
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
         public  string FamilyNameEn { get; set; }
-
+        
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
         public int MaritalStatusId { get; set; }
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
@@ -72,8 +72,6 @@
         /// </summary>
         public string? FingerPrintCode { get; set; }
 
-        public string? EmployeeImage { get; set; }
-        public string? EmployeeImageExtension { get; set; }
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
         public int ManagementId { get; set; }
 
@@ -100,6 +98,10 @@
         public long? AccountNo { get; set; }
 
         [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length), FileExtensionValidation(FileSettings.AllowedExtension)]
+        public IFormFile? EmployeeImageFile { get; set; } = default!;
+
+        [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length),
+         FileExtensionValidation(FileSettings.AllowedExtension)]
         public IFormFileCollection? EmployeeAttachments { get; set; } = default!;
 
     }
