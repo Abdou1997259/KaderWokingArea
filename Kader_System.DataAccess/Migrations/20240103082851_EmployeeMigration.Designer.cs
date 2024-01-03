@@ -4,6 +4,7 @@ using Kader_System.DataAccesss.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kader_System.DataAccess.Migrations
 {
     [DbContext(typeof(KaderDbContext))]
-    partial class KaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240103082851_EmployeeMigration")]
+    partial class EmployeeMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,7 +214,7 @@ namespace Kader_System.DataAccess.Migrations
                         {
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5basb1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "181ebc35-bff6-47f5-b093-22591891286d",
+                            ConcurrencyStamp = "1d7e8189-2c58-4961-8dbb-62248a896c9d",
                             Email = "mohammed88@gmail.com",
                             EmailConfirmed = true,
                             IsActive = true,
@@ -219,9 +222,9 @@ namespace Kader_System.DataAccess.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "MOHAMMED88@GMAIL.COM",
                             NormalizedUserName = "MR_MOHAMMED",
-                            PasswordHash = "AQAAAAIAAYagAAAAECv+1nnWNSuZakRrXqU9FoZZDlLOFDrnEfou+APRLWJqcNKieCgAMNMBh5AH5+z2wA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAgwsEtp8VUfWdG3zejBEl/OiynFrbRe3UYXUFYlB/QCPRnvTiafWfw8qklyyZQFiQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4f5c9f7f-35d8-4f84-8e76-1d02686af434",
+                            SecurityStamp = "25f1075f-c2d5-47a1-bad8-26a28b1c9041",
                             TwoFactorEnabled = false,
                             UserName = "Mr_Mohammed",
                             VisiblePassword = "Mohammed88"
@@ -1066,18 +1069,6 @@ namespace Kader_System.DataAccess.Migrations
 
                     b.Property<double>("FixedSalary")
                         .HasColumnType("float");
-
-                    b.Property<string>("FullNameAr")
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("nvarchar(max)")
-                        .HasComputedColumnSql("[FirstNameAr]+' '+[FatherNameAr]+' '+[GrandFatherNameAr]+' '+[FamilyNameAr]");
-
-                    b.Property<string>("FullNameEn")
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("nvarchar(max)")
-                        .HasComputedColumnSql("[FirstNameEn]+' '+[FatherNameEn]+' '+[GrandFatherNameEn]+' '+[FamilyNameEn]");
 
                     b.Property<int>("GenderId")
                         .HasColumnType("int");
