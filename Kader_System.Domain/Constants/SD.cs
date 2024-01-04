@@ -156,7 +156,15 @@ public static class SD
             public const string GetCompanyById = "company/getById/{id}";
             public const string DeleteCompany = "company/delete/{id}";
         }
-
+        public class Contract
+        {
+            public const string ListOfContracts = "contract/getListOfContracts";
+            public const string GetAllContracts = "contract";
+            public const string CreateContract = "contract/create";
+            public const string UpdateContract = "contract/update/{id}";
+            public const string GetContractById = "contract/getById/{id}";
+            public const string DeleteContract = "contract/delete/{id}";
+        }
         public class Allowance
         {
             public const string ListOfAllowances = "allowance/getListOfAllowances";
@@ -317,6 +325,7 @@ public static class SD
         public const string Role = "Role";
 
         public const string Employee = "Employee";
+        public const string Contract = "Contract";
         public const string EmployeeExist = "EmployeeExist";
         public const string ThereAreNotAttachments = "ThereAreNotAttachments";
         public const string CanNotAssignAnyEmpToFindingOther = "CanNotAssignAnyEmpToFindingOther";
