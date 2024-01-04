@@ -2,11 +2,11 @@
 
 public interface IContractService
 {
-    Task<Response<IEnumerable<StSelectListForMainScreenCategoryResponse>>> ListOfMainScreensCategoriesAsync(string lang);
-    Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model);
-    Task<Response<StCreateMainScreenCategoryRequest>> CreateMainScreenCategoryAsync(StCreateMainScreenCategoryRequest model);
-    Task<Response<StGetMainScreenCategoryByIdResponse>> GetMainScreenCategoryByIdAsync(int id);
-    Task<Response<StUpdateMainScreenCategoryRequest>> UpdateMainScreenCategoryAsync(int id, StUpdateMainScreenCategoryRequest model);
-    Task<Response<string>> UpdateActiveOrNotMainScreenCategoryAsync(int id);
-    Task<Response<string>> DeleteMainScreenCategoryAsync(int id);
+    Task<Response<IEnumerable<ListOfContractsResponse>>> ListOfContractsAsync(string lang);
+    Task<Response<GetAllContractsResponse>> GetAllContractAsync(string lang, GetAlFilterationForContractRequest model);
+    Task<Response<CreateContractRequest>> CreateContractAsync(CreateContractRequest model);
+    Task<Response<GetContractByIdResponse>> GetContractByIdAsync(int id);
+    Task<Response<CreateContractRequest>> UpdateContractAsync(int id, CreateContractRequest model);
+    Task<Response<string>> UpdateActiveOrNotContractAsync(int id);
+    Task<Response<string>> DeleteContractAsync(int id);
 }
