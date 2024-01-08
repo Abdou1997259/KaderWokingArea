@@ -326,6 +326,7 @@ public static class SD
 
         public const string Employee = "Employee";
         public const string Contract = "Contract";
+        public const string ContractDetail = "ContractDetail";
         public const string EmployeeExist = "EmployeeExist";
         public const string ThereAreNotAttachments = "ThereAreNotAttachments";
         public const string CanNotAssignAnyEmpToFindingOther = "CanNotAssignAnyEmpToFindingOther";
