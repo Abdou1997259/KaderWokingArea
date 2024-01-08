@@ -18,8 +18,7 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
         int? skip = null,
         int? take = null,
         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!
-
-        ) where TType : class
+       ) where TType : class
     {
         IQueryable<T> query = dbSet.AsNoTracking();
 
@@ -30,6 +29,8 @@ public class BaseRepository<T>(KaderDbContext context) : IBaseRepository<T> wher
                 StringSplitOptions.RemoveEmptyEntries))
                 query = query.Include(includeProperty).IgnoreQueryFilters();
         }
+
+      
 
         if (filter != null)
             query = query.Where(filter);

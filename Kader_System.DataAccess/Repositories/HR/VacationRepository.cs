@@ -1,8 +1,5 @@
 ﻿
-
-
 using Kader_System.Domain.DTOs.Response.HR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Kader_System.DataAccess.Repositories.HR;
 

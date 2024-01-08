@@ -8,8 +8,7 @@
         string includeProperties = null!,
         int? skip = null,
         int? take = null,
-        Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!
-        ) where TType : class;
+        Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!) where TType : class;
 
     Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter = null!,
      Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!, Expression<Func<T, bool>> includeFilter = null!,
