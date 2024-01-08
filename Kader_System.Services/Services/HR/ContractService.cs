@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.Mvc;
+
 namespace Kader_System.Services.Services.HR
 {
     public class ContractService(
@@ -136,12 +138,35 @@ namespace Kader_System.Services.Services.HR
 
         public async Task<Response<CreateContractRequest>> CreateContractAsync(CreateContractRequest model)
         {
-            var newContract = mapper.Map<HrContract>(model);
+            var newContract = new HrContract()
+            {
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                FixedSalary = model.FixedSalary,
+                EmployeeId = model.EmployeeId,
+                HousingAllowance = model.HousingAllowance,
+
+
+            };
+            if (model.Details != null)
+            {
+                newContract.ListOfAllowancesDetails =
+
+                    model.Details.Select(d => new HrContractAllowancesDetail()
+                    {
+                        AllowanceId = d.AllowanceId,
+                        Value = d.Value,
+                        IsPercent = d.IsPercent
+                    }).ToList()
+
+                ;
+            }
+
             GetFileNameAndExtension contractFile = new();
             if (!string.IsNullOrEmpty(model.ContractFile))
             {
 
-                contractFile = ManageFilesHelper.UploadFile(model.ContractFile, GoRootPath.HRFilesPath);
+                contractFile = ManageFilesHelper.SaveBase64StringToFile(model.ContractFile, GoRootPath.HRFilesPath, model.FileName);
             }
 
             newContract.FileName = contractFile?.FileName;
@@ -167,124 +192,133 @@ namespace Kader_System.Services.Services.HR
 
         public async Task<Response<CreateContractRequest>> UpdateContractAsync(int id, CreateContractRequest model)
         {
-            Expression<Func<HrContract, bool>> filter = x => x.IsDeleted == false && x.Id == id;
-            var obj = await unitOfWork.Contracts.GetFirstOrDefaultAsync(filter,
-                includeProperties: $"{nameof(_instanceContract.ListOfAllowancesDetails)}");
-            if (obj is null)
+            using var transaction = unitOfWork.BeginTransaction();
             {
-                string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
-                    shareLocalizer[Localization.Contract]);
+               
+                var obj = await unitOfWork.Contracts.GetByIdAsync(id);
+                if (obj is null)
+                {
+                    string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
+                        shareLocalizer[Localization.Contract]);
+                    return new()
+                    {
+                        Check = false,
+                        Data = model,
+                        Error = resultMsg,
+                        Msg = resultMsg
+                    };
+                }
+
+                if (!string.IsNullOrEmpty(obj.FileName))
+                {
+                    ManageFilesHelper.RemoveFile(Path.Combine(GoRootPath.HRFilesPath, obj.FileName));
+                }
+
+                obj.EmployeeId = model.EmployeeId;
+                obj.EndDate = model.EndDate;
+                obj.StartDate = model.StartDate;
+                obj.TotalSalary = model.TotalSalary;
+                obj.FixedSalary = model.FixedSalary;
+                obj.HousingAllowance = model.HousingAllowance;
+
+
+                var lstNewInserted = model.Details?.Where(d => d.Status == RowStatus.Inserted).ToList();
+                var lstUpdatedDetails = model.Details?.Where(d => d.Status == RowStatus.Updated).ToList();
+                var lstDeletedDetails = model.Details?.Where(d => d.Status == RowStatus.Deleted).ToList();
+                //Deleted Items
+                if (lstDeletedDetails != null && lstDeletedDetails.Any())
+                {
+                    foreach (var deletedRow in lstDeletedDetails)
+                    {
+                        var existObj = await unitOfWork.ContractAllowancesDetails.GetByIdAsync(deletedRow.Id);
+                        if (existObj != null)
+                        {
+                            unitOfWork.ContractAllowancesDetails.Remove(existObj);
+                        }
+                        else
+                        {
+                            return new()
+                            {
+                                Msg = $"Contract Detail with Id:{deletedRow.Id} Can not be found !!!!",
+                                Check = false,
+                                Data = model
+                            };
+                        }
+                    }
+                }
+                //New Details Inserted
+                if (lstNewInserted != null && lstNewInserted.Any())
+                {
+                    foreach (var newItem in lstNewInserted)
+                    {
+                        await unitOfWork.ContractAllowancesDetails.AddAsync(new HrContractAllowancesDetail()
+                        {
+                            AllowanceId = newItem.AllowanceId,
+                            Value = newItem.Value,
+                            ContractId = id,
+                            IsPercent = newItem.IsPercent
+                        });
+                    }
+                }
+                if (lstUpdatedDetails != null && lstUpdatedDetails.Any())
+                {
+                    foreach (var updateItem in lstUpdatedDetails)
+                    {
+                        var existObj = await unitOfWork.ContractAllowancesDetails.GetByIdAsync(updateItem.Id);
+                        if (existObj != null)
+                        {
+                            existObj.AllowanceId = updateItem.AllowanceId;
+                            existObj.IsPercent = updateItem.IsPercent;
+                            existObj.Value = updateItem.Value;
+                            existObj.ContractId = id;
+                            unitOfWork.ContractAllowancesDetails.Update(existObj);
+                        }
+                        else
+                        {
+                            return new()
+                            {
+                                Msg = $"Contract Detail with Id:{updateItem.Id} Can not be found to Update It !!!!",
+                                Check = false,
+                                Data = model
+                            };
+                        }
+                    }
+                }
+
+                GetFileNameAndExtension contractFile = new();
+                if (model.ContractFile is not null)
+                {
+
+                    if (model.ContractFile != null)
+                    {
+                        contractFile = ManageFilesHelper.SaveBase64StringToFile(model.ContractFile, GoRootPath.HRFilesPath, model.FileName);
+                    }
+
+                }
+
+                obj.FileName = contractFile?.FileName;
+                obj.FileExtension = contractFile?.FileExtension;
+                unitOfWork.Contracts.Update(obj);
+                await unitOfWork.CompleteAsync();
+                transaction.Commit();
                 return new()
                 {
-                    Check = false,
-                    Data = model,
-                    Error = resultMsg,
-                    Msg = resultMsg
+                    Msg = string.Format(shareLocalizer[Localization.Done],
+                        shareLocalizer[Localization.Contract]),
+                    Check = true,
+                    Data = model
                 };
             }
-
-            if (!string.IsNullOrEmpty(obj.FileName))
-            {
-                ManageFilesHelper.RemoveFile(Path.Combine(GoRootPath.HRFilesPath, obj.FileName));
-            }
-
-            obj.EmployeeId = model.EmployeeId;
-            obj.EndDate = model.EndDate;
-            obj.StartDate = model.StartDate;
-            obj.TotalSalary = model.TotalSalary;
-            obj.FixedSalary = model.FixedSalary;
-            obj.HousingAllowance = model.HousingAllowance;
-
-
-            var oldDetails = obj.ListOfAllowancesDetails;
-            var newDetails = model.Details;
-
-            int[] oldIds = oldDetails.Select(c => c.Id).ToArray();
-            int[] newIds = newDetails.Select(c => c.Id).ToArray();
-
-            //New Details Inserted
-            if (newDetails.Any(d => d.Id == 0))
-            {
-                foreach (var newItem in newDetails.Where(d => d.Id == 0))
-                {
-                    await unitOfWork.ContractAllowancesDetails.AddAsync(new()
-                    {
-                        AllowanceId = newItem.AllowanceId,
-                        Value = newItem.Value,
-                        IsPercent = newItem.IsPercent,
-                        ContractId = id
-                    });
-                }
-
-            }
-
-            //New Details Inserted
-            if (newDetails.Any(d => d.Id > 0))
-            {
-                foreach (var updatedItem in newDetails.Where(d => d.Id > 0))
-                {
-
-                    var oldObj = await unitOfWork.ContractAllowancesDetails.GetByIdAsync(updatedItem.Id);
-                    if (oldObj != null)
-                    {
-                        oldObj.AllowanceId = updatedItem.AllowanceId;
-                        oldObj.Value = updatedItem.Value;
-                        oldObj.IsPercent = updatedItem.IsPercent;
-                        oldObj.ContractId = id;
-                        unitOfWork.ContractAllowancesDetails.Update(oldObj);
-                    }
-                }
-            }
-
-            //Deleted Items
-            var deletedIds = oldIds.Except(newIds);
-            if (deletedIds.Any())
-            {
-                foreach (var deletedItem in deletedIds)
-                {
-                    var existItem
-                        = await unitOfWork.ContractAllowancesDetails.GetByIdAsync(deletedItem);
-                    if (existItem != null)
-                    {
-                        unitOfWork.ContractAllowancesDetails.Remove(existItem);
-                    }
-                }
-            }
-
-            GetFileNameAndExtension contractFile = new();
-            if (model.ContractFile is not null)
-            {
-
-                if (model.ContractFile != null)
-                {
-                    contractFile = ManageFilesHelper.UploadFile(model.ContractFile, GoRootPath.HRFilesPath);
-                }
-
-            }
-
-            obj.FileName = contractFile?.FileName;
-            obj.FileExtension = contractFile?.FileExtension;
-            unitOfWork.Contracts.Update(obj);
-            await unitOfWork.CompleteAsync();
-
-            return new()
-            {
-                Msg = string.Format(shareLocalizer[Localization.Done],
-                    shareLocalizer[Localization.Contract]),
-                Check = true,
-                Data = model
-            };
-
+           
 
         }
 
         public async Task<Response<string>> DeleteContractAsync(int id)
         {
-           using  var transaction = unitOfWork.BeginTransaction(); 
+            using var transaction = unitOfWork.BeginTransaction();
             try
             {
-                var contractExist = await unitOfWork.Contracts.GetFirstOrDefaultAsync(c => c.Id == id,
-                    $"{_instanceContract.ListOfAllowancesDetails}");
+                var contractExist = await unitOfWork.Contracts.GetByIdAsync(id);
                 if (contractExist is null)
                 {
                     string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
@@ -307,6 +341,7 @@ namespace Kader_System.Services.Services.HR
                 if (contractDetails.Any())
                 {
                     unitOfWork.ContractAllowancesDetails.RemoveRange(contractDetails);
+                    await unitOfWork.CompleteAsync();
                 }
 
                 unitOfWork.Contracts.Remove(contractExist);
@@ -328,6 +363,7 @@ namespace Kader_System.Services.Services.HR
                     Check = true,
                     Data = string.Empty,
                     Error = string.Empty,
+                    Msg = e.Message
 
                 };
 
