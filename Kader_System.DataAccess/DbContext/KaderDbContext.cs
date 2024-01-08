@@ -76,8 +76,13 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
             .HasComputedColumnSql("[FirstNameAr]+' '+[FatherNameAr]+' '+[GrandFatherNameAr]+' '+[FamilyNameAr]");
         modelBuilder.Entity<HrEmployee>().Property(e => e.FullNameEn)
             .HasComputedColumnSql("[FirstNameEn]+' '+[FatherNameEn]+' '+[GrandFatherNameEn]+' '+[FamilyNameEn]");
-      
 
+        modelBuilder.Entity<HrContract>()
+            .HasMany(contract => contract.ListOfAllowancesDetails)
+            .WithOne(detail => detail.Contract)
+            .HasForeignKey(detail => detail.ContractId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
         #region Fluent Api
 
         //modelBuilder.Entity<HrEmployee>()
