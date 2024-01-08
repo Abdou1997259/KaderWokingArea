@@ -1,6 +1,8 @@
-﻿namespace Kader_System.Domain.Extensions;
+﻿using System.IO;
 
-public static class ManageFilesHelper 
+namespace Kader_System.Domain.Extensions;
+
+public static class ManageFilesHelper
 {
     public static GetFileNameAndExtension UploadFile(IFormFile file, string path)
     {
@@ -37,12 +39,83 @@ public static class ManageFilesHelper
         }
         return list;
     }
+    public static GetFileNameAndExtension SaveBase64StringToFile(string base64String, string filePath,string fileName)
+    {
+        try
+        {
+            string createdFileName = Guid.NewGuid() +"_"+ fileName;
+            string finalFilePath = Path.Combine(Directory.GetCurrentDirectory()+ filePath, createdFileName);
+            // Convert Base64 string to byte array
+            byte[] fileBytes = Convert.FromBase64String(base64String);
+            if (Directory.Exists(Directory.GetCurrentDirectory()+filePath))
+            {
+                // Save byte array to a file
+                File.WriteAllBytes(finalFilePath, fileBytes);
 
+                return new GetFileNameAndExtension
+                {
+                    FileName = createdFileName,
+                    FileExtension = GetFileExtension(fileBytes)
+                };
+            }
+
+            return null;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving file: {ex.Message}");
+            throw new Exception($"Error saving file: {ex.Message}");
+        }
+    }
+
+    static string GetFileExtension(byte[] bytes)
+    {
+        // Check if the file has enough bytes to identify its signature
+        if (bytes.Length < 8)
+        {
+            return "Unknown";
+        }
+
+        // Extract the first 8 bytes (file signature) as a hexadecimal string
+        string hexSignature = BitConverter.ToString(bytes.Take(8).ToArray()).Replace("-", "");
+
+        // Map file signatures to file extensions
+        switch (hexSignature)
+        {
+            case "89504E470D0A1A0A": // PNG
+                return ".png";
+            case "474946383961": // GIF
+            case "474946383761": // GIF
+                return ".gif";
+            case "25504446": // PDF
+                return ".pdf";
+            case "FFD8FFE0": // JPEG
+            case "FFD8FFE1": // JPEG
+                return ".jpeg";
+            case "504B0304": // ZIP
+                return ".zip";
+           
+            case "504B030414000600": // Microsoft Office Open XML Format (DOCX)
+                return ".docx";
+            case "504B030414000800": // Microsoft Office Open XML Format (XLSX)
+                return ".xlsx";
+            case "504B030414000200": // Microsoft Office Open XML Format (PPTX)
+                return ".pptx";
+            case "1F8B08": // GZIP
+                return ".gz";
+            // Add more cases for other file types as needed
+            // ...
+
+            default:
+                return "Unknown";
+        }
+    }
     public static void RemoveFile(string file)
     {
         file = Directory.GetCurrentDirectory() + file;
-            if (File.Exists(file))
-                File.Delete(file);
+        if (File.Exists(file))
+            File.Delete(file);
     }
 
     public static void RemoveFiles(List<string> files)
@@ -55,7 +128,32 @@ public static class ManageFilesHelper
                 File.Delete(fullPath);
         }
     }
+    public static string ConvertFileToBase64(string file)
+    {
+        try
+        {
+            string fullPath = Path.Combine(Directory.GetCurrentDirectory(), file);
+            if (File.Exists(fullPath))
+            {
 
+                // Read the file content as a byte array
+                byte[] fileBytes = File.ReadAllBytes(fullPath);
+
+                // Convert the byte array to a Base64 string
+                string base64String = Convert.ToBase64String(fileBytes);
+
+                return base64String;
+            }
+
+            return "";
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error converting file to Base64: {ex.Message}");
+            return null;
+        }
+    }
     //public static List<GetFileNameAndExtension> UploadFiles(IFormFileCollection files, string path)
     //{
     //    List<GetFileNameAndExtension> list = new();
