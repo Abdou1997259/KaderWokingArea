@@ -31,5 +31,20 @@ public class HrProfile : Profile
 
 
         #endregion
+
+
+        #region Contract
+        CreateMap<HrContract,CreateContractRequest>()
+            .ForMember(dest => dest.Details, opt => opt.MapFrom(src => src.ListOfAllowancesDetails.Select(d => new CreateContractDetailsRequest
+            {
+                AllowanceId = d.AllowanceId,
+                Value = d.Value,
+                IsPercent = d.IsPercent,
+                Id = d.Id
+            }).ToList()))
+            .ReverseMap();
+
+
+        #endregion
     }
 }
