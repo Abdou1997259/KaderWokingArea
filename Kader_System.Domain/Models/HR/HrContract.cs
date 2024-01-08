@@ -10,8 +10,8 @@ public class HrContract : BaseEntity
     public double HousingAllowance { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public required string FileName { get; set; }
-    public required string FileExtension { get; set; }
+    public  string FileName { get; set; }
+    public  string FileExtension { get; set; }
 
     public int EmployeeId { get; set; }
     [ForeignKey(nameof(EmployeeId))]
