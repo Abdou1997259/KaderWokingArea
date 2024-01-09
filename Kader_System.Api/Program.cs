@@ -158,11 +158,12 @@ builder.Services.AddSwaggerGen(x =>
     x.AddSecurityDefinition(Modules.Bearer, new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
-        Description = "Please insert JWT with Bearer into field",
+        Description = "Please insert JWT with Bearer into field Like => Bearer yourToken....",
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
         Scheme = Modules.Bearer,
         BearerFormat = "Bearer",
+        
     });
     x.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
