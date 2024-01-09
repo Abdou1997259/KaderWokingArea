@@ -16,7 +16,7 @@ public class PermissionPolicyProviderService(IOptions<AuthorizationOptions> opti
         {
             var policy = new AuthorizationPolicyBuilder();
             policy.AddRequirements(new PermissionRequirementService(policyName));
-            return Task.FromResult(policy.Build())!;
+            return Task.FromResult(policy.Build());
         }
         else if (policyName.Equals(RequestClaims.DomainRestricted))
         {
