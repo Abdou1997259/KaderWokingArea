@@ -102,13 +102,17 @@ public class AuthService : IAuthService
             Email = user.Email!,
             RoleNames = currentUserRoles,
             Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            ExpiresOn = jwtSecurityToken.ValidTo
+            ExpiresOn = jwtSecurityToken.ValidTo,
+            
         };
 
         return new Response<AuthLoginUserResponse>
         {
+            IsActive = true,
             Check = true,
-            Data = result
+            Data = result,
+            Error = string.Empty,
+            Msg = string.Empty
         };
     }
 
