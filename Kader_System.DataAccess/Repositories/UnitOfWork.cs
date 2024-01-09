@@ -7,6 +7,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IUserRepository Users { get; private set; }
     public IRoleClaimRepository RoleClaims { get; private set; }
+    public IUserClaimRepository UserClaims { get; private set; }
     public IRoleRepository Roles { get; private set; }
     public IUserRoleRepository UserRoles { get; private set; }
     public IUserDeviceRepository UserDevices { get; private set; }
@@ -59,7 +60,7 @@ public class UnitOfWork : IUnitOfWork
         UserDevices = new UserDeviceRepository(_context);
         Roles = new RoleRepository(_context);
         UserRoles = new UserRoleRepository(_context);
-
+        UserClaims=new UserClaimRepository(_context);
         SubMainScreens = new SubMainScreenRepository(_context);
         SubMainScreenActions = new SubMainScreenActionRepository(_context);
         MainScreens = new MainScreenRepository(_context);

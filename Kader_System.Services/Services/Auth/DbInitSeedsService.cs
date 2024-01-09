@@ -32,6 +32,13 @@ public class DbInitSeedsService(RoleManager<ApplicationRole> roleManager, IUnitO
                     ClaimType = RequestClaims.RolePermission,
                     ClaimValue = roleClaim.ClaimValue
                 });
+                await _unitOfWork.UserClaims.AddAsync(new ApplicationUserClaim()
+                {
+                    UserId = SuperAdmin.Id,
+                    ClaimType = RequestClaims.RolePermission,
+                    ClaimValue = roleClaim.ClaimValue
+                });
+
                 await _unitOfWork.CompleteAsync();
             }
     }

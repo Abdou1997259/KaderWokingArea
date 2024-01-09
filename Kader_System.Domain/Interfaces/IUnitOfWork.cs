@@ -6,6 +6,7 @@ public interface IUnitOfWork : IDisposable
 
     IUserRepository Users { get; }
     IRoleClaimRepository RoleClaims { get; }
+    IUserClaimRepository UserClaims { get; }
     IUserDeviceRepository UserDevices { get; }
     IRoleRepository Roles { get; }
     IUserRoleRepository UserRoles { get; }
