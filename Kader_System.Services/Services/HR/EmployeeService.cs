@@ -149,7 +149,7 @@ namespace Kader_System.Services.Services.HR
                         MaritalStatus = lang == Localization.Arabic ? x.MaritalStatus!.Name : x.MaritalStatus!.NameInEnglish,
                         Nationality = lang == Localization.Arabic ? x.Nationality!.Name : x.Nationality!.NameInEnglish,
                         Department = lang == Localization.Arabic ? x.Department!.NameAr : x.Department!.NameEn,
-                        FingerPrint = lang == Localization.Arabic ? x.FingerPrint!.Name_ar : x.FingerPrint!.Name_en,
+                        FingerPrint = lang == Localization.Arabic ? x.FingerPrint!.NameAr : x.FingerPrint!.NameEn,
                         BirthDate = x.BirthDate,
                         ChildrenNumber = x.ChildrenNumber,
                         Email = x.Email,
