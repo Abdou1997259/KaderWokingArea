@@ -46,5 +46,19 @@ public class HrProfile : Profile
 
 
         #endregion
+
+
+        #region FingerPrintDevice
+
+        CreateMap<HrFingerPrint, CreateFingerPrintDeviceRequest>()
+            .IgnoreAllPropertiesWithAnInaccessibleSetter()
+            .ReverseMap();
+  
+        CreateMap<HrFingerPrint, GetFingerPrintDeviceByIdResponse>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Company!.NameAr))
+            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.Company!.Id))
+            .IgnoreAllPropertiesWithAnInaccessibleSetter()
+            .ReverseMap();
+        #endregion
     }
 }
