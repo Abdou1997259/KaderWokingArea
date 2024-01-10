@@ -220,6 +220,15 @@ public static class SD
             public const string GetEmployeeById = "employee/getById/{id}";
             public const string DeleteEmployee = "employee/delete/{id}";
         }
+        public class FingerPrint
+        {
+            public const string ListOfFingerPrintDevices = "fingerPrint/getListOfFingerPrintDevices";
+            public const string GetAllFingerPrintDevices = "fingerPrint/getAll";
+            public const string CreateFingerPrintDevice = "fingerPrint/create";
+            public const string UpdateFingerPrintDevice = "fingerPrint/update/{id}";
+            public const string GetFingerPrintDeviceById = "fingerPrint/getById/{id}";
+            public const string DeleteFingerPrintDevice = "fingerPrint/delete/{id}";
+        }
         public class Qualification
         {
             public const string ListOfQualifications = "qualification/getListOfQualifications";
@@ -386,7 +395,7 @@ public static class SD
         public const string CompletionStatus = "CompletionStatus";
         public const string ClientNotes = "ClientNotes";
         public const string ClientProcedure = "ClientProcedure";
-
+        public const string FingerPrintDevice = "FingerPrintDevice";
         public const string ReceiptVoucher = "ReceiptVoucher";
         public const string PaymentVoucher = "PaymentVoucher";
         public const string Treasury = "Treasury";
