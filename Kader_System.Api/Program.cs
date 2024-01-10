@@ -214,7 +214,7 @@ builder.Services.AddScoped<IManagementService, ManagementService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IContractService, ContractService>();
-
+builder.Services.AddScoped<IFingerPrintDeviceService, FingerPrintDeviceService>();
 
 #endregion
 
