@@ -84,6 +84,16 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
         #region Fluent Api
+        modelBuilder.Entity<HrManagement>()
+            .HasOne(m => m.Manager)
+            .WithOne(e => e.Management)
+            .HasForeignKey<HrManagement>(m => m.ManagerId);
+
+
+        modelBuilder.Entity<HrDepartment>()
+            .HasOne(d => d.Manager)
+            .WithOne(e => e.Department)
+            .HasForeignKey<HrEmployee>(e => e.DepartmentId);
 
         //modelBuilder.Entity<HrEmployee>()
         //    .HasOne(x => x.User)

@@ -93,11 +93,11 @@ public int MaritalStatusId { get; set; }
     public string? EmployeeImageExtension { get; set; }
 
     public int ManagementId { get; set; }
-    [ForeignKey(nameof(ManagementId))]
+    //[ForeignKey(nameof(ManagementId))]
     public HrManagement Management { get; set; } = default!;
 
     public int DepartmentId { get; set; }
-    [ForeignKey(nameof(DepartmentId))]
+    //[ForeignKey(nameof(DepartmentId))]
     public HrDepartment Department { get; set; } = default!;
 
     public int NationalityId { get; set; }
