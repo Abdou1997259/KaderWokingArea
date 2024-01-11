@@ -1,7 +1,7 @@
 ﻿namespace Kader_System.Api.Areas.HR.Controllers
 {
     [Area(Modules.HR)]
-    [AllowAnonymous]
+    [Authorize(Permissions.HR.View)]
     [ApiExplorerSettings(GroupName = Modules.HR)]
     [ApiController]
     [Route("api/v1/")]

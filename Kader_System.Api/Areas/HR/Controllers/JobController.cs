@@ -1,15 +1,10 @@
-﻿using Kader_System.Domain.DTOs.Request.HR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-
-namespace Kader_System.Api.Areas.HR.Controllers
+﻿namespace Kader_System.Api.Areas.HR.Controllers
 {
     [Area(Modules.HR)]
     [ApiExplorerSettings(GroupName = Modules.HR)]
     [Route("api/v1/")]
     [ApiController]
-    [AllowAnonymous]
+    [Authorize(Permissions.HR.View)]
     public class JobController(IHrJobService jobService) : ControllerBase
     {
         #region Retreive

@@ -1,11 +1,9 @@
-﻿using Kader_System.DataAccess.Repositories;
-
-namespace Kader_System.Api.Areas.HR.Controllers
+﻿namespace Kader_System.Api.Areas.HR.Controllers
 {
     [Area(Modules.HR)]
     [ApiExplorerSettings(GroupName = Modules.HR)]
     [ApiController]
-    [AllowAnonymous]
+    [Authorize(Permissions.HR.View)]
     [Route("api/v1/")]
     public class EmployeesController(IEmployeeService employeeService) : ControllerBase
     {

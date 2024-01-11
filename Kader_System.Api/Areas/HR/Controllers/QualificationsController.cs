@@ -3,7 +3,7 @@
 [Area(Modules.HR)]
 [ApiExplorerSettings(GroupName = Modules.HR)]
 [ApiController]
-[AllowAnonymous]
+[Authorize(Permissions.HR.View)]
 [Route("api/v1/")]
 public class QualificationsController(IQualificationService service) : ControllerBase
 {

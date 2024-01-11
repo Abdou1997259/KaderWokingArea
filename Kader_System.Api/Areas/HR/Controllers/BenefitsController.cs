@@ -4,7 +4,7 @@
 [ApiExplorerSettings(GroupName = Modules.HR)]
 [ApiController]
 [Route("api/v1/")]
-[AllowAnonymous]
+[Authorize(Permissions.HR.View)]
 public class BenefitsController(IBenefitService service) : ControllerBase
 {
     #region Retrieve

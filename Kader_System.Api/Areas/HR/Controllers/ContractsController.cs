@@ -3,8 +3,8 @@
     [Area(Modules.HR)]
     [ApiExplorerSettings(GroupName = Modules.HR)]
     [ApiController]
+    [Authorize(Permissions.HR.View)]
     [Route("api/v1/")]
-    [AllowAnonymous]
     public class ContractsController(IContractService contractService) : ControllerBase
     {
         [HttpGet(ApiRoutes.Contract.ListOfContracts)]
