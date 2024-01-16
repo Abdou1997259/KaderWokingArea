@@ -19,10 +19,11 @@
  using System.Text;
  using Kader_System.Services.Services.Setting;
  using Kader_System.Services.Services.HR;
- 
+ using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
+
  var builder = WebApplication.CreateBuilder(args);
- 
- var config = new ConfigurationBuilder()
+var config = new ConfigurationBuilder()
                  .AddJsonFile("appsettings.json")
                  .Build();
  
@@ -42,13 +43,12 @@
              .AllowAnyMethod()
              .AllowAnyHeader());
  });
- 
  builder.Services.AddControllers();
  builder.Services.AddEndpointsApiExplorer();
  builder.Services.AddSwaggerGen();
  builder.Services.AddAutoMapper(typeof(Program).Assembly);
- 
- builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
  {
      options.SignIn.RequireConfirmedAccount = true;
      options.User.RequireUniqueEmail = false;
@@ -58,13 +58,14 @@
      options.Password.RequireUppercase = false;
      options.Password.RequiredLength = 6;
  }).AddEntityFrameworkStores<KaderDbContext>();
- builder.Services.AddControllersWithViews().AddJsonOptions(x =>
+
+builder.Services.AddControllersWithViews().AddJsonOptions(x =>
                  x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
- 
- builder.Services.AddDbContext<KaderDbContext>(options =>
+
+builder.Services.AddDbContext<KaderDbContext>(options =>
      options.UseSqlServer(builder.Configuration.GetConnectionString(Shared.KaderSystemConnection),
      b => b.MigrationsAssembly(typeof(KaderDbContext).Assembly.FullName)));
- 
+
  #region JWT config
  
  builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(Shared.JwtSettings));
@@ -113,10 +114,10 @@
  {
      options.ValidationInterval = TimeSpan.Zero;
  });
- 
- #endregion
- 
- #region Localization config
+
+#endregion
+
+#region Localization config
 
 builder.Services.AddLocalization(options => options.ResourcesPath = Shared.Resources);
 
@@ -185,9 +186,9 @@ builder.Services.AddSwaggerGen(x =>
 });
 
 
-#endregion 
- 
- #region DI
+#endregion
+
+#region DI
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandlerService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProviderService>();
@@ -217,18 +218,50 @@ builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IFingerPrintDeviceService, FingerPrintDeviceService>();
 
 #endregion
+var httpPort = builder.Configuration.GetValue<int>("KestrelServer:Http.Port");
+var httpsPort = builder.Configuration.GetValue<int>("KestrelServer:Https.Port");
+var httpsCertificateFilePath = builder.Configuration.GetValue<string>("KestrelServer:Https.CertificationFilePath");
+var httpsCertificatePassword = builder.Configuration.GetValue<string>("KestrelServer:Https.CertificationPassword");
+builder.WebHost.UseIIS();
+builder.WebHost.UseIISIntegration();
+ 
+////Support Self-Host by Kestrel Server
+//builder.WebHost.UseKestrel(kestrelServerOptions =>
+//{
+//    if (string.IsNullOrEmpty(httpsCertificateFilePath) || string.IsNullOrEmpty(httpsCertificatePassword))
+//    {
+//        //if no certification then no ssl then run use http
+//        kestrelServerOptions.Limits.MaxConcurrentConnections = 100;
+//        kestrelServerOptions.Limits.MaxConcurrentUpgradedConnections = 100;
+//        kestrelServerOptions.Limits.MaxRequestBodySize = 10 * 1024;
+//        kestrelServerOptions.Limits.MinRequestBodyDataRate =
+//            new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+//        kestrelServerOptions.Limits.MinResponseDataRate =
+//            new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+//        kestrelServerOptions.ListenAnyIP(httpPort);
 
+//    }
+//    else
+//{
+//    //if exist certificate then run as HTTPS
+//    kestrelServerOptions.ListenAnyIP(httpsPort, (listenOptions) =>
+//    {
+//        listenOptions.UseHttps(httpsCertificateFilePath, httpsCertificatePassword);
+//    });
+//}
+
+//});
 var app = builder.Build();
- 
- # region To take an instance from specific repository
- 
- var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+#region To take an instance from specific repository
+
+var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
  using var scope = scopedFactory!.CreateScope();
  ILoggingRepository loggingRepository = scope.ServiceProvider.GetService<ILoggingRepository>()!;
- 
- #endregion
- 
- #region Seed cliams
+
+#endregion
+
+#region Seed cliams
 
 try
 {
@@ -249,19 +282,22 @@ static async void SeedData(IHost app) //can be placed at the very bottom under a
     await dbInitializer!.SeedClaimsForSuperAdmin();
 }
 #endregion
- 
- // Configure the HTTP request pipeline.
- if (app.Environment.IsDevelopment() || app.Environment.IsProduction() || app.Environment.IsEnvironment(Shared.Local))
- {
-     app.UseSwagger();
-     app.UseSwaggerUI(x =>
-     {
-         x.SwaggerEndpoint($"/swagger/{Modules.Auth}/swagger.json", "Auth_Management v1");
-         x.SwaggerEndpoint($"/swagger/{Modules.Setting}/swagger.json", "Setting_Management v1");
-         x.SwaggerEndpoint($"/swagger/{Modules.HR}/swagger.json", "HR_Management v1");
-     });
- }
- 
+app.UseSwagger();
+app.UseSwaggerUI(x =>
+{
+    x.SwaggerEndpoint($"/swagger/{Modules.Auth}/swagger.json", "Auth_Management v1");
+    x.SwaggerEndpoint($"/swagger/{Modules.Setting}/swagger.json", "Setting_Management v1");
+    x.SwaggerEndpoint($"/swagger/{Modules.HR}/swagger.json", "HR_Management v1");
+});
+//// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment() || app.Environment.IsProduction() || app.Environment.IsEnvironment(Shared.Local))
+// {
+     
+   
+//     Log.Information("end of swagger");
+//}
+
+
  app.ConfigureExceptionHandler(loggingRepository);    // custom as a global exception
  app.UseHttpsRedirection();
  app.UseRouting();
@@ -273,10 +309,17 @@ static async void SeedData(IHost app) //can be placed at the very bottom under a
  app.UseAuthorization();
  app.MapControllers();
  app.UseSerilogRequestLogging();
- 
- try
+ app.MapGet(string.Empty, (context) =>
  {
-     app.Run();
+     context.Response.Redirect("/swagger");
+     return Task.CompletedTask;
+ });
+
+ app.MapGet("env", async (context) => await context.Response.WriteAsync(app.Environment.EnvironmentName));
+
+try
+{
+    app.Run();
  }
  catch (Exception ex)
  {

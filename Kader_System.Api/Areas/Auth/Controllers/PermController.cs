@@ -129,7 +129,7 @@ public class PermController(IPermService service) : ControllerBase
         Request.Headers.AcceptLanguage.ToString().Split(',').First();
   
     [HttpPost("TestForAnything")]
-    public async Task<IActionResult> UpdateTestAsync(/*[FromForm] PermTest model*/IEnumerable<int> ids)
+    public  IActionResult UpdateTestAsync(/*[FromForm] PermTest model*/IEnumerable<int> ids)
     {
         return Ok(ids);
     }
