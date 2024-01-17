@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Kader_System.Api/wwwroot/Files/HR
+/Kader_System.Api/wwwroot/Images/HR/Employees
