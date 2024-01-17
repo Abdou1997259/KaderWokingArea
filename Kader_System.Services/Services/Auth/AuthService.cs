@@ -104,6 +104,7 @@ public class AuthService : IAuthService
             Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
             ExpiresOn = jwtSecurityToken.ValidTo,
             
+            
         };
 
         return new Response<AuthLoginUserResponse>

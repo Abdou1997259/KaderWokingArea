@@ -51,11 +51,19 @@ public static class SD
         public static string Password = "Mohammed88";
         public static string RoleNameInAr = "سوبر أدمن";
     }
+    public static class UserRole
+    {
+       
+        public static string Id = "0ffa8112-ba0d-4416-b0ed-992897ac896e";
+        public static string RoleNameInAr = "مستخدم";
+        public static string RoleNameInEn = "User";
+    }
     public static class Roles
     {
         public const string Administrative = "Administrative";
         public const string User = "User";
         public const string SuperAdmin = "SuperAdmin";
+      
     }
     public static class RequestClaims
     {

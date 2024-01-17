@@ -20,6 +20,14 @@ public static class ModelBuilderExtensions
                 Title_name_ar = SuperAdmin.RoleNameInAr,
                 ConcurrencyStamp = "1",
                 NormalizedName = "SUPERADMIN"
+            },new ApplicationRole()
+            {
+                Id = UserRole.Id,
+                Name = UserRole.RoleNameInEn,
+                Title_name_ar = UserRole.RoleNameInAr,
+                ConcurrencyStamp = "1",
+                NormalizedName = UserRole.RoleNameInEn.ToUpper(),
+                IsActive = true
             });
 
         modelBuilder.Entity<ApplicationUser>()

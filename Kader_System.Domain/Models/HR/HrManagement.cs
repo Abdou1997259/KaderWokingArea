@@ -7,7 +7,7 @@
         public string NameAr { get; set; }
         public string NameEn { get; set; }
         public int? ManagerId { get; set; }
-        //[ForeignKey(nameof(ManagerId))]
+        [ForeignKey(nameof(ManagerId))]
         public HrEmployee Manager { get; set; } 
         public int CompanyId { get; set; }
         [ForeignKey(nameof(CompanyId))]
