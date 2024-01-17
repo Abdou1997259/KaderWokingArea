@@ -32,17 +32,18 @@ var config = new ConfigurationBuilder()
      .CreateLogger();
  
  builder.Host.UseSerilog();
- 
- // Add services to the container.
- 
- builder.Services.AddCors(options =>
- {
-     options.AddPolicy(Shared.CorsPolicy,
-         builder => builder
-             .AllowAnyOrigin()
-             .AllowAnyMethod()
-             .AllowAnyHeader());
- });
+
+// Add services to the container.
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(Shared.CorsPolicy,
+//        builder => builder
+//            .AllowAnyOrigin()
+//            .AllowAnyMethod()
+//            .AllowAnyHeader());
+//});
+builder.Services.AddCors();
  builder.Services.AddControllers();
  builder.Services.AddEndpointsApiExplorer();
  builder.Services.AddSwaggerGen();
@@ -304,7 +305,7 @@ app.UseSwaggerUI(x =>
  app.UseStaticFiles();
  //app.ConfigureStaticFilesHandler();                   // custom as Static files
  app.UseRequestLocalization(localizationOptions);
- app.UseCors(Shared.CorsPolicy);
+ app.UseCors(b=>b.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
  app.UseAuthentication();
  app.UseAuthorization();
  app.MapControllers();
