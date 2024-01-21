@@ -4,6 +4,7 @@ using Kader_System.DataAccesss.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kader_System.DataAccess.Migrations
 {
     [DbContext(typeof(KaderDbContext))]
-    partial class KaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240121122438_transBenefitMig")]
+    partial class transBenefitMig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,7 +224,7 @@ namespace Kader_System.DataAccess.Migrations
                         {
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5basb1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "64f3eca5-8800-4a94-a236-7c7734252770",
+                            ConcurrencyStamp = "4e9500a9-8f99-4b30-808e-706868458d1a",
                             Email = "mohammed88@gmail.com",
                             EmailConfirmed = true,
                             IsActive = true,
@@ -229,9 +232,9 @@ namespace Kader_System.DataAccess.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "MOHAMMED88@GMAIL.COM",
                             NormalizedUserName = "MR_MOHAMMED",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBMqWWkfaQ/jXTsIfzllLVv6dIh3RiOXgnm9+aO32kzWbKlNOSvxnqoWItUfW4x1ow==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEATDg8OBL3A4V6q1F36xlTxL3MBIAIbMwQ0/0dYW58H2CuoZmL0dZ/g3/MxSAccQMA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4a47ce5e-680e-4c38-a6d7-8f70ff778cb8",
+                            SecurityStamp = "62d577a5-e6d6-4ccd-be37-6fe1e89c5c92",
                             TwoFactorEnabled = false,
                             UserName = "Mr_Mohammed",
                             VisiblePassword = "Mohammed88"
@@ -2931,9 +2934,6 @@ namespace Kader_System.DataAccess.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<int>("AmountTypeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Attachment")
                         .HasColumnType("nvarchar(max)");
 
@@ -2970,15 +2970,18 @@ namespace Kader_System.DataAccess.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.Property<int>("ValueTypeId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("AmountTypeId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BenefitId");
 
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("SalaryEffectId");
+
+                    b.HasIndex("ValueTypeId");
 
                     b.ToTable("Trans_Benefits");
                 });
@@ -3705,12 +3708,6 @@ namespace Kader_System.DataAccess.Migrations
 
             modelBuilder.Entity("Kader_System.Domain.Models.Trans.TransBenefit", b =>
                 {
-                    b.HasOne("Kader_System.Domain.Models.Trans.TransAmountType", "AmountType")
-                        .WithMany()
-                        .HasForeignKey("AmountTypeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Kader_System.Domain.Models.HR.HrBenefit", "Benefit")
                         .WithMany()
                         .HasForeignKey("BenefitId")
@@ -3726,6 +3723,12 @@ namespace Kader_System.DataAccess.Migrations
                     b.HasOne("Kader_System.Domain.Models.Trans.TransSalaryEffect", "SalaryEffect")
                         .WithMany()
                         .HasForeignKey("SalaryEffectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Kader_System.Domain.Models.Trans.TransAmountType", "AmountType")
+                        .WithMany()
+                        .HasForeignKey("ValueTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
