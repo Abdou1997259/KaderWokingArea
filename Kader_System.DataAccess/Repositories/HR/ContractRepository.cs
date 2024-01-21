@@ -33,7 +33,7 @@ public class ContractRepository(KaderDbContext context) : BaseRepository<HrContr
             StartDate = x.StartDate,
             EndDate = x.EndDate,
             HousingAllowance = x.HousingAllowance,
-            ContractFile = ManageFilesHelper.ConvertFileToBase64(Path.Combine(GoRootPath.HRFilesPath, x.FileName)),
+            ContractFile = ManageFilesHelper.ConvertFileToBase64(GoRootPath.HRFilesPath+ x.FileName),
             Details = x.ListOfAllowancesDetails.Select(details => new GetAllContractDetailsResponse()
             {
                 AllowanceId = details.AllowanceId,
