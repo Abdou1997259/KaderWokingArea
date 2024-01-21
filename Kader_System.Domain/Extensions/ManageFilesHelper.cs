@@ -132,7 +132,7 @@ public static class ManageFilesHelper
     {
         try
         {
-            string fullPath = Path.Combine(Directory.GetCurrentDirectory(), file);
+            string fullPath = Directory.GetCurrentDirectory()+ file;
             if (File.Exists(fullPath))
             {
 
