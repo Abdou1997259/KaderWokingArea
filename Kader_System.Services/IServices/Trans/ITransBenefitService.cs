@@ -2,11 +2,11 @@
 
 public interface ITransBenefitService
 {
-    Task<Response<IEnumerable<StSelectListForMainScreenCategoryResponse>>> ListOfMainScreensCategoriesAsync(string lang);
-    Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model);
-    Task<Response<StCreateMainScreenCategoryRequest>> CreateMainScreenCategoryAsync(StCreateMainScreenCategoryRequest model);
-    Task<Response<StGetMainScreenCategoryByIdResponse>> GetMainScreenCategoryByIdAsync(int id);
-    Task<Response<StUpdateMainScreenCategoryRequest>> UpdateMainScreenCategoryAsync(int id, StUpdateMainScreenCategoryRequest model);
-    Task<Response<string>> UpdateActiveOrNotMainScreenCategoryAsync(int id);
-    Task<Response<string>> DeleteMainScreenCategoryAsync(int id);
+    Task<Response<IEnumerable<SelectListOfTransBenefitResponse>>> ListOfTransBenefitsAsync(string lang);
+    Task<Response<GetAllTransBenefitResponse>> GetAllTransBenefitsAsync(string lang, GetAllFilterationForTransBenefitRequest model);
+    Task<Response<CreateTransBenefitRequest>> CreateTransBenefitAsync(CreateTransBenefitRequest model);
+    Task<Response<GetTransBenefitById>> GetTransBenefitByIdAsync(int id);
+    Task<Response<GetTransBenefitById>> UpdateTransBenefitAsync(int id, CreateTransBenefitRequest model);
+    Task<Response<string>> UpdateActiveOrNotTransBenefitAsync(int id);
+    Task<Response<string>> DeleteTransBenefitAsync(int id);
 }
