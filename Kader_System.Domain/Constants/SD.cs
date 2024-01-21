@@ -40,6 +40,7 @@ public static class SD
         public const string Auth = "Auth";
         public const string Setting = "Setting";
         public const string HR = "HR";
+        public const string Trans = "Trans";
         public const string V1 = "v1";
         public const string Bearer = "Bearer";
 
@@ -182,6 +183,15 @@ public static class SD
             public const string GetAllowanceById = "allowance/getById/{id}";
             public const string DeleteAllowance = "allowance/delete/{id}";
         }
+        public class TransAllowance
+        {
+            public const string ListOfTransAllowances = "transAllowance/getListOftransAllowances";
+            public const string GetAllTransAllowances = "transAllowance/getAll";
+            public const string CreateTransAllowance = "transAllowance/create";
+            public const string UpdateTransAllowance = "transAllowance/update/{id}";
+            public const string GetTransAllowanceById = "transAllowance/getById/{id}";
+            public const string DeleteTransAllowance = "transAllowance/delete/{id}";
+        }
         public class Management
         {
             public const string ListOfManagements = "management/getListOfManagements";
@@ -277,8 +287,8 @@ public static class SD
 
     public static class Localization
     {
-        public const string Arabic = "ar-EG";
-        public const string English = "en-US";
+        public const string Arabic = "ar";
+        public const string English = "en";
         public const string IsExist = "IsExist";
         public const string Project = "Project";
         public const string Task = "Task";

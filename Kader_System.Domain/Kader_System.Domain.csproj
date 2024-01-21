@@ -12,9 +12,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\Request\Trans\" />
-    <Folder Include="DTOs\Response\Trans\" />
-  </ItemGroup>
-
 </Project>
