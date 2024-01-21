@@ -13,6 +13,7 @@ public static class SD
         public const string HRFilesPath = "/wwwroot/Files/HR/";
         public const string HRAudiosPath = "/wwwroot/Audios/HR/";
         public const string HRVideosPath = "/wwwroot/Videos/HR/";
+        public const string TransFilesPath = "/wwwroot/Files/Trans/";
 
     }
     public static class ReadRootPath
@@ -191,6 +192,15 @@ public static class SD
             public const string UpdateTransAllowance = "transAllowance/update/{id}";
             public const string GetTransAllowanceById = "transAllowance/getById/{id}";
             public const string DeleteTransAllowance = "transAllowance/delete/{id}";
+        }
+        public class TransBenefit
+        {
+            public const string ListOfTransBenefits = "transBenefit/getListOftransBenefits";
+            public const string GetTransBenefits = "transBenefit/getAll";
+            public const string CreateTransBenefit = "transBenefit/create";
+            public const string UpdateTransBenefit = "transBenefit/update/{id}";
+            public const string GetTransBenefitById = "transBenefit/getById/{id}";
+            public const string DeleteTransBenefit = "transBenefit/delete/{id}";
         }
         public class Management
         {
