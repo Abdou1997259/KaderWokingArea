@@ -123,7 +123,7 @@ namespace Kader_System.Services.Services.HR
                     FixedSalary = obj.FixedSalary,
                     HousingAllowance = obj.HousingAllowance,
                     ContractFile =
-                        ManageFilesHelper.ConvertFileToBase64(Path.Combine(GoRootPath.HRFilesPath, obj.FileName)),
+                        ManageFilesHelper.ConvertFileToBase64(GoRootPath.HRFilesPath+ obj.FileName),
                     Details = obj.ListOfAllowancesDetails.Select(detail => new GetAllContractDetailsResponse()
                     {
                         AllowanceId = detail.AllowanceId,
