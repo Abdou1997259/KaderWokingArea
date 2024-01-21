@@ -224,6 +224,7 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IFingerPrintDeviceService, FingerPrintDeviceService>();
 builder.Services.AddScoped<ITransAllowanceService, TransAllowanceService>();
+builder.Services.AddScoped<ITransBenefitService, TransBenefitService>();
 #endregion
 var httpPort = builder.Configuration.GetValue<int>("KestrelServer:Http.Port");
 var httpsPort = builder.Configuration.GetValue<int>("KestrelServer:Https.Port");

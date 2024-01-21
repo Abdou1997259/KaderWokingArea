@@ -30,6 +30,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\Audios\" />
     <Folder Include="wwwroot\Files\HR\" />
+    <Folder Include="wwwroot\Files\Trans\" />
     <Folder Include="wwwroot\Images\HR\Employees\" />
     <Folder Include="wwwroot\Videos\" />
   </ItemGroup>
