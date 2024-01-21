@@ -1,28 +1,35 @@
-﻿namespace Kader_System.Services.Services.Trans;
-
-public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> sharLocalizer, IMapper mapper) : ITransAllowanceService
+﻿
+namespace Kader_System.Services.Services.Trans;
+public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> sharLocalizer, IMapper mapper) :ITransAllowanceService
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IStringLocalizer<SharedResource> _sharLocalizer = sharLocalizer;
-    private readonly IMapper _mapper = mapper;
+    private TransAllowance _insatance;
 
-    #region Main screen category
+    #region Retreive
 
-    public async Task<Response<IEnumerable<StSelectListForMainScreenCategoryResponse>>> ListOfMainScreensCategoriesAsync(string lang)
+    public async Task<Response<IEnumerable<SelectListForTransAllowancesResponse>>> ListOfTransAllowancesAsync(string lang)
     {
         var result =
-                await _unitOfWork.MainScreenCategories.GetSpecificSelectAsync(null!,
-                select: x => new StSelectListForMainScreenCategoryResponse
+            await unitOfWork.TransAllowances.GetSpecificSelectAsync(null!,
+                includeProperties: $"{nameof(_insatance.Allowance)},{nameof(_insatance.Employee)},{nameof(_insatance.SalaryEffect)}",
+                select: x => new SelectListForTransAllowancesResponse
                 {
                     Id = x.Id,
-                    Screen_main_title = lang == Localization.Arabic ? x.Screen_main_title_ar : x.Screen_main_title_en,
-                    Screen_main_image = x.Screen_main_image != null ? string.Concat(ReadRootPath.SettingImagesPath, x.Screen_main_image) : string.Empty
+                    ActionMonth = x.ActionMonth,
+                    SalaryEffect = lang == Localization.Arabic ? x.SalaryEffect!.Name : x.SalaryEffect!.NameInEnglish,
+                    AddedOn = x.Add_date,
+                    AllowanceId = x.AllowanceId,
+                    AllowanceName = lang == Localization.Arabic ? x.Allowance!.Name_ar : x.Allowance!.Name_en,
+                    Amount = x.Amount,
+                    EmployeeId = x.EmployeeId,
+                    EmployeeName = lang == Localization.Arabic ? x.Employee!.FullNameAr : x.Employee!.FullNameEn,
+                    Notes = x.Notes,
+                    SalaryEffectId = x.SalaryEffectId
                 }, orderBy: x =>
-                  x.OrderByDescending(x => x.Id));
+                    x.OrderByDescending(x => x.Id));
 
         if (!result.Any())
         {
-            string resultMsg = _sharLocalizer[Localization.NotFoundData];
+            string resultMsg = sharLocalizer[Localization.NotFoundData];
 
             return new()
             {
@@ -39,29 +46,39 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
         };
     }
 
-    public async Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model)
+    public async Task<Response<TransAllowanceGetAllResponse>> GetAllTransAllowancesAsync(string lang, GetAllFilterationAllowanceRequest model)
     {
-        Expression<Func<StMainScreenCategory, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+        Expression<Func<TransAllowance, bool>> filter = x => x.IsDeleted == model.IsDeleted;
 
-        var result = new StGetAllMainScreensCategoriesResponse
+        var result = new TransAllowanceGetAllResponse
         {
-            TotalRecords = await _unitOfWork.MainScreenCategories.CountAsync(filter: filter),
+            TotalRecords = await unitOfWork.TransAllowances.CountAsync(filter: filter),
 
-            Items = (await _unitOfWork.MainScreenCategories.GetSpecificSelectAsync(filter: filter,
-                 take: model.PageSize,
-                 skip: (model.PageNumber - 1) * model.PageSize,
-                 select: x => new MainScreenCategoryData
-                 {
-                     Id = x.Id,
-                     Screen_main_title = lang == Localization.Arabic ? x.Screen_main_title_ar : x.Screen_main_title_en,
-                     Screen_main_image = x.Screen_main_image != null ? string.Concat(ReadRootPath.SettingImagesPath, x.Screen_main_image) : string.Empty
-                 }, orderBy: x =>
-                   x.OrderByDescending(x => x.Id))).ToList()
+            Items = (await unitOfWork.TransAllowances.GetSpecificSelectAsync(filter: filter,
+                includeProperties: $"{nameof(_insatance.Allowance)},{nameof(_insatance.Employee)},{nameof(_insatance.SalaryEffect)}",
+                take: model.PageSize,
+                skip: (model.PageNumber - 1) * model.PageSize,
+                select: x => new TransAllowanceData()
+                {
+                    Id = x.Id,
+                    ActionMonth = x.ActionMonth,
+                    SalaryEffect = lang == Localization.Arabic ? x.SalaryEffect!.Name : x.SalaryEffect!.NameInEnglish,
+                    AddedOn = x.Add_date,
+                    AllowanceId = x.AllowanceId,
+                    AllowanceName = lang == Localization.Arabic ? x.Allowance!.Name_ar : x.Allowance!.Name_en,
+                    Amount = x.Amount,
+                    EmployeeId = x.EmployeeId,
+                    EmployeeName = lang == Localization.Arabic ? x.Employee!.FullNameAr : x.Employee!.FullNameEn,
+                    Notes = x.Notes,
+                    SalaryEffectId = x.SalaryEffectId
+
+                }, orderBy: x =>
+                    x.OrderByDescending(x => x.Id))).ToList()
         };
 
         if (result.TotalRecords is 0)
         {
-            string resultMsg = _sharLocalizer[Localization.NotFoundData];
+            string resultMsg = sharLocalizer[Localization.NotFoundData];
 
             return new()
             {
@@ -81,57 +98,13 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
         };
     }
 
-    public async Task<Response<StCreateMainScreenCategoryRequest>> CreateMainScreenCategoryAsync(StCreateMainScreenCategoryRequest model)
+    public async Task<Response<TransactionAllowanceGetByIdResponse>> GetTransAllowanceByIdAsync(int id)
     {
-        bool exists = false;
-        exists = await _unitOfWork.MainScreenCategories.ExistAsync(x => x.Screen_main_title_ar.Trim() == model.Screen_main_title_ar
-        && x.Screen_main_title_en.Trim() == model.Screen_main_title_en.Trim());
-
-        if (exists)
-        {
-            string resultMsg = string.Format(_sharLocalizer[Localization.IsExist],
-                _sharLocalizer[Localization.MainScreenCategory]);
-
-            return new()
-            {
-                Error = resultMsg,
-                Msg = resultMsg
-            };
-        }
-
-        string imageName = null!, imageExtension = null!;
-        if (model.Screen_main_image is not null)
-        {
-            var fileObj = ManageFilesHelper.UploadFile(model.Screen_main_image, GoRootPath.SettingImagesPath);
-            imageName = fileObj.FileName;
-            imageExtension = fileObj.FileExtension;
-        }
-
-
-        await _unitOfWork.MainScreenCategories.AddAsync(new()
-        {
-            Screen_main_title_ar = model.Screen_main_title_ar,
-            Screen_main_title_en = model.Screen_main_title_en,
-            Screen_main_image = imageName,
-            ImageExtension = imageExtension,
-        });
-        await _unitOfWork.CompleteAsync();
-
-        return new()
-        {
-            Msg = _sharLocalizer[Localization.Done],
-            Check = true,
-            Data = model
-        };
-    }
-
-    public async Task<Response<StGetMainScreenCategoryByIdResponse>> GetMainScreenCategoryByIdAsync(int id)
-    {
-        var obj = await _unitOfWork.MainScreenCategories.GetByIdAsync(id);
+        var obj = await unitOfWork.TransAllowances.GetByIdAsync(id);
 
         if (obj is null)
         {
-            string resultMsg = _sharLocalizer[Localization.NotFoundData];
+            string resultMsg = sharLocalizer[Localization.NotFoundData];
 
             return new()
             {
@@ -143,72 +116,77 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
 
         return new()
         {
-            Data = new()
-            {
-                Id = id,
-                Screen_main_title_ar = obj.Screen_main_title_ar,
-                Screen_main_title_en = obj.Screen_main_title_en,
-                Screen_main_image = string.Concat(ReadRootPath.SettingImagesPath, obj.Screen_main_image)
-            },
+            Data = mapper.Map<TransactionAllowanceGetByIdResponse>(obj),
             Check = true
         };
     }
 
-    public async Task<Response<StUpdateMainScreenCategoryRequest>> UpdateMainScreenCategoryAsync(int id, StUpdateMainScreenCategoryRequest model)
-    {
-        var obj = await _unitOfWork.MainScreenCategories.GetByIdAsync(id);
+    #endregion
 
-        if (obj == null)
+    #region Create
+    public async Task<Response<CreateTransAllowanceRequest>> CreateTransAllowanceAsync(CreateTransAllowanceRequest model)
+    {
+
+        var newTrans = mapper.Map<TransAllowance>(model);
+        await unitOfWork.TransAllowances.AddAsync(newTrans);
+        await unitOfWork.CompleteAsync();
+        return new()
         {
-            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
-                _sharLocalizer[Localization.MainScreenCategory]);
+            Msg = sharLocalizer[Localization.Done],
+            Check = true,
+            Data = model
+        };
+    }
+
+    #endregion
+
+    #region Update
+    public async Task<Response<TransactionAllowanceGetByIdResponse>> UpdateTransAllowanceAsync(int id, CreateTransAllowanceRequest model)
+    {
+        var obj = await unitOfWork.TransAllowances.GetByIdAsync(id);
+        if (obj is null)
+        {
+            string resultMsg = sharLocalizer[Localization.NotFoundData];
 
             return new()
             {
-                Data = model,
+                Data = new(),
                 Error = resultMsg,
                 Msg = resultMsg
             };
         }
 
-        if (model.Screen_main_image is not null)
-        {
-            string path = GoRootPath.SettingImagesPath;
-
-            ManageFilesHelper.RemoveFile(path + "/" + obj.Screen_main_image);
-
-            var fileObj = ManageFilesHelper.UploadFile(model.Screen_main_image, path);
-            obj.Screen_main_image = fileObj.FileName;
-            obj.ImageExtension= fileObj.FileExtension;
-        }
-
-        obj.Screen_main_title_ar = model.Screen_main_title_ar;
-        obj.Screen_main_title_en = model.Screen_main_title_en;
-
-        _unitOfWork.MainScreenCategories.Update(obj);
-        await _unitOfWork.CompleteAsync();
-
+        obj.AllowanceId = model.AllowanceId;
+        obj.Amount = model.Amount;
+        obj.EmployeeId = model.EmployeeId;
+        obj.Notes = model.Notes;
+        obj.SalaryEffectId = model.SalaryEffectId;
+        obj.ActionMonth = model.ActionMonth;
+        unitOfWork.TransAllowances.Update(obj);
+        await unitOfWork.CompleteAsync();
         return new()
         {
+            Msg = sharLocalizer[Localization.Done],
             Check = true,
-            Data = model,
-            Msg = _sharLocalizer[Localization.Updated]
+            Data = mapper.Map<TransactionAllowanceGetByIdResponse>(obj)
         };
     }
 
-    public Task<Response<string>> UpdateActiveOrNotMainScreenCategoryAsync(int id)
+    public Task<Response<string>> UpdateActiveOrNotTransAllowanceAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Response<string>> DeleteMainScreenCategoryAsync(int id)
-    {
-        var obj = await _unitOfWork.MainScreenCategories.GetByIdAsync(id);
 
-        if (obj == null)
+    #endregion
+
+    #region Delete
+    public async Task<Response<string>> DeleteTransAllowanceAsync(int id)
+    {
+        var obj = await unitOfWork.TransAllowances.GetByIdAsync(id);
+        if (obj is null)
         {
-            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
-                _sharLocalizer[Localization.MainScreenCategory]);
+            string resultMsg = sharLocalizer[Localization.NotFoundData];
 
             return new()
             {
@@ -218,16 +196,15 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
             };
         }
 
-        _unitOfWork.MainScreenCategories.Remove(obj);
-        await _unitOfWork.CompleteAsync();
-
+        unitOfWork.TransAllowances.Remove(obj);
+        await unitOfWork.CompleteAsync();
         return new()
         {
             Check = true,
             Data = string.Empty,
-            Msg = _sharLocalizer[Localization.Deleted]
+            Msg = sharLocalizer[Localization.Deleted]
         };
     }
-
     #endregion
+
 }

@@ -1,12 +1,15 @@
-﻿namespace Kader_System.Services.IServices.Trans;
+﻿
+using Kader_System.Domain.DTOs.Request.Trans;
+
+namespace Kader_System.Services.IServices.Trans;
 
 public interface ITransAllowanceService
 {
-    Task<Response<IEnumerable<StSelectListForMainScreenCategoryResponse>>> ListOfMainScreensCategoriesAsync(string lang);
-    Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model);
-    Task<Response<StCreateMainScreenCategoryRequest>> CreateMainScreenCategoryAsync(StCreateMainScreenCategoryRequest model);
-    Task<Response<StGetMainScreenCategoryByIdResponse>> GetMainScreenCategoryByIdAsync(int id);
-    Task<Response<StUpdateMainScreenCategoryRequest>> UpdateMainScreenCategoryAsync(int id, StUpdateMainScreenCategoryRequest model);
-    Task<Response<string>> UpdateActiveOrNotMainScreenCategoryAsync(int id);
-    Task<Response<string>> DeleteMainScreenCategoryAsync(int id);
+    Task<Response<IEnumerable<SelectListForTransAllowancesResponse>>> ListOfTransAllowancesAsync(string lang);
+    Task<Response<TransAllowanceGetAllResponse>> GetAllTransAllowancesAsync(string lang, GetAllFilterationAllowanceRequest model);
+    Task<Response<CreateTransAllowanceRequest>> CreateTransAllowanceAsync(CreateTransAllowanceRequest model);
+    Task<Response<TransactionAllowanceGetByIdResponse>> GetTransAllowanceByIdAsync(int id);
+    Task<Response<TransactionAllowanceGetByIdResponse>> UpdateTransAllowanceAsync(int id, CreateTransAllowanceRequest model);
+    Task<Response<string>> UpdateActiveOrNotTransAllowanceAsync(int id);
+    Task<Response<string>> DeleteTransAllowanceAsync(int id);
 }
