@@ -17,10 +17,12 @@
  using Serilog;
  using System.Text.Json.Serialization;
  using System.Text;
+ using Kader_System.Services.IServices.Trans;
  using Kader_System.Services.Services.Setting;
  using Kader_System.Services.Services.HR;
  using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
+using Kader_System.Services.Services.Trans;
 
  var builder = WebApplication.CreateBuilder(args);
 var config = new ConfigurationBuilder()
@@ -155,7 +157,11 @@ builder.Services.AddSwaggerGen(x =>
         Title = $"{Shared.KaderSystem} {Modules.HR}",
         Version = Modules.V1
     });
-
+    x.SwaggerDoc(Modules.Trans, new OpenApiInfo
+    {
+        Title = $"{Shared.KaderSystem} {Modules.Trans}",
+        Version = Modules.V1
+    });
 
     x.AddSecurityDefinition(Modules.Bearer, new OpenApiSecurityScheme
     {
@@ -217,7 +223,7 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IFingerPrintDeviceService, FingerPrintDeviceService>();
-
+builder.Services.AddScoped<ITransAllowanceService, TransAllowanceService>();
 #endregion
 var httpPort = builder.Configuration.GetValue<int>("KestrelServer:Http.Port");
 var httpsPort = builder.Configuration.GetValue<int>("KestrelServer:Https.Port");
@@ -289,6 +295,7 @@ app.UseSwaggerUI(x =>
     x.SwaggerEndpoint($"/swagger/{Modules.Auth}/swagger.json", "Auth_Management v1");
     x.SwaggerEndpoint($"/swagger/{Modules.Setting}/swagger.json", "Setting_Management v1");
     x.SwaggerEndpoint($"/swagger/{Modules.HR}/swagger.json", "HR_Management v1");
+    x.SwaggerEndpoint($"/swagger/{Modules.Trans}/swagger.json", "Transaction_Management v1");
 });
 //// Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment() || app.Environment.IsProduction() || app.Environment.IsEnvironment(Shared.Local))
