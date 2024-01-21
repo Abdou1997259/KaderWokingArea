@@ -16,6 +16,16 @@ namespace Kader_System.Api.Profiles
                 .ForMember(dest => dest.Add_date, opt => opt.MapFrom(src => src.AddedOn)).ReverseMap();
 
             #endregion
+
+            #region Benefit
+
+            CreateMap<TransBenefit, CreateTransBenefitRequest>()
+                      .ReverseMap();
+            CreateMap<GetTransBenefitById, TransBenefit>()
+                .ForMember(dest => dest.Add_date
+                    , opt => opt.MapFrom(src => src.AddedOn)).ReverseMap();
+
+            #endregion
         }
     }
 }
