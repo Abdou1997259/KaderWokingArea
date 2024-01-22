@@ -221,6 +221,15 @@ public static class SD
             public const string GetTransVacationById = "transVacation/getById/{id}";
             public const string DeleteTransVacation = "transVacation/delete/{id}";
         }
+        public class TransCovenant
+        {
+            public const string ListOfTransCovenants = "transCovenant/getListOftransCovenants";
+            public const string GetTransCovenants = "transCovenant/getAll";
+            public const string CreateTransCovenant = "transCovenant/create";
+            public const string UpdateTransCovenant = "transCovenant/update/{id}";
+            public const string GetTransCovenantById = "transCovenant/getById/{id}";
+            public const string DeleteTransCovenant = "transCovenant/delete/{id}";
+        }
         public class Management
         {
             public const string ListOfManagements = "management/getListOfManagements";
