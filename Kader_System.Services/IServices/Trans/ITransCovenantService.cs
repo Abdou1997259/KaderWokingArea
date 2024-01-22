@@ -2,11 +2,11 @@
 
 public interface ITransCovenantService
 {
-    Task<Response<IEnumerable<StSelectListForMainScreenCategoryResponse>>> ListOfMainScreensCategoriesAsync(string lang);
-    Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model);
-    Task<Response<StCreateMainScreenCategoryRequest>> CreateMainScreenCategoryAsync(StCreateMainScreenCategoryRequest model);
-    Task<Response<StGetMainScreenCategoryByIdResponse>> GetMainScreenCategoryByIdAsync(int id);
-    Task<Response<StUpdateMainScreenCategoryRequest>> UpdateMainScreenCategoryAsync(int id, StUpdateMainScreenCategoryRequest model);
-    Task<Response<string>> UpdateActiveOrNotMainScreenCategoryAsync(int id);
-    Task<Response<string>> DeleteMainScreenCategoryAsync(int id);
+    Task<Response<IEnumerable<SelectListOfCovenantResponse>>> ListOfTransCovenantsAsync(string lang);
+    Task<Response<GetAllTransCovenantResponse>> GetAllTransCovenantsAsync(string lang, GetAllFilterationForTransCovenant model);
+    Task<Response<CreateTransCovenantRequest>> CreateTransCovenantAsync(CreateTransCovenantRequest model);
+    Task<Response<GetTransCovenantById>> GetTransCovenantByIdAsync(int id);
+    Task<Response<CreateTransCovenantRequest>> UpdateTransCovenantAsync(int id, CreateTransCovenantRequest model);
+    Task<Response<string>> UpdateActiveOrNotTransCovenantAsync(int id);
+    Task<Response<string>> DeleteTransCovenantAsync(int id);
 }
