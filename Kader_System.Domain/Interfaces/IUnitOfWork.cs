@@ -49,7 +49,7 @@ public interface IUnitOfWork : IDisposable
     ITransBenefitRepository TransBenefits { get; }
     ITransCovenantRepository TransCovenants { get; }
     ITransDeductionRepository TransDeductions { get; }
-
+    ITransVacationRepository TransVacations { get; }
 
     Task<int> CompleteAsync();
 }

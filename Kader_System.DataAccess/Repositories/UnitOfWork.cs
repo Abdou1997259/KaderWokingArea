@@ -47,7 +47,7 @@ public class UnitOfWork : IUnitOfWork
     public ITransBenefitRepository TransBenefits { get; private set; }
     public ITransCovenantRepository TransCovenants { get; private set; }
     public ITransDeductionRepository TransDeductions { get; private set; }
-
+    public ITransVacationRepository TransVacations { get; private set; }
     public IManagementRepository Managements { get; private set; }
     public UnitOfWork(KaderDbContext context, IConfiguration config)
     {
@@ -98,6 +98,7 @@ public class UnitOfWork : IUnitOfWork
         TransBenefits = new TransBenefitRepository(_context);
         TransDeductions = new TransDeductionRepository(_context);
         TransCovenants = new TransCovenantRepository(_context);
+        TransVacations=new TransVacationRepository(_context);
     }
 
     public IDatabaseTransaction BeginTransaction() =>
