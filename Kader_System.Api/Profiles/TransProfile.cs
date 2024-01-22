@@ -43,6 +43,15 @@ namespace Kader_System.Api.Profiles
                 .ReverseMap();
 
             #endregion
+
+            #region Vacation
+
+            CreateMap<TransVacation, CreateTransVacationRequest>()
+                .ReverseMap();
+            CreateMap<GetTransVacationById, TransVacation>()
+                            .ReverseMap();
+
+            #endregion
         }
     }
 }
