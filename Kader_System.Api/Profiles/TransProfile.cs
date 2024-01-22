@@ -13,7 +13,10 @@ namespace Kader_System.Api.Profiles
             CreateMap<TransAllowance, CreateTransAllowanceRequest>()
                 .ReverseMap();
             CreateMap<TransactionAllowanceGetByIdResponse, TransAllowance>()
-                .ForMember(dest => dest.Add_date, opt => opt.MapFrom(src => src.AddedOn)).ReverseMap();
+                .ForMember(dest => dest.Add_date, 
+                    opt => 
+                        opt.MapFrom(src => src.AddedOn))
+                .ReverseMap();
 
             #endregion
 
@@ -23,7 +26,21 @@ namespace Kader_System.Api.Profiles
                       .ReverseMap();
             CreateMap<GetTransBenefitById, TransBenefit>()
                 .ForMember(dest => dest.Add_date
-                    , opt => opt.MapFrom(src => src.AddedOn)).ReverseMap();
+                    , opt =>
+                        opt.MapFrom(src => src.AddedOn))
+                .ReverseMap();
+
+            #endregion
+
+            #region Deduction
+
+            CreateMap<TransDeduction, CreateTransDeductionRequest>()
+                .ReverseMap();
+            CreateMap<GetTransDeductionById, TransDeduction>()
+                .ForMember(dest => dest.Add_date
+                    , opt => 
+                        opt.MapFrom(src => src.AddedOn))
+                .ReverseMap();
 
             #endregion
         }
