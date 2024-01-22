@@ -52,6 +52,15 @@ namespace Kader_System.Api.Profiles
                             .ReverseMap();
 
             #endregion
+
+            #region Covenant
+
+            CreateMap<TransCovenant, CreateTransCovenantRequest>()
+                .ReverseMap();
+            CreateMap<GetTransCovenantById, TransCovenant>()
+                .ReverseMap();
+
+            #endregion
         }
     }
 }
