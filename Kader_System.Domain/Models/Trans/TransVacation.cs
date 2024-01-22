@@ -5,15 +5,16 @@ public class TransVacation : BaseEntity
 {
     [Key]
     public int Id { get; set; }
-    public DateOnly Start_date { get; set; }
-    public double Days_count { get; set; }
-    public string? Notes { get; set; }
-
-    public int Employee_id { get; set; }
-    [ForeignKey(nameof(Employee_id))]
+    public DateOnly StartDate { get; set; }
+    public double DaysCount { get; set; }
+    public int EmployeeId { get; set; }
+    [ForeignKey(nameof(EmployeeId))]
     public HrEmployee Employee { get; set; } = default!;
 
-    public int Vacation_system_d_id { get; set; }
-    [ForeignKey(nameof(Vacation_system_d_id))]
+    public int VacationId { get; set; }
+    [ForeignKey(nameof(VacationId))]
     public HrVacation Vacation { get; set; } = default!;
+    public string? Notes { get; set; }
+    public string? Attachment { get; set; }
+    public string? AttachmentExtension { get; set; }
 }
