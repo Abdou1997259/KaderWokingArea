@@ -202,6 +202,16 @@ public static class SD
             public const string GetTransBenefitById = "transBenefit/getById/{id}";
             public const string DeleteTransBenefit = "transBenefit/delete/{id}";
         }
+
+        public class TransDeduction
+        {
+            public const string ListOfTransDeductions = "transDeduction/getListOftransDeductions";
+            public const string GetTransDeductions = "transDeduction/getAll";
+            public const string CreateTransDeduction = "transDeduction/create";
+            public const string UpdateTransDeduction = "transDeduction/update/{id}";
+            public const string GetTransDeductionById = "transDeduction/getById/{id}";
+            public const string DeleteTransDeduction = "transDeduction/delete/{id}";
+        }
         public class Management
         {
             public const string ListOfManagements = "management/getListOfManagements";
