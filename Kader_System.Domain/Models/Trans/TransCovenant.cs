@@ -5,13 +5,16 @@ public class TransCovenant : BaseEntity
 {
     [Key]
     public int Id { get; set; }
-    public required string Name_en { get; set; }
-    public required string Name_ar { get; set; }
+    public required string NameEn { get; set; }
+    public required string NameAr { get; set; }
     public DateOnly Date { get; set; }
     public string? Notes { get; set; }
-    public double Covenant_amount { get; set; }
+    public double Amount { get; set; }
 
-    public int Employee_id { get; set; }
-    [ForeignKey(nameof(Employee_id))]
+    public int EmployeeId { get; set; }
+    [ForeignKey(nameof(EmployeeId))]
     public HrEmployee Employee { get; set; } = default!;
+
+    public string? Attachment { get; set; }
+    public string? AttachmentExtension { get; set; }
 }
