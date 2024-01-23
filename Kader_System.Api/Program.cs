@@ -1,30 +1,30 @@
- using Kader_System.DataAccess.Repositories.Logging;
- using Kader_System.DataAccess.Repositories.StaticDataRepository;
- using Kader_System.DataAccess.Repositories;
- using Kader_System.DataAccesss.DbContext;
- using Kader_System.Domain.Customization.Middleware;
- using Kader_System.Domain.Interfaces.Logging;
- using Kader_System.Domain.Interfaces.StaticDataRepository;
- using Kader_System.Domain.Interfaces;
- using Kader_System.Domain.Options;
- using Kader_System.Domain.SwaggerFilter;
- using Kader_System.Domain;
- using Kader_System.Services.Services.Auth;
- using Microsoft.AspNetCore.Identity;
- using Microsoft.EntityFrameworkCore;
- using Microsoft.IdentityModel.Tokens;
- using Microsoft.OpenApi.Models;
- using Serilog;
- using System.Text.Json.Serialization;
- using System.Text;
- using Kader_System.Services.IServices.Trans;
- using Kader_System.Services.Services.Setting;
- using Kader_System.Services.Services.HR;
- using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Options;
+using Kader_System.DataAccess.Repositories;
+using Kader_System.DataAccess.Repositories.Logging;
+using Kader_System.DataAccess.Repositories.StaticDataRepository;
+using Kader_System.DataAccesss.DbContext;
+using Kader_System.Domain;
+using Kader_System.Domain.Customization.Middleware;
+using Kader_System.Domain.Interfaces;
+using Kader_System.Domain.Interfaces.Logging;
+using Kader_System.Domain.Interfaces.StaticDataRepository;
+using Kader_System.Domain.Options;
+using Kader_System.Domain.SwaggerFilter;
+using Kader_System.Services.IServices.Trans;
+using Kader_System.Services.Services.Auth;
+using Kader_System.Services.Services.HR;
+using Kader_System.Services.Services.Setting;
 using Kader_System.Services.Services.Trans;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Serilog;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
- var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 var config = new ConfigurationBuilder()
                  .AddJsonFile("appsettings.json")
                  .Build();
@@ -63,7 +63,11 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
  }).AddEntityFrameworkStores<KaderDbContext>();
 
 builder.Services.AddControllersWithViews().AddJsonOptions(x =>
-                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+    {
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    }
+    );
 
 builder.Services.AddDbContext<KaderDbContext>(options =>
      options.UseSqlServer(builder.Configuration.GetConnectionString(Shared.KaderSystemConnection),
@@ -235,7 +239,7 @@ var httpsCertificateFilePath = builder.Configuration.GetValue<string>("KestrelSe
 var httpsCertificatePassword = builder.Configuration.GetValue<string>("KestrelServer:Https.CertificationPassword");
 builder.WebHost.UseIIS();
 builder.WebHost.UseIISIntegration();
- 
+
 ////Support Self-Host by Kestrel Server
 //builder.WebHost.UseKestrel(kestrelServerOptions =>
 //{
@@ -262,6 +266,7 @@ builder.WebHost.UseIISIntegration();
 //}
 
 //});
+
 var app = builder.Build();
 
 #region To take an instance from specific repository
@@ -293,6 +298,9 @@ static async void SeedData(IHost app) //can be placed at the very bottom under a
     await dbInitializer!.SeedClaimsForSuperAdmin();
 }
 #endregion
+
+
+
 app.UseSwagger();
 app.UseSwaggerUI(x =>
 {
