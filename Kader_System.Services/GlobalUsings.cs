@@ -40,3 +40,5 @@ global using Kader_System.Domain.DTOs.Request.HR.Vacation;
 global using Kader_System.Domain.DTOs.Response.Trans;
 global using Kader_System.Domain.DTOs.Request.Trans;
 global using Kader_System.Domain.Models.Trans;
+global using Kader_System.Domain.DTOs.Request.Setting;
+global using Kader_System.Domain.Models;

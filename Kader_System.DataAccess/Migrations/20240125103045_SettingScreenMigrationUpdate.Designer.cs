@@ -4,6 +4,7 @@ using Kader_System.DataAccesss.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kader_System.DataAccess.Migrations
 {
     [DbContext(typeof(KaderDbContext))]
-    partial class KaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240125103045_SettingScreenMigrationUpdate")]
+    partial class SettingScreenMigrationUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,7 +224,7 @@ namespace Kader_System.DataAccess.Migrations
                         {
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5basb1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "392bba27-3406-4c5c-bbae-c51b48b9d9e5",
+                            ConcurrencyStamp = "f8f0f88a-a379-4cfc-8145-684e081708cf",
                             Email = "mohammed88@gmail.com",
                             EmailConfirmed = true,
                             IsActive = true,
@@ -229,9 +232,9 @@ namespace Kader_System.DataAccess.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "MOHAMMED88@GMAIL.COM",
                             NormalizedUserName = "MR_MOHAMMED",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGNWMOQ3I8OihhBgG4OmvpO7rbjQxffEbeP4vK2MAKT2eeLYpEDyxT078YkKYl4xbA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDjAGDKdVVkL/lZLCVQAXmh12c9RKWMRiT4K9C0aoHQVoZ/B3RBbMReXoT9kNjUYjw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9bda98e6-c47b-4699-8501-37dea6cdd6d6",
+                            SecurityStamp = "789fe5ae-b6be-4e27-9693-9af5b0b2abc6",
                             TwoFactorEnabled = false,
                             UserName = "Mr_Mohammed",
                             VisiblePassword = "Mohammed88"
@@ -2776,79 +2779,6 @@ namespace Kader_System.DataAccess.Migrations
                     b.ToTable("St_SubMainScreenActions");
                 });
 
-            modelBuilder.Entity("Kader_System.Domain.Models.Title", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("Add_date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Added_by")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeleteBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("TitleNameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TitleNameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UpdateBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Titles");
-                });
-
-            modelBuilder.Entity("Kader_System.Domain.Models.TitlePermission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Permissions")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("SubScreenId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TitleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubScreenId");
-
-                    b.HasIndex("TitleId");
-
-                    b.ToTable("TitlePermissions");
-                });
-
             modelBuilder.Entity("Kader_System.Domain.Models.Trans.TransAllowance", b =>
                 {
                     b.Property<int>("Id")
@@ -3768,25 +3698,6 @@ namespace Kader_System.DataAccess.Migrations
                     b.Navigation("ScreenSub");
                 });
 
-            modelBuilder.Entity("Kader_System.Domain.Models.TitlePermission", b =>
-                {
-                    b.HasOne("Kader_System.Domain.Models.Setting.StScreenSub", "ScreenSub")
-                        .WithMany()
-                        .HasForeignKey("SubScreenId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Kader_System.Domain.Models.Title", "Title")
-                        .WithMany("TitlePermissions")
-                        .HasForeignKey("TitleId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ScreenSub");
-
-                    b.Navigation("Title");
-                });
-
             modelBuilder.Entity("Kader_System.Domain.Models.Trans.TransAllowance", b =>
                 {
                     b.HasOne("Kader_System.Domain.Models.HR.HrAllowance", "Allowance")
@@ -3983,11 +3894,6 @@ namespace Kader_System.DataAccess.Migrations
             modelBuilder.Entity("Kader_System.Domain.Models.Setting.StScreenSub", b =>
                 {
                     b.Navigation("ListOfActions");
-                });
-
-            modelBuilder.Entity("Kader_System.Domain.Models.Title", b =>
-                {
-                    b.Navigation("TitlePermissions");
                 });
 #pragma warning restore 612, 618
         }

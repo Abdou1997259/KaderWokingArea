@@ -1,4 +1,6 @@
-﻿namespace Kader_System.DataAccess.Repositories;
+﻿using Kader_System.Domain.Models;
+
+namespace Kader_System.DataAccess.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
@@ -49,6 +51,7 @@ public class UnitOfWork : IUnitOfWork
     public ITransDeductionRepository TransDeductions { get; private set; }
     public ITransVacationRepository TransVacations { get; private set; }
     public IManagementRepository Managements { get; private set; }
+    public ITitleRepository Titles { get; private set; }
     public UnitOfWork(KaderDbContext context, IConfiguration config)
     {
         _context = context;
@@ -65,7 +68,7 @@ public class UnitOfWork : IUnitOfWork
         SubMainScreenActions = new SubMainScreenActionRepository(_context);
         MainScreens = new MainScreenRepository(_context);
         MainScreenCategories = new MainScreenCategoryRepository(_context);
-
+        Titles=new TitleRepository(_context);
         AccountingWays = new AccountingWayRepository(_context);
         Allowances = new AllowanceRepository(_context);
         Benefits = new BenefitRepository(_context);

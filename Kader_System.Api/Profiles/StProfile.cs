@@ -6,7 +6,7 @@ public class StProfile : Profile
     {
         #region Setting
 
-        CreateMap<StSubMainScreen, StUpdateSubMainScreenRequest>()
+        CreateMap<StScreenSub, StUpdateSubMainScreenRequest>()
                 .ReverseMap();
 
         #endregion

@@ -5,7 +5,7 @@ public class SubMainScreenActionRepository(KaderDbContext context) : BaseReposit
     private new readonly KaderDbContext _context = context;
     public async Task<IEnumerable<GetEachSubMainWithActions>> GetEachSubMainWithActionsAsync(string lang)
     {
-        var ee = await _context.SubMainScreenActions.GroupBy(gro => gro.SubMainScreenId)
+        var ee = await _context.SubMainScreenActions.GroupBy(gro => gro.ScreenSubId)
             .Select(x => new GetEachSubMainWithActions
             {
                 SubMainId = x.Key,
@@ -13,7 +13,7 @@ public class SubMainScreenActionRepository(KaderDbContext context) : BaseReposit
                 {
                     ActionId = y.ActionId,
                     ActionName = lang == Localization.Arabic ? y.Action.Name : y.Action.NameInEnglish,
-                    ClaimValue = $"Permissions.{y.SubMainScreen.Name}.{y.Action.NameInEnglish}"
+                    ClaimValue = $"Permissions.{y.ScreenSub.Name}.{y.Action.NameInEnglish}"
                 }).ToList()
             }).ToListAsync();
 

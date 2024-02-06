@@ -6,9 +6,9 @@ public class StSubMainScreenAction : BaseEntity
     [Key]
     public int Id { get; set; }
 
-    public int SubMainScreenId { get; set; }
-    [ForeignKey(nameof(SubMainScreenId))]
-    public StSubMainScreen SubMainScreen { get; set; } = default!;
+    public int ScreenSubId { get; set; }
+    [ForeignKey(nameof(ScreenSubId))]
+    public StScreenSub ScreenSub { get; set; } = default!;
 
     public int ActionId { get; set; }
     [ForeignKey(nameof(ActionId))]

@@ -137,6 +137,7 @@ public static class SD
             public const string DeleteUser = "DeleteUser/{id}";
             public const string SetNewPasswordToSpecificUser = "SetNewPasswordToSpecificUser";
             public const string SetNewPasswordToSuperAdmin = "SetNewPasswordToSuperAdmin/{newPassword}";
+            public const string GetMyProfile = "getMyProfile/{userId}";
         }
 
         public class Perm

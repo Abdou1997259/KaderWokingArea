@@ -14,7 +14,7 @@ public interface IUnitOfWork : IDisposable
     ISubMainScreenActionRepository SubMainScreenActions { get; }
     IMainScreenRepository MainScreens { get; }
     IMainScreenCategoryRepository MainScreenCategories { get; }
-
+    ITitleRepository Titles { get; }
 
     IAccountingWayRepository AccountingWays { get; }
     IAllowanceRepository Allowances { get; }

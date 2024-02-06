@@ -17,7 +17,7 @@ public class SubMainScreenService(IUnitOfWork unitOfWork, IStringLocalizer<Share
                 {
                     Id = x.Id,
                     Sub_title = lang == Localization.Arabic ? x.Screen_sub_title_ar : x.Screen_sub_title_en,
-                    Screen_main_id = x.Screen_main_id,
+                    Screen_main_id = x.ScreenCatId,
                     Url = x.Url
                 }, orderBy: x =>
                   x.OrderByDescending(x => x.Id));
@@ -43,7 +43,7 @@ public class SubMainScreenService(IUnitOfWork unitOfWork, IStringLocalizer<Share
 
     public async Task<Response<StGetAllSubMainScreensResponse>> GetAllSubMainScreensAsync(string lang, StGetAllFiltrationsForSubMainScreenRequest model)
     {
-        Expression<Func<StSubMainScreen, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+        Expression<Func<StScreenSub, bool>> filter = x => x.IsDeleted == model.IsDeleted;
 
         var result = new StGetAllSubMainScreensResponse
         {
@@ -57,11 +57,11 @@ public class SubMainScreenService(IUnitOfWork unitOfWork, IStringLocalizer<Share
                      Sub_id = x.Id,
                      Sub_title = lang == Localization.Arabic ? x.Screen_sub_title_ar : x.Screen_sub_title_en,
                      Url = x.Url,
-                     Screen_cat_id = x.MainScreen.Screen_cat_id,
-                     Cat_title = lang == Localization.Arabic ? x.MainScreen.MainScreenCategory.Screen_main_title_ar : x.MainScreen.MainScreenCategory.Screen_main_title_en,
-                     Main_id = x.Screen_main_id,
-                     Main_title = lang == Localization.Arabic ? x.MainScreen.Screen_cat_title_ar : x.MainScreen.Screen_cat_title_en,
-                     Main_image = string.Concat(ReadRootPath.SettingImagesPath, x.MainScreen.MainScreenCategory.Screen_main_image)
+                     Screen_cat_id = x.ScreenCat.MainScreenId,
+                     Cat_title = lang == Localization.Arabic ? x.ScreenCat.MainScreen.Screen_main_title_ar : x.ScreenCat.MainScreen.Screen_main_title_en,
+                     Main_id = x.ScreenCatId,
+                     Main_title = lang == Localization.Arabic ? x.ScreenCat.Screen_cat_title_ar : x.ScreenCat.Screen_cat_title_en,
+                     Main_image = string.Concat(ReadRootPath.SettingImagesPath, x.ScreenCat.MainScreen.Screen_main_image)
                  }, orderBy: x =>
                    x.OrderByDescending(x => x.Id))).ToList()
         };
@@ -109,7 +109,7 @@ public class SubMainScreenService(IUnitOfWork unitOfWork, IStringLocalizer<Share
         {
             Screen_sub_title_en = model.Screen_sub_title_en,
             Screen_sub_title_ar = model.Screen_sub_title_ar,
-            Screen_main_id = model.Screen_main_id,
+            ScreenCatId = model.Screen_main_id,
             Url = model.Url,
             Name = model.Name,
             ListOfActions = model.Actions.Select(ob => new StSubMainScreenAction
@@ -193,14 +193,14 @@ public class SubMainScreenService(IUnitOfWork unitOfWork, IStringLocalizer<Share
             }
 
 
-            var mapped = _mapper.Map<StSubMainScreen>(model);
+            var mapped = _mapper.Map<StScreenSub>(model);
 
             _unitOfWork.SubMainScreens.Update(mapped);
 
             await _unitOfWork.SubMainScreenActions.AddRangeAsync(model.Actions.Select(ob => new StSubMainScreenAction
             {
                 ActionId = ob,
-                SubMainScreenId = id
+                ScreenSubId = id
             }));
 
 

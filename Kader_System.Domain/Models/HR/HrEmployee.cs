@@ -35,7 +35,7 @@ public class HrEmployee : BaseEntity
     }
 
 
-public int MaritalStatusId { get; set; }
+    public int MaritalStatusId { get; set; }
     [ForeignKey(nameof(MaritalStatusId))]
     public HrMaritalStatus MaritalStatus { get; set; } = default!;
 
@@ -64,8 +64,9 @@ public int MaritalStatusId { get; set; }
     [ForeignKey(nameof(SalaryPaymentWayId))]
     public HrSalaryPaymentWay SalaryPaymentWay { get; set; } = default!;
 
-    public required string Username { get; set; }
-    public required string Password { get; set; }
+    public string? UserId { get; set; }
+    [ForeignKey(nameof(UserId))]
+    public ApplicationUser User { get; set; }
     [DefaultValue(0)]
     public required int ChildrenNumber { get; set; }
 

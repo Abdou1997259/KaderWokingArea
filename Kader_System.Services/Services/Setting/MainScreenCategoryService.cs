@@ -41,7 +41,7 @@ public class MainScreenCategoryService(IUnitOfWork unitOfWork, IStringLocalizer<
 
     public async Task<Response<StGetAllMainScreensCategoriesResponse>> GetAllMainScreensCategoriesAsync(string lang, StGetAllFiltrationsForMainScreenCategoryRequest model)
     {
-        Expression<Func<StMainScreenCategory, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+        Expression<Func<StMainScreen, bool>> filter = x => x.IsDeleted == model.IsDeleted;
 
         var result = new StGetAllMainScreensCategoriesResponse
         {

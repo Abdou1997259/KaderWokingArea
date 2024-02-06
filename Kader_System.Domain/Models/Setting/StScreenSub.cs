@@ -1,7 +1,7 @@
 ﻿namespace Kader_System.Domain.Models.Setting;
 
-[Table("St_SubMainScreens")]
-public class StSubMainScreen : BaseEntity
+[Table("St_ScreensSubs")]
+public class StScreenSub : BaseEntity
 {
     [Key]
     public int Id { get; set; }
@@ -10,9 +10,9 @@ public class StSubMainScreen : BaseEntity
     public required string Url { get; set; } 
     public required string Name { get; set; }
     
-    public int Screen_main_id { get; set; }
-    [ForeignKey(nameof(Screen_main_id))]
-    public StMainScreen MainScreen { get; set; } = default!;
+    public int ScreenCatId { get; set; }
+    [ForeignKey(nameof(ScreenCatId))]
+    public StMainScreenCat ScreenCat { get; set; } = default!;
 
     public ICollection<StSubMainScreenAction> ListOfActions { get; set; } = [];
 }

@@ -57,7 +57,9 @@ namespace Kader_System.Services.Services.HR
         public async Task<Response<GetEmployeeByIdResponse>> GetEmployeeByIdAsync(int id)
         {
             Expression<Func<HrEmployee, bool>> filter = x => x.Id == id;
-            var obj = await unitOfWork.Employees.GetFirstOrDefaultAsync(filter, includeProperties: $"{nameof(_instanceEmployee.Management)},{nameof(_instanceEmployee.Job)}");
+            var obj = await unitOfWork.Employees.GetFirstOrDefaultAsync(filter, 
+                includeProperties: $"{nameof(_instanceEmployee.Management)},{nameof(_instanceEmployee.Job)}," +
+                                   $"{nameof(_instanceEmployee.User)}");
 
             if (obj is null)
             {
@@ -107,14 +109,14 @@ namespace Kader_System.Services.Services.HR
                     MaritalStatusId = obj.MaritalStatusId,
                     NationalId = obj.NationalId,
                     NationalityId = obj.NationalityId,
-                    Password = obj.Password,
+                    Password = obj.User!.VisiblePassword,
                     Phone = obj.Phone,
                     QualificationId = obj.QualificationId,
                     ReligionId = obj.ReligionId,
                     SalaryPaymentWayId = obj.SalaryPaymentWayId,
                     ShiftId = obj.ShiftId,
                     TotalSalary = obj.TotalSalary,
-                    Username = obj.Username,
+                    Username = obj.User!.UserName,
                     EmployeeImage = $"{GoRootPath.EmployeeImagesPath}{obj.EmployeeImage}"
                 },
                 Check = true
@@ -134,7 +136,8 @@ namespace Kader_System.Services.Services.HR
                     $"{nameof(_instanceEmployee.Nationality)},{nameof(_instanceEmployee.FingerPrint)}," +
                     $"{nameof(_instanceEmployee.EmployeeType)},{nameof(_instanceEmployee.Gender)}," +
                     $"{nameof(_instanceEmployee.Job)},{nameof(_instanceEmployee.Qualification)},{nameof(_instanceEmployee.Vacation)}," +
-                    $"{nameof(_instanceEmployee.Shift)},{nameof(_instanceEmployee.Religion)},{nameof(_instanceEmployee.SalaryPaymentWay)}",
+                    $"{nameof(_instanceEmployee.Shift)},{nameof(_instanceEmployee.Religion)}," +
+                    $"{nameof(_instanceEmployee.SalaryPaymentWay)},{nameof(_instanceEmployee.User)}",
                     take: model.PageSize,
                     skip: (model.PageNumber - 1) * model.PageSize,
                     select: x => new EmployeesData
@@ -160,10 +163,10 @@ namespace Kader_System.Services.Services.HR
                         Job = lang == Localization.Arabic ? x.Job!.NameAr : x.Job!.NameEn,
                         JobNumber = x.JobNumber,
                         NationalId = x.NationalId,
-                        Password = x.Password,
+                        Password = x.User!.VisiblePassword,
                         Phone = x.Phone,
                         Qualification = lang == Localization.Arabic ? x.Qualification!.NameAr : x.Qualification!.NameEn,
-                        Username = x.Username,
+                        Username = x.User!.UserName,
                         Shift = lang == Localization.Arabic ? x.Shift!.Name_ar : x.Shift!.Name_en,
                         Vacation = lang == Localization.Arabic ? x.Vacation!.NameAr : x.Vacation!.NameEn,
                         Religion = lang == Localization.Arabic ? x.Religion!.Name : x.Religion!.NameInEnglish,
@@ -250,25 +253,28 @@ namespace Kader_System.Services.Services.HR
 
                 var newUser = await unitOfWork.Users.AddAsync(new ApplicationUser()
                 {
-                    UserName = newEmployee.Username,
+                    UserName = model.Username,
                     Id = Guid.NewGuid().ToString(),
-                    NormalizedUserName = newEmployee.Username.ToUpper(),
+                    NormalizedUserName = model.Username.ToUpper(),
                     Email = newEmployee.Email,
                     NormalizedEmail = newEmployee.Email.ToUpper(),
                     EmailConfirmed = true,
                     IsActive = true,
-                    PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!, newEmployee.Password),
-                    VisiblePassword = newEmployee.Password
+                    PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!, model.Password),
+                    VisiblePassword = model.Password
 
                 });
                 if (newUser != null)
                 {
+                    newEmployee.UserId = newUser.Id;
                     await unitOfWork.UserRoles.AddAsync(new ApplicationUserRole()
                     {
                         RoleId = UserRole.Id,
                         UserId = newUser.Id
                     });
                 }
+
+               
                 await unitOfWork.CompleteAsync();
                 transaction.Commit();
                 return new()
@@ -387,8 +393,7 @@ namespace Kader_System.Services.Services.HR
                 obj.GrandFatherNameEn = model.GrandFatherNameEn;
                 obj.FingerPrintCode = model.FingerPrintCode;
                 obj.FingerPrintId = model.FingerPrintId;
-                obj.Username = model.Username;
-                obj.Password = model.Password;
+              
                 obj.Phone = model.Phone;
                 obj.GenderId = model.GenderId;
                 obj.QualificationId = model.QualificationId;
@@ -411,34 +416,36 @@ namespace Kader_System.Services.Services.HR
                 unitOfWork.Employees.Update(obj);
 
 
-                var userExist = await userManager.FindByNameAsync(obj.Username);
+                var userExist = await userManager.FindByNameAsync(model.Username);
                 if (userExist != null)
                 {
-                    userExist.VisiblePassword = obj.Password;
+                    userExist.VisiblePassword = model.Password;
                     userExist.Email = obj.Email;
                     userExist.NormalizedEmail = obj.Email.ToUpper();
                     userExist.PasswordHash =
-                        new PasswordHasher<ApplicationUser>().HashPassword(userExist, obj.Password);
+                        new PasswordHasher<ApplicationUser>().HashPassword(userExist, model.Password);
+                    obj.UserId = userExist.Id;
                     await userManager.UpdateAsync(userExist);
                 }
                 else
                 {
                    var newUser=await unitOfWork.Users.AddAsync(new ApplicationUser()
                     {
-                        VisiblePassword = obj.Password,
+                        VisiblePassword = model.Password,
                         Email = obj.Email,
                         ConcurrencyStamp = "1",
                         NormalizedEmail = obj.Email.ToUpper(),
                         PhoneNumber = obj.Phone,
                         IsActive = true,
-                        PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!,obj.Password),
+                        PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!,model.Password),
                         Id = Guid.NewGuid().ToString(),
-                        UserName = obj.Username,
-                        NormalizedUserName = obj.Username.ToUpper(),
+                        UserName = model.Username,
+                        NormalizedUserName = model.Username.ToUpper(),
                         
                     });
                     if (newUser != null)
                     {
+                        obj.UserId= newUser.Id;
                        await unitOfWork.UserRoles.AddAsync(new ApplicationUserRole()
                         {
                             RoleId = UserRole.Id,
@@ -514,17 +521,20 @@ namespace Kader_System.Services.Services.HR
                 }
 
                 unitOfWork.Employees.Remove(obj);
-
-               var userData= await unitOfWork.Users.GetFirstOrDefaultAsync(c => c.UserName == obj.Username);
-               if (userData != null)
-               {
-                   var userRoles = await unitOfWork.UserRoles.GetAllAsync(c => c.UserId == userData.Id);
-                   if (userRoles.Any())
-                   {
-                       unitOfWork.UserRoles.RemoveRange(userRoles);
-                   }
-                   unitOfWork.Users.Remove(userData);
-               }
+                if (!string.IsNullOrEmpty(obj.UserId))
+                {
+                    var userData = await unitOfWork.Users.GetFirstOrDefaultAsync(c => c.Id == obj.UserId);
+                    if (userData != null)
+                    {
+                        var userRoles = await unitOfWork.UserRoles.GetAllAsync(c => c.UserId == userData.Id);
+                        if (userRoles.Any())
+                        {
+                            unitOfWork.UserRoles.RemoveRange(userRoles);
+                        }
+                        unitOfWork.Users.Remove(userData);
+                    }
+                }
+              
                 await unitOfWork.CompleteAsync();
 
 

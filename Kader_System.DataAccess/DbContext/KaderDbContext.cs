@@ -10,9 +10,9 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
 
     public DbSet<ApplicationUserDevice> UserDevices { get; set; }
     public DbSet<ComLog> Logs { get; set; }
-    public DbSet<StMainScreenCategory> MainScreenCategories { get; set; }
-    public DbSet<StMainScreen> MainScreens { get; set; }
-    public DbSet<StSubMainScreen> SubMainScreens { get; set; }
+    public DbSet<StMainScreen> MainScreenCategories { get; set; }
+    public DbSet<StMainScreenCat> MainScreens { get; set; }
+    public DbSet<StScreenSub> SubMainScreens { get; set; }
     public DbSet<StAction> Actions { get; set; }
     public DbSet<StSubMainScreenAction> SubMainScreenActions { get; set; }
 
@@ -51,7 +51,8 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<HrJob> HrJobs { get; set; }
     public DbSet<HrQualification> HrQualifications { get; set; }
     public DbSet<HrManagement> Managements { get; set; }
-
+    public DbSet<Title> Titles { get; set; }
+    public DbSet<TitlePermission> TitlePermissions { get; set; }
     #endregion
     //
 

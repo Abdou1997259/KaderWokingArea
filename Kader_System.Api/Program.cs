@@ -28,12 +28,12 @@ var builder = WebApplication.CreateBuilder(args);
 var config = new ConfigurationBuilder()
                  .AddJsonFile("appsettings.json")
                  .Build();
- 
- Log.Logger = new LoggerConfiguration()
-     .ReadFrom.Configuration(config)
-     .CreateLogger();
- 
- builder.Host.UseSerilog();
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(config)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 
@@ -46,10 +46,10 @@ var config = new ConfigurationBuilder()
 //            .AllowAnyHeader());
 //});
 builder.Services.AddCors();
- builder.Services.AddControllers();
- builder.Services.AddEndpointsApiExplorer();
- builder.Services.AddSwaggerGen();
- builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
  {
@@ -73,54 +73,54 @@ builder.Services.AddDbContext<KaderDbContext>(options =>
      options.UseSqlServer(builder.Configuration.GetConnectionString(Shared.KaderSystemConnection),
      b => b.MigrationsAssembly(typeof(KaderDbContext).Assembly.FullName)));
 
- #region JWT config
- 
- builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(Shared.JwtSettings));
- 
- var jwtSettings = new JwtSettings();
- builder.Configuration.Bind(nameof(jwtSettings), jwtSettings);
- builder.Services.AddSingleton(jwtSettings);
- 
- builder.Services.AddAuthentication(options =>
- {
-     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
- }).AddJwtBearer(o =>
- {
-     o.RequireHttpsMetadata = false;
-     o.SaveToken = false;
-     o.TokenValidationParameters = new TokenValidationParameters
-     {
-         ValidateIssuerSigningKey = true,
-         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SecretKey)),
-         ValidateIssuer = true,
-         ValidateAudience = false,
-         ValidateLifetime = true,
-         ValidIssuer = jwtSettings.Issuer,
-         ClockSkew = TimeSpan.Zero
-     };
-     o.Events = new JwtBearerEvents
-     {
-         OnMessageReceived = context =>
-         {
-             var accessToken = context.Request.Query[Shared.AccessToken];
- 
-             // If the request is for our hub...
-             var path = context.HttpContext.Request.Path;
-             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments(Shared.Notify))
-             {
-                 // Read the token out of the query string
-                 context.Request.Headers.Authorization = accessToken;
-                 context.Token = accessToken;
-             }
-             return Task.CompletedTask;
-         }
-     };
- });
- builder.Services.Configure<SecurityStampValidatorOptions>(options =>
- {
-     options.ValidationInterval = TimeSpan.Zero;
- });
+#region JWT config
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(Shared.JwtSettings));
+
+var jwtSettings = new JwtSettings();
+builder.Configuration.Bind(nameof(jwtSettings), jwtSettings);
+builder.Services.AddSingleton(jwtSettings);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
+{
+    o.RequireHttpsMetadata = false;
+    o.SaveToken = false;
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SecretKey)),
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ClockSkew = TimeSpan.Zero
+    };
+    o.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query[Shared.AccessToken];
+
+            // If the request is for our hub...
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments(Shared.Notify))
+            {
+                // Read the token out of the query string
+                context.Request.Headers.Authorization = accessToken;
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
 
 #endregion
 
@@ -141,8 +141,8 @@ builder.Services.AddControllers().AddDataAnnotationsLocalization(options =>
 });
 
 #endregion
- 
- #region Swagger config
+
+#region Swagger config
 
 builder.Services.AddSwaggerGen(x =>
 {
@@ -175,7 +175,7 @@ builder.Services.AddSwaggerGen(x =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = Modules.Bearer,
         BearerFormat = "Bearer",
-        
+
     });
     x.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
@@ -272,8 +272,8 @@ var app = builder.Build();
 #region To take an instance from specific repository
 
 var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
- using var scope = scopedFactory!.CreateScope();
- ILoggingRepository loggingRepository = scope.ServiceProvider.GetService<ILoggingRepository>()!;
+using var scope = scopedFactory!.CreateScope();
+ILoggingRepository loggingRepository = scope.ServiceProvider.GetService<ILoggingRepository>()!;
 
 #endregion
 
@@ -312,40 +312,40 @@ app.UseSwaggerUI(x =>
 //// Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment() || app.Environment.IsProduction() || app.Environment.IsEnvironment(Shared.Local))
 // {
-     
-   
+
+
 //     Log.Information("end of swagger");
 //}
 
 
- app.ConfigureExceptionHandler(loggingRepository);    // custom as a global exception
- app.UseHttpsRedirection();
- app.UseRouting();
- app.UseStaticFiles();
- //app.ConfigureStaticFilesHandler();                   // custom as Static files
- app.UseRequestLocalization(localizationOptions);
- app.UseCors(b=>b.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
- app.UseAuthentication();
- app.UseAuthorization();
- app.MapControllers();
- app.UseSerilogRequestLogging();
- app.MapGet(string.Empty, (context) =>
- {
-     context.Response.Redirect("/swagger");
-     return Task.CompletedTask;
- });
+app.ConfigureExceptionHandler(loggingRepository);    // custom as a global exception
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseStaticFiles();
+//app.ConfigureStaticFilesHandler();                   // custom as Static files
+app.UseRequestLocalization(localizationOptions);
+app.UseCors(b => b.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.UseSerilogRequestLogging();
+app.MapGet(string.Empty, (context) =>
+{
+    context.Response.Redirect("/swagger");
+    return Task.CompletedTask;
+});
 
- app.MapGet("env", async (context) => await context.Response.WriteAsync(app.Environment.EnvironmentName));
+app.MapGet("env", async (context) => await context.Response.WriteAsync(app.Environment.EnvironmentName));
 
 try
 {
     app.Run();
- }
- catch (Exception ex)
- {
-     Log.Fatal(ex, "Application Error When Building");
- }
- finally
- {
-     Log.CloseAndFlush();
- }
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application Error When Building");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

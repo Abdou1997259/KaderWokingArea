@@ -8,7 +8,7 @@ public class HrProfile : Profile
     {
         #region Company
 
-        CreateMap<StSubMainScreen, StUpdateSubMainScreenRequest>()
+        CreateMap<StScreenSub, StUpdateSubMainScreenRequest>()
                 .ReverseMap();
 
         #endregion
