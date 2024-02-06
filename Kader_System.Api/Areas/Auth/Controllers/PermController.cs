@@ -4,7 +4,7 @@
 [ApiController]
 [ApiExplorerSettings(GroupName = Modules.Auth)]
 [Authorize(Permissions.Setting.View)]
-[Route("Api/[controller]")]
+[Route("api/v1/")]
 public class PermController(IPermService service) : ControllerBase
 {
     private readonly IPermService _service = service;

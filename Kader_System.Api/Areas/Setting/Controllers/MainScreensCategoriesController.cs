@@ -4,7 +4,7 @@
 [ApiExplorerSettings(GroupName = Modules.Setting)]
 [ApiController]
 [Authorize(Permissions.MainScreenCat.View)]
-[Route("Api/v1/")]
+[Route("api/v1/")]
 
 public class MainScreensCategoriesController(IMainScreenCategoryService service) : ControllerBase
 {

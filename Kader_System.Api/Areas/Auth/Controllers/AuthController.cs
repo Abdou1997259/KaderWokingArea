@@ -5,7 +5,7 @@
 [ApiExplorerSettings(GroupName = Modules.Auth)]
 [Authorize(Permissions.Setting.View)]
 //[Authorize("Superadmin")]
-[Route("Api/[controller]")]
+[Route("api/v1/")]
 public class AuthController(IAuthService service) : ControllerBase
 {
     private readonly IAuthService _service = service;
