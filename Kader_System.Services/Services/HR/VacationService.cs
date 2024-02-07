@@ -1,6 +1,8 @@
 ﻿
 
+using Kader_System.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using System.Xml;
 
 namespace Kader_System.Services.Services.HR
@@ -94,19 +96,38 @@ namespace Kader_System.Services.Services.HR
         }
 
 
-        public async Task<Response<GetAllVacationResponse>> GetAllVacationsWithJoinAsync(string lang, GetAllFilterationFoVacationRequest model)
+        public async Task<Response<GetAllVacationResponse>> GetAllVacationsWithJoinAsync(string lang,
+            GetAllFilterationFoVacationRequest model,string host)
         {
             Expression<Func<HrVacation, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-
+            var totalRecords = await unitOfWork.Vacations.CountAsync(filter: filter);
+            int page = 1;
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
+            if (model.PageNumber < 1)
+                page = 1;
+            var pageLinks = Enumerable.Range(1, totalPages)
+                .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
+                .ToList();
             var result = new GetAllVacationResponse()
             {
-                TotalRecords = await unitOfWork.Vacations.CountAsync(filter: filter),
+                TotalRecords = totalRecords,
 
                 Items = ( unitOfWork.Vacations.GetVacationInfo
                     (   filter,
                         take: model.PageSize,
-                        skip: (model.PageNumber - 1) * model.PageSize))
-                        
+                        skip: (model.PageNumber - 1) * model.PageSize)),
+                CurrentPage = model.PageNumber,
+                FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
+                From = (page - 1) * model.PageSize + 1,
+                To = Math.Min(page * model.PageSize, totalRecords),
+                LastPage = totalPages,
+                LastPageUrl = host + $"?PageSize={model.PageSize}&PageNumber={totalPages}&IsDeleted={model.IsDeleted}",
+                PreviousPage = page > 1 ? host + $"?PageSize={model.PageSize}&PageNumber={page - 1}&IsDeleted={model.IsDeleted}" : null,
+                NextPageUrl = page < totalPages ? host + $"?PageSize={model.PageSize}&PageNumber={page + 1}&IsDeleted={model.IsDeleted}" : null,
+                Path = host,
+                PerPage = model.PageSize,
+                Links = pageLinks
+
             };
 
             if (result.TotalRecords is 0)

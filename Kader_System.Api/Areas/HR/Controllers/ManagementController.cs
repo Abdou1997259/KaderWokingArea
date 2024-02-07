@@ -15,7 +15,7 @@
 
         [HttpGet(ApiRoutes.Management.GetAllManagements)]
         public async Task<IActionResult> GetAll([FromQuery] HrGetAllFiltrationsFoManagementsRequest model)
-            => Ok(await service.GetAllManagementsAsync(GetCurrentRequestLanguage(), model));
+            => Ok(await service.GetAllManagementsAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
 
         [HttpGet(ApiRoutes.Management.GetManagementById)]
         public async Task<IActionResult> GetById (int id)
@@ -91,7 +91,9 @@
 
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
-
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
     }
 }

@@ -15,7 +15,7 @@ namespace Kader_System.Api.Areas.Trans
 
         [HttpGet(ApiRoutes.TransCovenant.GetTransCovenants)]
         public async Task<IActionResult> GetAllTransCovenants([FromQuery] GetAllFilterationForTransCovenant request) =>
-            Ok(await service.GetAllTransCovenantsAsync(GetCurrentRequestLanguage(),request));
+            Ok(await service.GetAllTransCovenantsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
 
         [HttpPost(ApiRoutes.TransCovenant.CreateTransCovenant)]
         public async Task<IActionResult> CreateTransCovenant([FromBody] CreateTransCovenantRequest request)
@@ -72,7 +72,9 @@ namespace Kader_System.Api.Areas.Trans
         #region Helpers
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
-
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
 
         #endregion
     }

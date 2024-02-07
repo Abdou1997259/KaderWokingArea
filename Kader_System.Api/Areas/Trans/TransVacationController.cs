@@ -17,7 +17,7 @@ namespace Kader_System.Api.Areas.Trans
 
         [HttpGet(ApiRoutes.TransVacation.GetTransVacations)]
         public async Task<IActionResult> GetAllTransVacations([FromQuery] GetAllFilterationForTransVacationRequest request) =>
-            Ok(await service.GetAllTransVacationsAsync(GetCurrentRequestLanguage(),request));
+            Ok(await service.GetAllTransVacationsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
 
         [HttpPost(ApiRoutes.TransVacation.CreateTransVacation)]
         public async Task<IActionResult> CreateTransVacation([FromBody] CreateTransVacationRequest request)
@@ -75,7 +75,9 @@ namespace Kader_System.Api.Areas.Trans
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
 
-
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
     }
 }

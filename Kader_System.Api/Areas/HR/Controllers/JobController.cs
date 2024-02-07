@@ -28,7 +28,8 @@
         [HttpGet(ApiRoutes.Job.GetAllJobs)]
         public async Task<IActionResult> GetAll([FromQuery] HrGetAllFilterationForJobRequest model)
         {
-            return Ok(await jobService.GetAllJobsAsync(GetCurrentRequestLanguage(), model));
+           
+            return Ok(await jobService.GetAllJobsAsync(GetCurrentRequestLanguage(), model,GetCurrentHost()));
         }
         #endregion
 
@@ -81,6 +82,10 @@
 
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
+
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value+
+            HttpContext.Request.Path.Value;
 
         #endregion
 

@@ -3,7 +3,7 @@
 public interface ITransDeductionService
 {
     Task<Response<IEnumerable<SelectListOfTransDeductionResponse>>> ListOfTransDeductionsAsync(string lang);
-    Task<Response<GetAllTransDeductionResponse>> GetAllTransDeductionsAsync(string lang, GetAllFilterationForTransDeductionRequest model);
+    Task<Response<GetAllTransDeductionResponse>> GetAllTransDeductionsAsync(string lang, GetAllFilterationForTransDeductionRequest model, string host);
     Task<Response<CreateTransDeductionRequest>> CreateTransDeductionAsync(CreateTransDeductionRequest model);
     Task<Response<GetTransDeductionById>> GetTransDeductionByIdAsync(int id);
     Task<Response<GetTransDeductionById>> UpdateTransDeductionAsync(int id, CreateTransDeductionRequest model);

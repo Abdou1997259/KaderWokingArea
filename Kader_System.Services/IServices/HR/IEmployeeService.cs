@@ -3,7 +3,7 @@
 public interface IEmployeeService
 {
     Task<Response<IEnumerable<ListOfEmployeesResponse>>> ListOfEmployeesAsync(string lang);
-    Task<Response<GetAllEmployeesResponse>> GetAllEmployeesAsync(string lang, GetAllEmployeesFilterRequest model);
+    Task<Response<GetAllEmployeesResponse>> GetAllEmployeesAsync(string lang, GetAllEmployeesFilterRequest model, string host);
     Task<Response<CreateEmployeeRequest>> CreateEmployeeAsync(CreateEmployeeRequest model);
     Task<Response<GetEmployeeByIdResponse>> GetEmployeeByIdAsync(int id);
     Task<Response<CreateEmployeeRequest>> UpdateEmployeeAsync(int id, CreateEmployeeRequest model);

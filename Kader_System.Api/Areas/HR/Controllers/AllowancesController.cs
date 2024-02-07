@@ -14,7 +14,7 @@ public class AllowancesController(IAllowanceService service) : ControllerBase
 
     [HttpGet(ApiRoutes.Allowance.GetAllAllowances)]
     public async Task<IActionResult> GetAllAllowancesAsync([FromQuery] HrGetAllFiltrationsForAllowancesRequest model) =>
-        Ok(await service.GetAllAllowancesAsync(GetCurrentRequestLanguage(), model));
+        Ok(await service.GetAllAllowancesAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
 
     [HttpGet(ApiRoutes.Allowance.GetAllowanceById)]
     public async Task<IActionResult> GetAllowanceByIdAsync(int id)
@@ -79,7 +79,9 @@ public class AllowancesController(IAllowanceService service) : ControllerBase
     private string GetCurrentRequestLanguage() =>
         Request.Headers.AcceptLanguage.ToString().Split(',').First();
 
-
+    private string GetCurrentHost() =>
+        HttpContext.Request.Host.Value +
+        HttpContext.Request.Path.Value;
     #endregion
 
 

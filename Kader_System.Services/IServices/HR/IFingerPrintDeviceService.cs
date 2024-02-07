@@ -2,7 +2,7 @@
 {
     public interface IFingerPrintDeviceService
     {
-        Task<Response<GetAllFingerPrintDevicesResponse>> GetAllFingerPrintDevicesAsync(string lang,GetAllFingerPrintDevicesFilterrationRequest request);
+        Task<Response<GetAllFingerPrintDevicesResponse>> GetAllFingerPrintDevicesAsync(string lang,GetAllFingerPrintDevicesFilterrationRequest request,string host);
         Task<Response<GetFingerPrintDeviceByIdResponse>> GetFingerPrintDeviceByIdAsync(int id);
         Task<Response<IEnumerable<ListOfFingerPrintDevicesResponse>>> GetFingerPrintDevicesAsync(string lang);
         Task<Response<CreateFingerPrintDeviceRequest>> CreateFingerPrintDevicesAsync(CreateFingerPrintDeviceRequest request);

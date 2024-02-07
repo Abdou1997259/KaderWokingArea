@@ -13,7 +13,7 @@
 
         [HttpGet(ApiRoutes.Contract.GetAllContracts)]
         public async Task<IActionResult> GetAllAsync([FromQuery] GetAlFilterationForContractRequest request) =>
-            Ok(await contractService.GetAllContractAsync(GetCurrentRequestLanguage(), request));
+            Ok(await contractService.GetAllContractAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
         [HttpGet(ApiRoutes.Contract.GetContractById)]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
@@ -83,6 +83,9 @@
 
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
     }
 }

@@ -16,7 +16,7 @@ namespace Kader_System.Api.Areas.Trans
 
         [HttpGet(ApiRoutes.TransAllowance.GetAllTransAllowances)]
         public async Task<IActionResult> GetAllTransAllowances([FromQuery] GetAllFilterationAllowanceRequest model) =>
-            Ok(await service.GetAllTransAllowancesAsync(GetCurrentRequestLanguage(),model));
+            Ok(await service.GetAllTransAllowancesAsync(GetCurrentRequestLanguage(),model, GetCurrentHost()));
 
         [HttpGet(ApiRoutes.TransAllowance.GetTransAllowanceById)]
         public async Task<IActionResult> GetTransAllowanceById([FromRoute]int id)
@@ -95,7 +95,9 @@ namespace Kader_System.Api.Areas.Trans
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
 
-
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
     }
 }

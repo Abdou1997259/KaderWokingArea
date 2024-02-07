@@ -20,7 +20,7 @@ namespace Kader_System.Api.Areas.HR.Controllers
 
         [HttpGet(ApiRoutes.Department.GetAllDepartments)]
         public async Task<IActionResult> GetAll([FromQuery]GetAllFiltrationsForDepartmentsRequest filter)
-            => Ok(await service.GetAllDepartmentsAsync(GetCurrentRequestLanguage(), filter));
+            => Ok(await service.GetAllDepartmentsAsync(GetCurrentRequestLanguage(), filter, GetCurrentHost()));
 
         [HttpGet(ApiRoutes.Department.GetDepartmentById)]
         public async Task<IActionResult> GetById(int id)
@@ -91,7 +91,9 @@ namespace Kader_System.Api.Areas.HR.Controllers
 
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
-
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
     }
 }

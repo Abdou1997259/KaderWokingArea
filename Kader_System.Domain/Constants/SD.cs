@@ -50,7 +50,7 @@ public static class SD
     {
         public const string Id = "b74ddd14-6340-4840-95c2-db12554843e5basb1";
         public const string RoleId = "fab4fac1-c546-41de-aebc-a14da68957ab1";
-        public static string Password = "Mohammed88";
+        public static string Password = "123456";
         public static string RoleNameInAr = "سوبر أدمن";
     }
     public static class UserRole
@@ -379,6 +379,7 @@ public static class SD
         public const string News = "News";
         public const string Updated = "Updated";
         public const string Deleted = "Deleted";
+        public const string Restored = "Restored";
         public const string CurrentAndNewPasswordIsTheSame = "CurrentAndNewPasswordIsTheSame";
         public const string CurrentPasswordIsIncorrect = "CurrentPasswordIsIncorrect";
         public const string UserName = "UserName";

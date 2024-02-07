@@ -1,4 +1,6 @@
-﻿namespace Kader_System.Services.Services.HR;
+﻿using Kader_System.Domain.DTOs;
+
+namespace Kader_System.Services.Services.HR;
 
 public class AllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> sharLocalizer, IMapper mapper) : IAllowanceService
 {
@@ -38,13 +40,24 @@ public class AllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
         };
     }
 
-    public async Task<Response<HrGetAllAllowancesResponse>> GetAllAllowancesAsync(string lang, HrGetAllFiltrationsForAllowancesRequest model)
+    public async Task<Response<HrGetAllAllowancesResponse>> GetAllAllowancesAsync(string lang, HrGetAllFiltrationsForAllowancesRequest model,string host)
     {
         Expression<Func<HrAllowance, bool>> filter = x => x.IsDeleted == model.IsDeleted;
 
+
+         var totalRecords = await _unitOfWork.Allowances.CountAsync(filter: filter);
+            int page = 1;
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize==0?10:model.PageSize));
+            if (model.PageNumber < 1)
+                page = 1;
+            var pageLinks = Enumerable.Range(1, totalPages)
+                .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
+                .ToList();
+
+
         var result = new HrGetAllAllowancesResponse
         {
-            TotalRecords = await _unitOfWork.Allowances.CountAsync(filter: filter),
+            TotalRecords = totalRecords ,
 
             Items = (await _unitOfWork.Allowances.GetSpecificSelectAsync(filter: filter,
                  take: model.PageSize,
@@ -54,7 +67,18 @@ public class AllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
                      Id = x.Id,
                      Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en
                  }, orderBy: x =>
-                   x.OrderByDescending(x => x.Id))).ToList()
+                   x.OrderByDescending(x => x.Id))).ToList(),
+            CurrentPage = model.PageNumber,
+            FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
+            From = (page - 1) * model.PageSize + 1,
+            To = Math.Min(page * model.PageSize, totalRecords),
+            LastPage = totalPages,
+            LastPageUrl = host + $"?PageSize={model.PageSize}&PageNumber={totalPages}&IsDeleted={model.IsDeleted}",
+            PreviousPage = page > 1 ? host + $"?PageSize={model.PageSize}&PageNumber={page - 1}&IsDeleted={model.IsDeleted}" : null,
+            NextPageUrl = page < totalPages ? host + $"?PageSize={model.PageSize}&PageNumber={page + 1}&IsDeleted={model.IsDeleted}" : null,
+            Path = host,
+            PerPage = model.PageSize,
+            Links = pageLinks
         };
 
         if (result.TotalRecords is 0)
@@ -176,6 +200,39 @@ public class AllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
         throw new NotImplementedException();
     }
 
+    public async Task<Response<HrGetAllowanceByIdResponse>> RestoreAllowanceAsync(int id)
+    {
+        var obj = await _unitOfWork.Allowances.GetByIdAsync(id);
+        if (obj == null)
+        {
+            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
+                _sharLocalizer[Localization.Allowance]);
+
+            return new()
+            {
+                Data = null,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        obj.IsDeleted = false;
+        _unitOfWork.Allowances.Update(obj);
+        await _unitOfWork.CompleteAsync();
+        return new()
+        {
+            Check = true,
+            Data = new()
+            {
+                Id = obj.Id,
+                Name_ar = obj.Name_ar,
+                Name_en = obj.Name_en
+            },
+            Msg = _sharLocalizer[Localization.Restored]
+        };
+
+
+    }
     public async Task<Response<string>> DeleteAllowanceAsync(int id)
     {
         var obj = await _unitOfWork.Allowances.GetByIdAsync(id);

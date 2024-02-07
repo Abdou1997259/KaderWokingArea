@@ -6,7 +6,7 @@ public interface IVacationService
 {
     Task<Response<IEnumerable<SelectListResponse>>> ListOfVacationsAsync(string lang);
     Task<Response<GetAllVacationResponse>> GetAllVacationsAsync(string lang, GetAllFilterationFoVacationRequest model);
-    Task<Response<GetAllVacationResponse>> GetAllVacationsWithJoinAsync(string lang, GetAllFilterationFoVacationRequest model);
+    Task<Response<GetAllVacationResponse>> GetAllVacationsWithJoinAsync(string lang, GetAllFilterationFoVacationRequest model, string host);
     Task<Response<CreateVacationRequest>> CreateVacationAsync(CreateVacationRequest model);
     Task<Response<GetVacationDetailsByIdResponse>> GetVacationByIdAsync(int id);
     Task<Response<UpdateVacationRequest>> UpdateVacationAsync(int id, UpdateVacationRequest model);

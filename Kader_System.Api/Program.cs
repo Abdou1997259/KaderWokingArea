@@ -331,7 +331,7 @@ app.MapControllers();
 app.UseSerilogRequestLogging();
 app.MapGet(string.Empty, (context) =>
 {
-    context.Response.Redirect("/swagger");
+    context.Response.Redirect("/swagger/index.html");
     return Task.CompletedTask;
 });
 

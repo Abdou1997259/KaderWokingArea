@@ -15,7 +15,7 @@ public class CompaniesController(ICompanyService service) : ControllerBase
 
     [HttpGet(ApiRoutes.Company.GetAllCompanies)]
     public async Task<IActionResult> GetAllCompaniesAsync([FromQuery] HrGetAllFiltrationsForCompaniesRequest model) =>
-        Ok(await service.GetAllCompaniesAsync(GetCurrentRequestLanguage(), model));
+        Ok(await service.GetAllCompaniesAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
 
     [HttpGet(ApiRoutes.Company.GetCompanyById)]
     public async Task<IActionResult> GetCompanyByIdAsync(int id)
@@ -82,6 +82,9 @@ public class CompaniesController(ICompanyService service) : ControllerBase
 
     private string GetCurrentRequestLanguage() =>
         Request.Headers.AcceptLanguage.ToString().Split(',').First();
+    private string GetCurrentHost() =>
+        HttpContext.Request.Host.Value +
+        HttpContext.Request.Path.Value;
     #endregion
 
 }

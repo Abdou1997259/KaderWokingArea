@@ -14,7 +14,7 @@
             => Ok(await fingerPrintDeviceService.GetFingerPrintDevicesAsync(GetCurrentRequestLanguage()));
         [HttpGet(ApiRoutes.FingerPrint.GetAllFingerPrintDevices)]
         public async Task<IActionResult> ListOfDevices([FromQuery]GetAllFingerPrintDevicesFilterrationRequest request)
-            => Ok(await fingerPrintDeviceService.GetAllFingerPrintDevicesAsync(GetCurrentRequestLanguage(), request));
+            => Ok(await fingerPrintDeviceService.GetAllFingerPrintDevicesAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
         [HttpGet(ApiRoutes.FingerPrint.GetFingerPrintDeviceById)]
         public async Task<IActionResult> GetFingerPrintDeviceById(int id)
         {
@@ -87,6 +87,9 @@
         #region Helper
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
     }
 }

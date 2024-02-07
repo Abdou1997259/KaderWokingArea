@@ -14,7 +14,7 @@ public class QualificationsController(IQualificationService service) : Controlle
 
     [HttpGet(ApiRoutes.Qualification.GetAllQualifications)]
     public async Task<IActionResult> GetAllDeductionsAsync([FromQuery] HrGetAllFiltrationsForQualificationsRequest model) =>
-        Ok(await service.GetAllQualificationsAsync(GetCurrentRequestLanguage(), model));
+        Ok(await service.GetAllQualificationsAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
 
 
     [HttpGet(ApiRoutes.Qualification.GetQualificationById)]
@@ -79,7 +79,9 @@ public class QualificationsController(IQualificationService service) : Controlle
 
     private string GetCurrentRequestLanguage() =>
         Request.Headers.AcceptLanguage.ToString().Split(',').First();
-
+    private string GetCurrentHost() =>
+        HttpContext.Request.Host.Value +
+        HttpContext.Request.Path.Value;
     #endregion
 
 

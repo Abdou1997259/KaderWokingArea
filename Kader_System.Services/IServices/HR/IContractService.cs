@@ -3,7 +3,7 @@
 public interface IContractService
 {
     Task<Response<IEnumerable<ListOfContractsResponse>>> ListOfContractsAsync(string lang);
-    Task<Response<GetAllContractsResponse>> GetAllContractAsync(string lang, GetAlFilterationForContractRequest model);
+    Task<Response<GetAllContractsResponse>> GetAllContractAsync(string lang, GetAlFilterationForContractRequest model,string host);
     Task<Response<CreateContractRequest>> CreateContractAsync(CreateContractRequest model);
     Task<Response<GetContractByIdResponse>> GetContractByIdAsync(int id);
     Task<Response<CreateContractRequest>> UpdateContractAsync(int id, CreateContractRequest model);

@@ -1,4 +1,6 @@
-﻿namespace Kader_System.Services.Services.Auth;
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace Kader_System.Services.Services.Auth;
 
 public class AuthService : IAuthService
 {
@@ -33,9 +35,8 @@ public class AuthService : IAuthService
     public async Task<Response<AuthLoginUserResponse>> LoginUserAsync(AuthLoginUserRequest model)
     {
         string err = _sharLocalizer[Localization.Error];
-
+       
         var user = await _userManager.FindByNameAsync(model.UserName);
-
         if (user == null)
             return new()
             {

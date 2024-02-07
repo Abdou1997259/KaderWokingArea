@@ -3,7 +3,7 @@
 public interface IShiftService
 {
     Task<Response<IEnumerable<SelectListResponse>>> ListOfShiftsAsync(string lang);
-    Task<Response<HrGetAllShiftsResponse>> GetAllShiftsAsync(string lang, HrGetAllFiltrationsForShiftsRequest model);
+    Task<Response<HrGetAllShiftsResponse>> GetAllShiftsAsync(string lang, HrGetAllFiltrationsForShiftsRequest model, string host);
     Task<Response<HrCreateShiftRequest>> CreateShiftAsync(HrCreateShiftRequest model);
     Task<Response<HrGetShiftByIdResponse>> GetShiftByIdAsync(int id);
     Task<Response<HrUpdateShiftRequest>> UpdateShiftAsync(int id, HrUpdateShiftRequest model);

@@ -22,7 +22,7 @@ namespace Kader_System.Api.Areas.HR.Controllers
 
         [HttpGet(ApiRoutes.Vacation.GetAllVacations)]
         public async Task<IActionResult> GetAllVacationsAsync([FromQuery] GetAllFilterationFoVacationRequest model) =>
-            Ok(await service.GetAllVacationsWithJoinAsync(GetCurrentRequestLanguage(), model));
+            Ok(await service.GetAllVacationsWithJoinAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
 
 
         [HttpGet(ApiRoutes.Vacation.GetVacationById)]
@@ -87,7 +87,9 @@ namespace Kader_System.Api.Areas.HR.Controllers
 
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
-
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
     }
 }

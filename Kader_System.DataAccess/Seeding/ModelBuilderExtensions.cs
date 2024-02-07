@@ -35,8 +35,8 @@ public static class ModelBuilderExtensions
             new ApplicationUser()
             {
                 Id = SuperAdmin.Id,
-                UserName = "Mr_Mohammed",
-                NormalizedUserName = "MR_MOHAMMED",
+                UserName = "admin",
+                NormalizedUserName = "ADMIN",
                 Email = "mohammed88@gmail.com",
                 NormalizedEmail = "MOHAMMED88@GMAIL.COM",
                 EmailConfirmed = true,

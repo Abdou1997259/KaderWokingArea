@@ -15,7 +15,7 @@ public class ShiftsController(IShiftService service) : ControllerBase
 
     [HttpGet(ApiRoutes.Shift.GetAllShifts)]
     public async Task<IActionResult> GetAllShiftsAsync([FromQuery] HrGetAllFiltrationsForShiftsRequest model) =>
-        Ok(await service.GetAllShiftsAsync(GetCurrentRequestLanguage(), model));
+        Ok(await service.GetAllShiftsAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
 
 
     #endregion
@@ -68,4 +68,7 @@ public class ShiftsController(IShiftService service) : ControllerBase
 
     private string GetCurrentRequestLanguage() =>
         Request.Headers.AcceptLanguage.ToString().Split(',').First();
+    private string GetCurrentHost() =>
+        HttpContext.Request.Host.Value +
+        HttpContext.Request.Path.Value;
 }

@@ -15,7 +15,7 @@ public class BenefitsController(IBenefitService service) : ControllerBase
 
     [HttpGet(ApiRoutes.Benefit.GetAllBenefits)]
     public async Task<IActionResult> GetAllBenefitsAsync([FromQuery] HrGetAllFiltrationsForBenefitsRequest model) =>
-        Ok(await service.GetAllBenefitsAsync(GetCurrentRequestLanguage(), model));
+        Ok(await service.GetAllBenefitsAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
     [HttpGet(ApiRoutes.Benefit.GetBenefitById)]
     public async Task<IActionResult> GetBenefitByIdAsync(int id)
     {
@@ -77,7 +77,9 @@ public class BenefitsController(IBenefitService service) : ControllerBase
     #region Helpers
     private string GetCurrentRequestLanguage() =>
         Request.Headers.AcceptLanguage.ToString().Split(',').First();
-
+    private string GetCurrentHost() =>
+        HttpContext.Request.Host.Value +
+        HttpContext.Request.Path.Value;
     #endregion
 
 }

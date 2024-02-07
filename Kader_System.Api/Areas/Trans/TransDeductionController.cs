@@ -17,7 +17,7 @@ namespace Kader_System.Api.Areas.Trans
 
         [HttpGet(ApiRoutes.TransDeduction.GetTransDeductions)]
         public async Task<IActionResult> GetAllTransDeductions([FromQuery] GetAllFilterationForTransDeductionRequest request) =>
-            Ok(await service.GetAllTransDeductionsAsync(GetCurrentRequestLanguage(),request));
+            Ok(await service.GetAllTransDeductionsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
 
         [HttpPost(ApiRoutes.TransDeduction.CreateTransDeduction)]
         public async Task<IActionResult> CreateTransDeduction([FromBody] CreateTransDeductionRequest request)
@@ -74,7 +74,9 @@ namespace Kader_System.Api.Areas.Trans
         #region Helpers
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
-
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
 
         #endregion
     }

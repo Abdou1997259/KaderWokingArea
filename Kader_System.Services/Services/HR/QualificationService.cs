@@ -1,4 +1,6 @@
-﻿namespace Kader_System.Services.Services.HR;
+﻿using Kader_System.Domain.DTOs;
+
+namespace Kader_System.Services.Services.HR;
 
 public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> sharLocalizer, IMapper mapper) : IQualificationService
 {
@@ -38,13 +40,20 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
         };
     }
 
-    public async Task<Response<HrGetAllQualificationsResponse>> GetAllQualificationsAsync(string lang, HrGetAllFiltrationsForQualificationsRequest model)
+    public async Task<Response<HrGetAllQualificationsResponse>> GetAllQualificationsAsync(string lang, HrGetAllFiltrationsForQualificationsRequest model,string host)
     {
         Expression<Func<HrQualification, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-
+        var totalRecords = await _unitOfWork.Qualifications.CountAsync(filter: filter);
+        int page = 1;
+        int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
+        if (model.PageNumber < 1)
+            page = 1;
+        var pageLinks = Enumerable.Range(1, totalPages)
+            .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
+            .ToList();
         var result = new HrGetAllQualificationsResponse
         {
-            TotalRecords = await _unitOfWork.Qualifications.CountAsync(filter: filter),
+            TotalRecords =  totalRecords,
 
             Items = (await _unitOfWork.Qualifications.GetSpecificSelectAsync(filter: filter,
                  take: model.PageSize,
@@ -54,7 +63,17 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
                      Id = x.Id,
                      Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
                  }, orderBy: x =>
-                   x.OrderByDescending(x => x.Id))).ToList()
+                   x.OrderByDescending(x => x.Id))).ToList(),
+            FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
+            From = (page - 1) * model.PageSize + 1,
+            To = Math.Min(page * model.PageSize, totalRecords),
+            LastPage = totalPages,
+            LastPageUrl = host + $"?PageSize={model.PageSize}&PageNumber={totalPages}&IsDeleted={model.IsDeleted}",
+            PreviousPage = page > 1 ? host + $"?PageSize={model.PageSize}&PageNumber={page - 1}&IsDeleted={model.IsDeleted}" : null,
+            NextPageUrl = page < totalPages ? host + $"?PageSize={model.PageSize}&PageNumber={page + 1}&IsDeleted={model.IsDeleted}" : null,
+            Path = host,
+            PerPage = model.PageSize,
+            Links = pageLinks
         };
 
         if (result.TotalRecords is 0)

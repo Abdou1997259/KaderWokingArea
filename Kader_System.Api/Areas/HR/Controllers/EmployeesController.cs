@@ -17,7 +17,7 @@
 
         [HttpGet(ApiRoutes.Employee.GetAllEmployees)]
         public async Task<IActionResult> GetAllEmployeesAsync([FromQuery]GetAllEmployeesFilterRequest request) =>
-            Ok(await employeeService.GetAllEmployeesAsync(GetCurrentRequestLanguage(), request));
+            Ok(await employeeService.GetAllEmployeesAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
 
 
         [HttpGet(ApiRoutes.Employee.GetEmployeeById)]
@@ -92,6 +92,9 @@
         #region Helper
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();
+        private string GetCurrentHost() =>
+            HttpContext.Request.Host.Value +
+            HttpContext.Request.Path.Value;
         #endregion
 
     }

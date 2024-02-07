@@ -15,7 +15,7 @@ public class DeductionsController(IDeductionService service) : ControllerBase
 
     [HttpGet(ApiRoutes.Deduction.GetAllDeductions)]
     public async Task<IActionResult> GetAllDeductionsAsync([FromQuery] HrGetAllFiltrationsForDeductionsRequest model) =>
-        Ok(await _service.GetAllDeductionsAsync(GetCurrentRequestLanguage(), model));
+        Ok(await _service.GetAllDeductionsAsync(GetCurrentRequestLanguage(), model, GetCurrentHost()));
 
     [HttpPost(ApiRoutes.Deduction.CreateDeduction)]
     public async Task<IActionResult> CreateDeductionAsync(HrCreateDeductionRequest model)
@@ -63,4 +63,7 @@ public class DeductionsController(IDeductionService service) : ControllerBase
 
     private string GetCurrentRequestLanguage() =>
         Request.Headers.AcceptLanguage.ToString().Split(',').First();
+    private string GetCurrentHost() =>
+        HttpContext.Request.Host.Value +
+        HttpContext.Request.Path.Value;
 }

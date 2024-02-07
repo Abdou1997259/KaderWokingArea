@@ -1,4 +1,7 @@
-﻿namespace Kader_System.Services.Services.HR;
+﻿using Kader_System.Domain.DTOs;
+using Microsoft.Extensions.Hosting;
+
+namespace Kader_System.Services.Services.HR;
 
 public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> shareLocalizer, IMapper mapper) : ICompanyService
 {
@@ -39,13 +42,23 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
         };
     }
 
-    public async Task<Response<HrGetAllCompaniesResponse>> GetAllCompaniesAsync(string lang, HrGetAllFiltrationsForCompaniesRequest model)
+    public async Task<Response<HrGetAllCompaniesResponse>> GetAllCompaniesAsync(string lang, HrGetAllFiltrationsForCompaniesRequest model,string host)
     {
         Expression<Func<HrCompany, bool>> filter = x => x.IsDeleted == model.IsDeleted;
 
+        var totalRecords = await unitOfWork.Companies.CountAsync(filter: filter);
+        int page = 1;
+        int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
+        if (model.PageNumber < 1)
+            page = 1;
+        var pageLinks = Enumerable.Range(1, totalPages)
+            .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
+            .ToList();
+
+
         var result = new HrGetAllCompaniesResponse
         {
-            TotalRecords = await unitOfWork.Companies.CountAsync(filter: filter),
+            TotalRecords = totalRecords,
 
             Items = (await unitOfWork.Companies.GetSpecificSelectAsync(filter: filter,
                  take: model.PageSize,
@@ -59,7 +72,18 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
                      Company_type_name = lang == Localization.Arabic ? x.CompanyType.Name : x.CompanyType.NameInEnglish,
                      Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
                  }, orderBy: x =>
-                   x.OrderByDescending(x => x.Id))).ToList()
+                   x.OrderByDescending(x => x.Id))).ToList(),
+            CurrentPage = model.PageNumber,
+            FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
+            From = (page - 1) * model.PageSize + 1,
+            To = Math.Min(page * model.PageSize, totalRecords),
+            LastPage = totalPages,
+            LastPageUrl = host + $"?PageSize={model.PageSize}&PageNumber={totalPages}&IsDeleted={model.IsDeleted}",
+            PreviousPage = page > 1 ? host + $"?PageSize={model.PageSize}&PageNumber={page - 1}&IsDeleted={model.IsDeleted}" : null,
+            NextPageUrl = page < totalPages ? host + $"?PageSize={model.PageSize}&PageNumber={page + 1}&IsDeleted={model.IsDeleted}" : null,
+            Path = host,
+            PerPage = model.PageSize,
+            Links = pageLinks
         };
 
         if (result.TotalRecords is 0)
@@ -272,6 +296,40 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
     public Task<Response<string>> UpdateActiveOrNotCompanyAsync(int id)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<Response<object>> RestoreCompanyAsync(int id)
+    {
+        var obj = await unitOfWork.Companies.GetByIdAsync(id);
+        if (obj == null)
+        {
+            string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
+                shareLocalizer[Localization.Company]);
+
+            return new()
+            {
+                Data = string.Empty,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        obj.IsDeleted = false;
+        unitOfWork.Companies.Update(obj);
+        await unitOfWork.CompleteAsync();
+        var newObject = new
+        {
+            Id = obj.Id,
+            NameAr = obj.NameAr,
+            NameEn = obj.NameEn
+        };
+        return new()
+        {
+            Data = newObject
+            ,
+            Error = string.Empty,
+            Msg = "Restored Successfully"
+        };
     }
     #endregion
 
