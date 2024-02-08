@@ -45,12 +45,15 @@ namespace Kader_System.Services.Services.HR
         public async Task<Response<GetAllDepartmentsResponse>> GetAllDepartmentsAsync(string lang
             , GetAllFiltrationsForDepartmentsRequest model,string host)
         {
-            Expression<Func<HrDepartment, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+            Expression<Func<HrDepartment, bool>> filter = x => x.IsDeleted == model.IsDeleted &&
+                                                               (string.IsNullOrEmpty(model.Word) || x.NameAr.Contains(model.Word) || x.NameEn.Contains(model.Word));
             var totalRecords = await unitOfWork.Departments.CountAsync(filter: filter);
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
             if (model.PageNumber < 1)
                 page = 1;
+            else
+                page = model.PageNumber;
             var pageLinks = Enumerable.Range(1, totalPages)
                 .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
                 .ToList();

@@ -43,12 +43,15 @@ public class BenefitService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
 
     public async Task<Response<HrGetAllBenefitsResponse>> GetAllBenefitsAsync(string lang, HrGetAllFiltrationsForBenefitsRequest model,string host)
     {
-        Expression<Func<HrBenefit, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+        Expression<Func<HrBenefit, bool>> filter = x => x.IsDeleted == model.IsDeleted &&
+            (string.IsNullOrEmpty(model.Word) || x.Name_ar.Contains(model.Word )|| x.Name_en.Contains(model.Word));
         var totalRecords =await _unitOfWork.Benefits.CountAsync(filter: filter);
         int page = 1;
         int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
         if (model.PageNumber < 1)
             page = 1;
+        else
+            page = model.PageNumber;
         var pageLinks = Enumerable.Range(1, totalPages)
             .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
             .ToList();

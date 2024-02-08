@@ -58,6 +58,8 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
         int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
         if (model.PageNumber < 1)
             page = 1;
+        else
+            page = model.PageNumber;
         var pageLinks = Enumerable.Range(1, totalPages)
             .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
             .ToList();

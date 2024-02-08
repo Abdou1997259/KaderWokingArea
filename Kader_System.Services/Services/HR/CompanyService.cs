@@ -44,13 +44,19 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
 
     public async Task<Response<HrGetAllCompaniesResponse>> GetAllCompaniesAsync(string lang, HrGetAllFiltrationsForCompaniesRequest model,string host)
     {
-        Expression<Func<HrCompany, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+        Expression<Func<HrCompany, bool>> filter = x => x.IsDeleted == model.IsDeleted &&
+            (string.IsNullOrEmpty(model.Word) || x.NameAr.Contains(model.Word)  || x.NameEn.Contains(model.Word)
+             || x.CompanyOwner==model.Word
+             || x.CompanyType!.Name.Contains(model.Word));
 
         var totalRecords = await unitOfWork.Companies.CountAsync(filter: filter);
         int page = 1;
-        int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
+        int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize))
+            ;
         if (model.PageNumber < 1)
             page = 1;
+        else
+            page = model.PageNumber;
         var pageLinks = Enumerable.Range(1, totalPages)
             .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
             .ToList();
