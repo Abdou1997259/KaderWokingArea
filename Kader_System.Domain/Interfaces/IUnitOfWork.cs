@@ -50,6 +50,9 @@ public interface IUnitOfWork : IDisposable
     ITransCovenantRepository TransCovenants { get; }
     ITransDeductionRepository TransDeductions { get; }
     ITransVacationRepository TransVacations { get; }
-
+    INationalityRepository Nationalities { get; }
+    IMaritalStatusRepository MaritalStatus { get; }
+    IGenderRepository Genders { get; }
+    IReligionRepository Religions { get; }
     Task<int> CompleteAsync();
 }

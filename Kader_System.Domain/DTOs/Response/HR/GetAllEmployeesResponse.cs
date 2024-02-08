@@ -37,7 +37,6 @@
         public string SalaryPaymentWay { get; set; }
 
         public string Username { get; set; }
-        public string Password { get; set; }
 
         public int ChildrenNumber { get; set; }
         public string Shift { get; set; }
@@ -63,7 +62,7 @@
 
         public string Nationality { get; set; }
 
-        public string Qualification { get; set; }
+        public string qualification_name { get; set; }
 
 
         public string Vacation { get; set; }
@@ -75,5 +74,18 @@
         /// </summary>
 
         public string EmployeeType { get; set; }
+
+
+        public string religion_name { get; set; }   
+        public string note { get; set; }
+        public string nationality_name { get; set; }
+        public string marital_status_name { get; set; }
+        public int employee_loans_count { get; set; }
+        public string management_name { get; set; }
+        public string job_name { get; set; }
+        public string company_name { get; set; }
+        public string department_name { get; set; }
+        public int vacation_days_count { get; set; }
+
     }
 }

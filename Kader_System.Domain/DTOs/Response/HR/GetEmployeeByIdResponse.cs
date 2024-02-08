@@ -1,8 +1,11 @@
-﻿namespace Kader_System.Domain.DTOs.Response.HR
+﻿using System.Xml.Schema;
+
+namespace Kader_System.Domain.DTOs.Response.HR
 {
     public class GetEmployeeByIdResponse
     {
         public int Id { get; set; }
+        
         public  string FirstNameAr { get; set; }
         public  string FirstNameEn { get; set; }
         public  string FatherNameAr { get; set; }
@@ -12,9 +15,9 @@
         public  string FamilyNameAr { get; set; }
         public  string FamilyNameEn { get; set; }
  
-        public string FullNameAr => $"{FirstNameAr} {FatherNameAr} {GrandFatherNameAr} {FamilyNameAr}";
-    
-        public string FullNameEn => $"{FirstNameEn} {FatherNameEn} {GrandFatherNameEn} {FamilyNameEn}";
+        public string FullNameAr { get; set; }
+
+        public string FullNameEn { get; set; }
 
         public int MaritalStatusId { get; set; }
        
@@ -40,14 +43,15 @@
         public int SalaryPaymentWayId { get; set; }
     
         public  string Username { get; set; }
-        public  string Password { get; set; }
       
         public  int ChildrenNumber { get; set; }
 
 
 
         public int ShiftId { get; set; }
-      
+        public string shift_name { get; set; }
+
+
         public int CompanyId { get; set; }
      
         /// <summary>
@@ -84,6 +88,20 @@
         /// </summary>
         public int EmployeeTypeId { get; set; }
         public long? AccountNo { get; set; }
-     
+
+        public string religion_name { get; set; }
+        public string? note { get; set; }
+        public string nationality_name { get; set; }
+        public string marital_status_name { get; set; }
+        public int employee_loans_count { get; set; }
+        public string management_name { get; set; }
+        public string job_name { get; set; }
+        public string company_name { get; set; }
+        public string department_name { get; set; }
+        public double vacation_days_count { get; set; }
+        public string qualification_name { get; set; }
+        public double allowances_sum { get; set; }
+        public double employee_loans_sum { get; set; }
+
     }
 }
