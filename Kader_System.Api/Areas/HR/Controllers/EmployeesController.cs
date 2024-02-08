@@ -24,14 +24,18 @@
 
         public async Task<IActionResult> GetEmployeeByIdAsync(int id)
         {
-            var response = await employeeService.GetEmployeeByIdAsync(id);
+            var response =  employeeService.GetEmployeeById(id,GetCurrentRequestLanguage());
             if (response.Check)
                 return Ok(response);
             else if (!response.Check)
                 return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
         }
-
+        [HttpGet(ApiRoutes.Employee.GetLookUps)]
+        public async Task<IActionResult> GetLookUps()
+        {
+          return Ok(await employeeService.GetEmployeesLookUpsData(GetCurrentRequestLanguage()));
+        }
 
         #endregion
 
@@ -58,8 +62,19 @@
 
         #region Put
 
+        [HttpPut(ApiRoutes.Employee.Restore)]
+        public async Task<IActionResult> RestoreEmployee([FromRoute]int id)
+        {
+            var response = await employeeService.RestoreEmployeeAsync(id);
+            if (response.Check)
+                return Ok(response);
+            else if (!response.Check)
+                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
+
         [HttpPut(ApiRoutes.Employee.UpdateEmployee)]
-        public async Task<IActionResult> UpdateEmployeeAsyncTask([FromRoute]int id,[FromForm] CreateEmployeeRequest request)
+        public async Task<IActionResult> UpdateEmployeeAsyncTask([FromRoute] int id, [FromForm] CreateEmployeeRequest request)
         {
             var response = await employeeService.UpdateEmployeeAsync(id, request);
             if (response.Check)
@@ -68,8 +83,6 @@
                 return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
         }
-
-
         #endregion
 
 
