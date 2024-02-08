@@ -124,6 +124,7 @@ public class HrEmployee : BaseEntity
     public HrEmployeeType EmployeeType { get; set; } = default!;
 
     public long? AccountNo { get; set; }
+    public string? Note { get; set; }
     public ICollection<HrEmployeeAttachment> ListOfAttachments { get; set; } = [];
 
 
