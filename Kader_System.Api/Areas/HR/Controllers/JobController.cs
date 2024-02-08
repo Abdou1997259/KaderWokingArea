@@ -62,6 +62,16 @@
         }
 
 
+        [HttpPut(ApiRoutes.Job.RestoreJob)]
+        public async Task<IActionResult> RestoreJob([FromRoute] int id)
+        {
+            var response = await jobService.RestoreJobAsync(id);
+            if (response.Check)
+                return Ok(response);
+            else if (!response.Check)
+                return BadRequest(response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
         #endregion
 
         #region Delete

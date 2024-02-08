@@ -52,6 +52,10 @@ namespace Kader_System.Services.Services.HR
             var pageLinks = Enumerable.Range(1, totalPages)
                 .Select(p => new Link() { label = p.ToString(), url =host+ $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p==model.PageNumber})
                 .ToList();
+            //List Of Employees
+            var employees =await unitOfWork.Employees.GetAllAsync();
+
+
             var result = new HrGetAllJobsResponse
             {
                 TotalRecords =totalRecords ,
@@ -62,7 +66,10 @@ namespace Kader_System.Services.Services.HR
                     select: x => new JobData()
                     {
                         Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+                        HasAdditionalTime = x.HasAdditionalTime,
+                        HasNeedLicense = x.HasNeedLicense,
+                        EmployeesCount = employees.Count(e => e.JobId == x.Id)
                     }, orderBy: x =>
                         x.OrderByDescending(x => x.Id))).ToList(),
                 CurrentPage = model.PageNumber,
@@ -123,7 +130,9 @@ namespace Kader_System.Services.Services.HR
             await unitOfWork.Jobs.AddAsync(new()
             {
                 NameEn = model.NameEn,
-                NameAr = model.NameAr
+                NameAr = model.NameAr,
+                HasAdditionalTime = model.HasAdditionalTime,
+                HasNeedLicense = model.HasNeedLicense
             });
             await unitOfWork.CompleteAsync();
 
@@ -157,7 +166,10 @@ namespace Kader_System.Services.Services.HR
                 {
                     Id = id,
                     NameAr = obj.NameAr,
-                    NameEn = obj.NameEn
+                    NameEn = obj.NameEn,
+                    HasAdditionalTime = obj.HasAdditionalTime,
+                    HasNeedLicense = obj.HasNeedLicense,
+                    EmployeesCount =await unitOfWork.Employees.CountAsync(e=>e.JobId==id)
                 },
                 Check = true
             };
@@ -182,6 +194,8 @@ namespace Kader_System.Services.Services.HR
 
             obj.NameAr = model.NameAr;
             obj.NameEn = model.NameEn;
+            obj.HasAdditionalTime = model.HasAdditionalTime;
+            obj.HasNeedLicense = model.HasNeedLicense;
 
             unitOfWork.Jobs.Update(obj);
             await unitOfWork.CompleteAsync();
@@ -190,6 +204,43 @@ namespace Kader_System.Services.Services.HR
             {
                 Check = true,
                 Data = model,
+                Msg = sharLocalizer[Localization.Updated]
+            };
+        }
+
+        public async Task<Response<HrGetJobByIdResponse>> RestoreJobAsync(int id )
+        {
+            var obj = await unitOfWork.Jobs.GetByIdAsync(id);
+
+            if (obj == null)
+            {
+                string resultMsg = string.Format(sharLocalizer[Localization.CannotBeFound],
+                    sharLocalizer[Localization.Qualification]);
+
+                return new()
+                {
+                    Data = null,
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            obj.IsDeleted = false;
+
+            unitOfWork.Jobs.Update(obj);
+            await unitOfWork.CompleteAsync();
+
+            return new()
+            {
+                Check = true,
+                Data = new()
+                {
+                    HasAdditionalTime = obj.HasAdditionalTime,
+                    HasNeedLicense = obj.HasNeedLicense,
+                    Id = obj.Id,
+                    NameAr = obj.NameAr,
+                    NameEn = obj.NameEn
+                },
                 Msg = sharLocalizer[Localization.Updated]
             };
         }

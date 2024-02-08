@@ -303,6 +303,7 @@ public static class SD
             public const string GetAllJobs = "Job/getAll";
             public const string CreateJob = "Job/create";
             public const string UpdateJob = "Job/update/{id}";
+            public const string RestoreJob = "Job/Restore/{id}";
             public const string GetJobById = "Job/getById/{id}";
             public const string DeleteJob = "Job/delete/{id}";
         }
