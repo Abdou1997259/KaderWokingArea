@@ -250,8 +250,8 @@ namespace Kader_System.Services.Services.HR
 
         public async Task<Response<CreateEmployeeRequest>> CreateEmployeeAsync(CreateEmployeeRequest model)
         {
-            var fullNameAr = $"{model.FirstNameAr} {model.FatherNameAr} {model.GrandFatherNameAr} {model.FamilyNameAr}";
-            var fullNameEn = $"{model.FirstNameEn} {model.FatherNameEn} {model.GrandFatherNameEn} {model.FamilyNameEn}";
+            var fullNameAr = $"{model.first_name_ar} {model.father_name_ar} {model.grand_father_name_ar} {model.family_name_ar}";
+            var fullNameEn = $"{model.first_name_en} {model.father_name_en} {model.grand_father_name_en} {model.family_name_en}";
 
             var exists = await unitOfWork.Employees.ExistAsync(x => x.FullNameEn.Trim() == fullNameEn.Trim()
                                                                     && x.FullNameAr.Trim() == fullNameAr.Trim());
@@ -274,16 +274,16 @@ namespace Kader_System.Services.Services.HR
                 var newEmployee = mapper.Map<HrEmployee>(model);
 
                 GetFileNameAndExtension imageFile = new();
-                if (model.EmployeeImageFile != null)
+                if (model.employee_image_file != null)
                 {
-                    imageFile = ManageFilesHelper.UploadFile(model.EmployeeImageFile, GoRootPath.EmployeeImagesPath);
+                    imageFile = ManageFilesHelper.UploadFile(model.employee_image_file, GoRootPath.EmployeeImagesPath);
                 }
 
                 List<GetFileNameAndExtension> employeeAttachments = [];
-                if (model.EmployeeAttachments is not null && model.EmployeeAttachments.Any())
+                if (model.employee_attachments is not null && model.employee_attachments.Any())
                 {
                     employeeAttachments =
-                        ManageFilesHelper.UploadFiles(model.EmployeeAttachments, GoRootPath.HRFilesPath);
+                        ManageFilesHelper.UploadFiles(model.employee_attachments, GoRootPath.HRFilesPath);
                 }
 
                 newEmployee.EmployeeImage = imageFile?.FileName;
@@ -298,15 +298,15 @@ namespace Kader_System.Services.Services.HR
 
                 var newUser = await unitOfWork.Users.AddAsync(new ApplicationUser()
                 {
-                    UserName = model.Username,
+                    UserName = model.user_name,
                     Id = Guid.NewGuid().ToString(),
-                    NormalizedUserName = model.Username.ToUpper(),
+                    NormalizedUserName = model.user_name.ToUpper(),
                     Email = newEmployee.Email,
                     NormalizedEmail = newEmployee.Email.ToUpper(),
                     EmailConfirmed = true,
                     IsActive = true,
-                    PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!, model.Password),
-                    VisiblePassword = model.Password
+                    PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!, model.password),
+                    VisiblePassword = model.password
 
                 });
                 if (newUser != null)
@@ -339,7 +339,7 @@ namespace Kader_System.Services.Services.HR
                         shareLocalizer[Localization.Employee]),
                     Check = false,
                     Data = model,
-                    Error = ex.Message
+                    Error = ex.InnerException!=null ? ex.InnerException.ToString() :ex.Message
                 };
             }
 
@@ -373,8 +373,8 @@ namespace Kader_System.Services.Services.HR
             }
 
 
-            var fullNameAr = $"{model.FirstNameAr} {model.FatherNameAr} {model.GrandFatherNameAr} {model.FamilyNameAr}";
-            var fullNameEn = $"{model.FirstNameEn} {model.FatherNameEn} {model.GrandFatherNameEn} {model.FamilyNameEn}";
+            var fullNameAr = $"{model.first_name_ar} {model.father_name_ar} {model.grand_father_name_ar} {model.family_name_ar}";
+            var fullNameEn = $"{model.first_name_en} {model.father_name_en} {model.grand_father_name_en} {model.family_name_en}";
 
             var exists = await unitOfWork.Employees.ExistAsync(x => x.FullNameEn.Trim() == fullNameEn.Trim()
                                                                     && x.FullNameAr.Trim() == fullNameAr.Trim() && x.Id != id);
@@ -409,47 +409,47 @@ namespace Kader_System.Services.Services.HR
 
 
                 GetFileNameAndExtension imageFile = new();
-                if (model.EmployeeImageFile != null)
+                if (model.employee_image_file != null)
                 {
-                    imageFile = ManageFilesHelper.UploadFile(model.EmployeeImageFile, GoRootPath.EmployeeImagesPath);
+                    imageFile = ManageFilesHelper.UploadFile(model.employee_image_file, GoRootPath.EmployeeImagesPath);
                 }
 
                 List<GetFileNameAndExtension> employeeAttachments = [];
-                if (model.EmployeeAttachments is not null && model.EmployeeAttachments.Any())
+                if (model.employee_attachments is not null && model.employee_attachments.Any())
                 {
-                    employeeAttachments = ManageFilesHelper.UploadFiles(model.EmployeeAttachments, GoRootPath.HRFilesPath);
+                    employeeAttachments = ManageFilesHelper.UploadFiles(model.employee_attachments, GoRootPath.HRFilesPath);
                 }
-                obj.Address = model.Address;
-                obj.AccountNo = model.AccountNo;
-                obj.Email = model.Email;
-                obj.BirthDate = model.BirthDate;
-                obj.ChildrenNumber = model.ChildrenNumber;
-                obj.CompanyId = model.CompanyId;
-                obj.DepartmentId = model.DepartmentId;
-                obj.EmployeeTypeId = model.EmployeeTypeId;
-                obj.VacationId = model.VacationId;
-                obj.FamilyNameAr = model.FamilyNameAr;
-                obj.FamilyNameEn = model.FamilyNameEn;
-                obj.FirstNameEn = model.FirstNameEn;
-                obj.FirstNameAr = model.FirstNameAr;
-                obj.FatherNameAr = model.FatherNameAr;
-                obj.FatherNameEn = model.FatherNameEn;
-                obj.GrandFatherNameAr = model.GrandFatherNameAr;
-                obj.GrandFatherNameEn = model.GrandFatherNameEn;
-                obj.FingerPrintCode = model.FingerPrintCode;
-                obj.FingerPrintId = model.FingerPrintId;
+                obj.Address = model.address;
+                obj.AccountNo = model.account_no;
+                obj.Email = model.email;
+                obj.BirthDate = model.birth_date;
+                obj.ChildrenNumber = model.children_number;
+                obj.CompanyId = model.company_id;
+                obj.DepartmentId = model.department_id;
+                obj.EmployeeTypeId = model.employee_type_id;
+                obj.VacationId = model.vacation_id;
+                obj.FamilyNameAr = model.family_name_ar;
+                obj.FamilyNameEn = model.family_name_en;
+                obj.FirstNameEn = model.first_name_en;
+                obj.FirstNameAr = model.first_name_ar;
+                obj.FatherNameAr = model.father_name_ar;
+                obj.FatherNameEn = model.father_name_en;
+                obj.GrandFatherNameAr = model.grand_father_name_ar;
+                obj.GrandFatherNameEn = model.grand_father_name_en;
+                obj.FingerPrintCode = model.finger_print_code;
+                obj.FingerPrintId = model.finger_print_id;
               
-                obj.Phone = model.Phone;
-                obj.GenderId = model.GenderId;
-                obj.QualificationId = model.QualificationId;
-                obj.ShiftId = model.ShiftId;
-                obj.NationalId = model.NationalId;
-                obj.NationalityId = model.NationalityId;
-                obj.JobId = model.JobId;
-                obj.JobNumber = model.JobNumber;
-                obj.HiringDate = model.HiringDate;
-                obj.ImmediatelyDate = model.ImmediatelyDate;
-                obj.IsActive = model.IsActive;
+                obj.Phone = model.phone;
+                obj.GenderId = model.gender_id;
+                obj.QualificationId = model.qualification_id;
+                obj.ShiftId = model.shift_id;
+                obj.NationalId = model.national_id;
+                obj.NationalityId = model.nationality_id;
+                obj.JobId = model.job_id;
+                obj.JobNumber = model.job_number;
+                obj.HiringDate = model.hiring_date;
+                obj.ImmediatelyDate = model.immediately_date;
+                obj.IsActive = model.is_active;
                 obj.EmployeeImage = imageFile?.FileName;
                 obj.EmployeeImageExtension = imageFile?.FileExtension;
                 obj.ListOfAttachments = employeeAttachments?.Select(f => new HrEmployeeAttachment
@@ -461,14 +461,14 @@ namespace Kader_System.Services.Services.HR
                 unitOfWork.Employees.Update(obj);
 
 
-                var userExist = await userManager.FindByNameAsync(model.Username);
+                var userExist = await userManager.FindByNameAsync(model.user_name);
                 if (userExist != null)
                 {
-                    userExist.VisiblePassword = model.Password;
+                    userExist.VisiblePassword = model.password;
                     userExist.Email = obj.Email;
                     userExist.NormalizedEmail = obj.Email.ToUpper();
                     userExist.PasswordHash =
-                        new PasswordHasher<ApplicationUser>().HashPassword(userExist, model.Password);
+                        new PasswordHasher<ApplicationUser>().HashPassword(userExist, model.password);
                     obj.UserId = userExist.Id;
                     await userManager.UpdateAsync(userExist);
                 }
@@ -476,16 +476,16 @@ namespace Kader_System.Services.Services.HR
                 {
                    var newUser=await unitOfWork.Users.AddAsync(new ApplicationUser()
                     {
-                        VisiblePassword = model.Password,
+                        VisiblePassword = model.password,
                         Email = obj.Email,
                         ConcurrencyStamp = "1",
                         NormalizedEmail = obj.Email.ToUpper(),
                         PhoneNumber = obj.Phone,
                         IsActive = true,
-                        PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!,model.Password),
+                        PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!,model.password),
                         Id = Guid.NewGuid().ToString(),
-                        UserName = model.Username,
-                        NormalizedUserName = model.Username.ToUpper(),
+                        UserName = model.user_name,
+                        NormalizedUserName = model.user_name.ToUpper(),
                         
                     });
                     if (newUser != null)
