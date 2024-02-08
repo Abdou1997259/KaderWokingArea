@@ -60,18 +60,10 @@ namespace Kader_System.Services.Services.HR
             {
                 TotalRecords =totalRecords ,
                
-            Items = (await unitOfWork.Jobs.GetSpecificSelectAsync(filter: filter,
-                    take: model.PageSize,
-                    skip: (model.PageNumber - 1) * model.PageSize,
-                    select: x => new JobData()
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
-                        HasAdditionalTime = x.HasAdditionalTime,
-                        HasNeedLicense = x.HasNeedLicense,
-                        EmployeesCount = employees.Count(e => e.JobId == x.Id)
-                    }, orderBy: x =>
-                        x.OrderByDescending(x => x.Id))).ToList(),
+            Items = (unitOfWork.Jobs.GetJobInfo
+            (filter,
+                take: model.PageSize,
+                skip: (model.PageNumber - 1) * model.PageSize)),
                 CurrentPage = model.PageNumber,
                 FirstPageUrl =host+ $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
