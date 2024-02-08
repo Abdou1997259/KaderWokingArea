@@ -53,6 +53,10 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<HrManagement> Managements { get; set; }
     public DbSet<Title> Titles { get; set; }
     public DbSet<TitlePermission> TitlePermissions { get; set; }
+    public DbSet<HrNationality> Nationalities { get; set; }
+    public DbSet<HrRelegion> Relegions { get; set; }
+    public DbSet<HrMaritalStatus> MaritalStatus { get; set; }
+    
     #endregion
     //
 
