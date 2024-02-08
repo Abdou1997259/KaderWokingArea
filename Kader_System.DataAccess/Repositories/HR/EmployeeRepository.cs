@@ -1,5 +1,138 @@
-﻿namespace Kader_System.DataAccess.Repositories.HR;
+﻿using Kader_System.Domain.DTOs.Response.HR;
+using Kader_System.Domain.Interfaces;
+using Microsoft.AspNetCore.Mvc.Formatters;
+
+namespace Kader_System.DataAccess.Repositories.HR;
 
 public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmployee>(context), IEmployeeRepository
-{ 
+{
+
+    public Response<GetEmployeeByIdResponse> GetEmployeeByIdAsync(int id, string lang)
+    {
+        try
+        {
+            var employeeAllowances = context.TransAllowances.Where(e => e.EmployeeId == id).ToList();
+            var employeeVacations = context.TransVacations.Where(e => e.EmployeeId == id).ToList();
+
+
+            var result = from employee in context.Employees
+                join department in context.Departments on employee.DepartmentId equals department.Id into deptGroup
+                from dept in deptGroup.DefaultIfEmpty()
+                join management in context.Managements on employee.ManagementId equals management.Id into manGroup
+                from man in manGroup.DefaultIfEmpty()
+                join user in context.Users on employee.UserId equals user.Id into userGroup
+                from usr in userGroup.DefaultIfEmpty()
+                join qualification in context.HrQualifications on employee.QualificationId equals qualification.Id into
+                    qualGroup
+                from qual in qualGroup.DefaultIfEmpty()
+                join job in context.HrJobs on employee.JobId equals job.Id into jobGroup
+                from j in jobGroup.DefaultIfEmpty()
+                join relegion in context.Relegions on employee.ReligionId equals relegion.Id into relegioGroup
+                from r in relegioGroup.DefaultIfEmpty()
+
+                join company in context.Companys on employee.CompanyId equals company.Id into companyGroup
+                from com in companyGroup.DefaultIfEmpty()
+
+                join nationality in context.Nationalities on employee.NationalityId equals nationality.Id into
+                    nationalityGroup
+                from nat in nationalityGroup.DefaultIfEmpty()
+
+                join marital in context.MaritalStatus on employee.MaritalStatusId equals marital.Id into maritalGroup
+                from ms in maritalGroup.DefaultIfEmpty()
+
+                join shift in context.Shifts on employee.MaritalStatusId equals shift.Id into shiftGroup
+                from sh in shiftGroup.DefaultIfEmpty()
+                         where employee.Id == id
+                select new GetEmployeeByIdResponse()
+                {
+                    FullNameAr = employee.FullNameAr,
+                    FullNameEn = employee.FullNameEn,
+                    ManagementId = employee.ManagementId,
+                    CompanyId = employee.CompanyId,
+                    FirstNameEn = employee.FirstNameEn,
+                    FatherNameAr = employee.FatherNameAr,
+                    FatherNameEn = employee.FatherNameEn,
+                    GrandFatherNameAr = employee.GrandFatherNameAr,
+                    GrandFatherNameEn = employee.GrandFatherNameEn,
+                    FamilyNameAr = employee.FamilyNameAr,
+                    FamilyNameEn = employee.FamilyNameEn,
+                    FirstNameAr = employee.FirstNameAr,
+                    IsActive = employee.IsActive,
+                    VacationId = employee.VacationId,
+                    AccountNo = employee.AccountNo,
+                    Address = employee.Address,
+                    BirthDate = employee.BirthDate,
+                    ChildrenNumber = employee.ChildrenNumber,
+                    DepartmentId = employee.DepartmentId,
+                    Email = employee.Email,
+                    EmployeeImageExtension = employee.EmployeeImageExtension,
+                    EmployeeTypeId = employee.EmployeeTypeId,
+                    FingerPrintCode = employee.FingerPrintCode,
+                    FingerPrintId = employee.FingerPrintId,
+                    FixedSalary = employee.FixedSalary,
+                    GenderId = employee.GenderId,
+                    HiringDate = employee.HiringDate,
+                    ImmediatelyDate = employee.ImmediatelyDate,
+                    Id = employee.Id,
+                    JobId = employee.JobId,
+                    JobNumber = employee.JobNumber,
+                    MaritalStatusId = employee.MaritalStatusId,
+                    NationalId = employee.NationalId,
+                    NationalityId = employee.NationalityId,
+                    Phone = employee.Phone,
+                    QualificationId = employee.QualificationId,
+                    ReligionId = employee.ReligionId,
+                    SalaryPaymentWayId = employee.SalaryPaymentWayId,
+                    ShiftId = employee.ShiftId,
+                    TotalSalary = employee.TotalSalary,
+                    Username = usr.UserName,
+                    EmployeeImage = $"{GoRootPath.EmployeeImagesPath}{employee.EmployeeImage}",
+                    qualification_name = lang == Localization.Arabic ? qual.NameAr : qual.NameEn,
+                    company_name = lang == Localization.Arabic ? com.NameAr : com.NameEn,
+                    management_name = lang == Localization.Arabic ? man.NameAr : man.NameEn,
+                    employee_loans_count = 0,
+                    vacation_days_count = employeeVacations.Sum(v=>v.DaysCount),
+                    job_name = lang == Localization.Arabic ? j.NameAr : j.NameEn,
+                    department_name = lang == Localization.Arabic ? dept.NameAr : dept.NameEn,
+                    marital_status_name = lang == Localization.Arabic ? ms.Name : ms.NameInEnglish,
+                    nationality_name = lang == Localization.Arabic ? nat.Name : nat.NameInEnglish,
+                    religion_name = lang == Localization.Arabic ? r.Name : r.NameInEnglish,
+                    note = employee.Note,
+                    shift_name = lang == Localization.Arabic ?sh.Name_ar :sh.Name_en,
+                    allowances_sum = employeeAllowances.Sum(a=>a.Amount),
+                    employee_loans_sum = 0
+                };
+            if (result?.FirstOrDefault()?.Id == null || result?.FirstOrDefault()?.Id == 0)
+            {
+                return new()
+                {
+                    Msg = $"Employee with id {id} can not be found",
+                    Check = false,
+                    Data = null,
+                    Error = string.Empty
+                };
+            }
+
+            return new Response<GetEmployeeByIdResponse>()
+            {
+                Check = true,
+                Data = result?.FirstOrDefault(),
+                Error = string.Empty,
+                Msg = string.Empty
+            };
+        }
+        catch (Exception exception)
+        {
+            return new()
+            {
+                Msg = $"ERROR",
+                Check = false,
+                Data = null,
+                Error = exception.InnerException!=null ? exception.InnerException.ToString() :exception.Message
+            };
+        }
+        
+
+
+    }
 }

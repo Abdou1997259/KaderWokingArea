@@ -1,4 +1,5 @@
 ﻿using Kader_System.Domain.Models;
+using Kader_System.Domain.Models.HR;
 
 namespace Kader_System.DataAccess.Repositories;
 
@@ -52,13 +53,19 @@ public class UnitOfWork : IUnitOfWork
     public ITransVacationRepository TransVacations { get; private set; }
     public IManagementRepository Managements { get; private set; }
     public ITitleRepository Titles { get; private set; }
+    public INationalityRepository Nationalities { get; private set; }
+    public IMaritalStatusRepository MaritalStatus { get; private set; }
+    public IGenderRepository Genders { get; private set; }
+    public IReligionRepository Religions { get; private set; }
     public UnitOfWork(KaderDbContext context, IConfiguration config)
     {
         _context = context;
         _config = config;
-      
-
-        Users = new UserRepository(_context);
+        Nationalities = new NationalityRepository(_context);
+        MaritalStatus = new MaritalStatusRepository(_context);
+        Genders=new GenderRepository(_context);
+        Religions=new ReligionRepository(_context);
+          Users = new UserRepository(_context);
         RoleClaims = new RoleClaimRepository(_context);
         UserDevices = new UserDeviceRepository(_context);
         Roles = new RoleRepository(_context);
