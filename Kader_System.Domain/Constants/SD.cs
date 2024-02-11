@@ -164,6 +164,7 @@ public static class SD
             public const string GetAllCompanies = "company";
             public const string CreateCompany = "company/create";
             public const string UpdateCompany = "company/update/{id}";
+            public const string RestoreCompany = "company/restore/{id}";
             public const string GetCompanyById = "company/getById/{id}";
             public const string DeleteCompany = "company/delete/{id}";
         }

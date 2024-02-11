@@ -334,7 +334,8 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
             Data = newObject
             ,
             Error = string.Empty,
-            Msg = "Restored Successfully"
+            Msg = "Restored Successfully",
+            Check = true
         };
     }
     #endregion

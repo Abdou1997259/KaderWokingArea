@@ -60,7 +60,20 @@ public class CompaniesController(ICompanyService service) : ControllerBase
     }
 
     #endregion
+    #region Restore
 
+    [HttpPut(ApiRoutes.Company.RestoreCompany)]
+    public async Task<IActionResult> RestoreCompanyAsync([FromRoute] int id)
+    {
+        var response = await service.RestoreCompanyAsync(id);
+        if (response.Check)
+            return Ok(response);
+        else if (!response.Check)
+            return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+        return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+    }
+
+    #endregion
 
     #region Delete
     [HttpDelete(ApiRoutes.Company.DeleteCompany)]
