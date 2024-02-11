@@ -42,7 +42,10 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
 
     public async Task<Response<HrGetAllQualificationsResponse>> GetAllQualificationsAsync(string lang, HrGetAllFiltrationsForQualificationsRequest model,string host)
     {
-        Expression<Func<HrQualification, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+        Expression<Func<HrQualification, bool>> filter = x => x.IsDeleted == model.IsDeleted
+            && (string.IsNullOrEmpty(model.Word) || x.NameAr.Contains(model.Word)
+                                                 || x.NameEn.Contains(model.Word)
+                                               );
         var totalRecords = await _unitOfWork.Qualifications.CountAsync(filter: filter);
         int page = 1;
         int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
@@ -57,15 +60,11 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
         {
             TotalRecords =  totalRecords,
 
-            Items = (await _unitOfWork.Qualifications.GetSpecificSelectAsync(filter: filter,
+            Items =  _unitOfWork.Qualifications.GetQualificationInfo(qualFilter: filter,
                  take: model.PageSize,
                  skip: (model.PageNumber - 1) * model.PageSize,
-                 select: x => new QualificationData
-                 {
-                     Id = x.Id,
-                     Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
-                 }, orderBy: x =>
-                   x.OrderByDescending(x => x.Id))).ToList(),
+                 lang:lang
+                ),
             FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
             From = (page - 1) * model.PageSize + 1,
             To = Math.Min(page * model.PageSize, totalRecords),
@@ -189,6 +188,41 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
             Check = true,
             Data = model,
             Msg = _sharLocalizer[Localization.Updated]
+        };
+    }
+
+
+    public async Task<Response<HrUpdateQualificationRequest>> RestoreQualificationAsync(int id)
+    {
+        var obj = await _unitOfWork.Qualifications.GetFirstOrDefaultAsync(q=>q.Id==id);
+
+        if (obj == null)
+        {
+            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
+                _sharLocalizer[Localization.Qualification]);
+
+            return new()
+            {
+                Data = null,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        obj.IsDeleted = false;
+        _unitOfWork.Qualifications.Update(obj);
+        await _unitOfWork.CompleteAsync();
+
+        return new()
+        {
+            Check = true,
+            Data = new()
+            {
+                Name_ar = obj.NameAr,
+                Name_en = obj.NameEn
+            },
+            Msg = string.Format(_sharLocalizer[Localization.Restored],
+                _sharLocalizer[Localization.Qualification])
         };
     }
 

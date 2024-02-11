@@ -2,7 +2,6 @@
 
 public class HrCreateQualificationRequest
 {
-    public int Id { get; set; }
 
     [Display(Name = Annotations.NameInEnglish), Required(ErrorMessage = Annotations.FieldIsRequired)]
     public required string Name_en { get; set; }

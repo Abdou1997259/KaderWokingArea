@@ -295,6 +295,7 @@ public static class SD
             public const string GetAllQualifications = "qualification/getAll";
             public const string CreateQualification = "qualification/create";
             public const string UpdateQualification = "qualification/update/{id}";
+            public const string RestoreQualification = "qualification/restore/{id}";
             public const string GetQualificationById = "qualification/getById/{id}";
             public const string DeleteQualification = "qualification/delete/{id}";
         }

@@ -47,9 +47,19 @@ public class QualificationsController(IQualificationService service) : Controlle
     #region Update
 
     [HttpPut(ApiRoutes.Qualification.UpdateQualification)]
-    public async Task<IActionResult> UpdateDeductionAsync([FromRoute] int id, HrUpdateQualificationRequest model)
+    public async Task<IActionResult> UpdateQualificationAsync([FromRoute] int id, HrUpdateQualificationRequest model)
     {
         var response = await service.UpdateQualificationAsync(id, model);
+        if (response.Check)
+            return Ok(response);
+        else if (!response.Check)
+            return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+        return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+    }
+    [HttpPut(ApiRoutes.Qualification.RestoreQualification)]
+    public async Task<IActionResult> RestoreQualificationAsync([FromRoute] int id)
+    {
+        var response = await service.RestoreQualificationAsync(id );
         if (response.Check)
             return Ok(response);
         else if (!response.Check)
