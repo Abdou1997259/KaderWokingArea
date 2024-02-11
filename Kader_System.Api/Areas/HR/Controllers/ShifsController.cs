@@ -55,6 +55,26 @@ public class ShiftsController(IShiftService service) : ControllerBase
         return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
     }
 
+    [HttpPut(ApiRoutes.Shift.ChangeShift)]
+    public async Task<IActionResult> ChangeShiftAsync([FromForm] ChangeShiftRequest model)
+    {
+        var response = await service.ChangeShift( model.from_shift,model.to_shift);
+        if (response.Check)
+            return Ok(response);
+        else if (!response.Check)
+            return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+        return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+    }
+    [HttpPut(ApiRoutes.Shift.RestoreShift)]
+    public async Task<IActionResult> RestoreShiftAsync([FromRoute] int id)
+    {
+        var response = await service.RestoreShiftAsync(id);
+        if (response.Check)
+            return Ok(response);
+        else if (!response.Check)
+            return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+        return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+    }
     [HttpDelete(ApiRoutes.Shift.DeleteShift)]
     public async Task<IActionResult> DeleteShiftAsync(int id)
     {

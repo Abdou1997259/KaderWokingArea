@@ -9,5 +9,8 @@ public class ShiftData
     public string Name { get; set; } = string.Empty;
     public TimeOnly Start_shift { get; set; }
     public TimeOnly End_shift { get; set; }
+
+    public int?  EmployeesCount { get; set; }
+    public string? AddedByUser { get; set; }
 }
 

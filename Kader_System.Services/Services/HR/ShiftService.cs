@@ -44,7 +44,13 @@ public class ShiftService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResourc
     public async Task<Response<HrGetAllShiftsResponse>> GetAllShiftsAsync(string lang,
         HrGetAllFiltrationsForShiftsRequest model,string host)
     {
-        Expression<Func<HrShift, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+        Expression<Func<HrShift, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                                                      && (string.IsNullOrEmpty(model.Word) ||
+                                                          x.Name_ar.Contains(model.Word)
+                                                          || x.Name_en.Contains(model.Word)
+                                                          || x.Start_shift.ToString().Contains(model.Word)
+                                                          || x.End_shift.ToString().Contains(model.Word));
+                                               
         var totalRecords = await _unitOfWork.Shifts.CountAsync(filter: filter);
         int page = 1;
         int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
@@ -59,17 +65,9 @@ public class ShiftService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResourc
         {
             TotalRecords = totalRecords,
 
-            Items = (await _unitOfWork.Shifts.GetSpecificSelectAsync(filter: filter,
+            Items = ( _unitOfWork.Shifts.GetShiftInfo(shiftFilter: filter,
                  take: model.PageSize,
-                 skip: (model.PageNumber - 1) * model.PageSize,
-                 select: x => new ShiftData
-                 {
-                     Id = x.Id,
-                     Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en,
-                     Start_shift = x.Start_shift,
-                     End_shift = x.End_shift
-                 }, orderBy: x =>
-                   x.OrderByDescending(x => x.Id))).ToList(),
+                 skip: (model.PageNumber - 1) * model.PageSize)),
             CurrentPage = model.PageNumber,
             FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
             From = (page - 1) * model.PageSize + 1,
@@ -126,7 +124,10 @@ public class ShiftService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResourc
         await _unitOfWork.Shifts.AddAsync(new()
         {
             Name_en = model.Name_en,
-            Name_ar = model.Name_ar
+            Name_ar = model.Name_ar,
+            Start_shift = model.Start_shift.ToTimeOnly(),
+            End_shift = model.End_shift.ToTimeOnly(),
+            
         });
         await _unitOfWork.CompleteAsync();
 
@@ -160,7 +161,9 @@ public class ShiftService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResourc
             {
                 Id = id,
                 Name_ar = obj.Name_ar,
-                Name_en = obj.Name_en
+                Name_en = obj.Name_en,
+                End_shift = obj.End_shift,
+                Start_shift = obj.Start_shift,
             },
             Check = true
         };
@@ -185,7 +188,8 @@ public class ShiftService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResourc
 
         obj.Name_ar = model.Name_ar;
         obj.Name_en = model.Name_en;
-
+        obj.Start_shift=model.Start_shift.ToTimeOnly();
+        obj.End_shift=model.End_shift.ToTimeOnly();
         _unitOfWork.Shifts.Update(obj);
         await _unitOfWork.CompleteAsync();
 
@@ -195,6 +199,101 @@ public class ShiftService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResourc
             Data = model,
             Msg = _sharLocalizer[Localization.Updated]
         };
+    }
+
+    public async Task<Response<HrUpdateShiftRequest>> RestoreShiftAsync(int id)
+    {
+        var obj = await _unitOfWork.Shifts.GetFirstOrDefaultAsync(s=>s.Id==id);
+
+        if (obj == null)
+        {
+            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
+                _sharLocalizer[Localization.Shift]);
+
+            return new()
+            {
+                Data = null,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        obj.IsDeleted = false;
+        _unitOfWork.Shifts.Update(obj);
+        await _unitOfWork.CompleteAsync();
+
+        return new()
+        {
+            Check = true,
+            Data =new ()
+            {
+                Name_ar = obj.Name_ar,
+                Name_en = obj.Name_en,
+                End_shift = obj.End_shift.ToString(),
+                Start_shift = obj.Start_shift.ToString()
+            },
+            Msg = _sharLocalizer[Localization.Restored]
+        };
+    }
+
+    public async Task<Response<string>> ChangeShift(int from, int to)
+    {
+        var oldShift = await _unitOfWork.Shifts.GetByIdAsync(from);
+        var newShift = await _unitOfWork.Shifts.GetByIdAsync(to);
+        if (oldShift == null)
+        {
+            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
+                _sharLocalizer[Localization.Shift]);
+
+            return new()
+            {
+                Data = null,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+        if (newShift == null)
+        {
+            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
+                _sharLocalizer[Localization.Shift]);
+
+            return new()
+            {
+                Data = null,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        if (oldShift == newShift)
+        {
+            return new()
+            {
+                Data = null,
+                Error = "Can not change to the Shift",
+                Msg = "Can not change to the Shift"
+            };
+        }
+
+        var oldShiftEmpls =await unitOfWork.Employees.GetAllAsync(e => e.ShiftId == from);
+        if (oldShiftEmpls!=null &&oldShiftEmpls.Any())
+        {
+            foreach (var emp in oldShiftEmpls.ToList())
+            {
+                emp.ShiftId = to;
+            }
+            unitOfWork.Employees.UpdateRange(oldShiftEmpls);
+            await unitOfWork.CompleteAsync();
+        }
+
+        return new Response<string>()
+        {
+            Check = true,
+            Error = string.Empty,
+            Data = $"The Shift of {oldShiftEmpls.Count()} employees have been changed",
+            Msg = "Shift Changed Successfully"
+        };
+
     }
 
     public Task<Response<string>> UpdateActiveOrNotShiftAsync(int id)

@@ -7,6 +7,8 @@ public interface IShiftService
     Task<Response<HrCreateShiftRequest>> CreateShiftAsync(HrCreateShiftRequest model);
     Task<Response<HrGetShiftByIdResponse>> GetShiftByIdAsync(int id);
     Task<Response<HrUpdateShiftRequest>> UpdateShiftAsync(int id, HrUpdateShiftRequest model);
+    Task<Response<HrUpdateShiftRequest>> RestoreShiftAsync(int id);
+    Task<Response<string>> ChangeShift(int from, int to);
     Task<Response<string>> UpdateActiveOrNotShiftAsync(int id);
     Task<Response<string>> DeleteShiftAsync(int id);
 }

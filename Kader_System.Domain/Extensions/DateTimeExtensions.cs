@@ -63,4 +63,15 @@ public static class DateTimeExtensions
 
     public static DateTime? ToIncreaseOneHour(this DateTime? date) =>
         date == null ? date : date.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+    public static TimeOnly ToTimeOnly(this string time)
+    {
+        DateTime newTime = new DateTime();
+        if (DateTime.TryParse(time, out newTime))
+        {
+             return new TimeOnly(newTime.Hour, newTime.Minute, newTime.Second);
+        }
+        else
+           return TimeOnly.FromDateTime(DateTime.UtcNow);
+    }
 }

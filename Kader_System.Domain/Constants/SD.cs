@@ -323,6 +323,8 @@ public static class SD
             public const string GetAllShifts = "shift/getAll";
             public const string CreateShift = "shift/create";
             public const string UpdateShift = "shift/update/{id}";
+            public const string RestoreShift = "shift/restore/{id}";
+            public const string ChangeShift = "shift/change";
             public const string GetShiftById = "shift/getById/{id}";
             public const string DeleteShift = "shift/delete/{id}";
         }
@@ -437,6 +439,7 @@ public static class SD
         public const string Allowance = "Allowance";
         public const string Benefit = "Benefit";
         public const string Qualification = "Qualification";
+        public const string Shift = "Shift";
         public const string Deduction = "Deduction";
         public const string Vacation = "Vacation";
         public const string Image = "Image";
