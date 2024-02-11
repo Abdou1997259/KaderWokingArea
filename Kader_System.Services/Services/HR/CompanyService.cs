@@ -115,9 +115,16 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
     }
 
 
-    public async Task<Response<HrGetCompanyByIdResponse>> GetCompanyByIdAsync(int id)
+    public async Task<Response<HrGetCompanyByIdResponse>> GetCompanyByIdAsync(int id,string lang)
     {
-        var obj = await unitOfWork.Companies.GetByIdAsync(id);
+        var obj = await unitOfWork.Companies.GetFirstOrDefaultAsync(filter=>filter.Id==id ,
+            includeProperties:$"{nameof(_instance.CompanyType)},{nameof(_instance.ListOfsContract)}," +
+                              $"{nameof(_instance.Licenses)}");
+
+
+        var employeesCount =await unitOfWork.Employees.CountAsync(d => d.CompanyId == id);
+        var managementsCount = await unitOfWork.Managements.CountAsync(d => d.CompanyId == id);
+        var departmentsCount= unitOfWork.Departments.GetDepartmentsByCompanyId(id).Count();
 
         if (obj is null)
         {
@@ -140,6 +147,22 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
                 Name_en = obj.NameEn,
                 Company_owner = obj.CompanyOwner,
                 Company_type = obj.CompanyTypeId,
+                Company_type_name =lang==Localization.Arabic? obj.CompanyType!.Name:obj.CompanyType!.NameInEnglish,
+                Contracts = obj.ListOfsContract.Select(c=>new CompanyContractResponse()
+                {
+                    Contract = $"{GoRootPath.HRFilesPath}{c.CompanyContracts}",
+                    Id = c.Id
+                }).ToList(),
+                Licenses = obj.Licenses.Select(l=>new CompanyLicenseResponse()
+                {
+                    Id = l.Id,
+                    License = $"{GoRootPath.HRFilesPath}{l.LicenseName}",
+
+                }).ToList(),
+                employees_count = employeesCount,
+                managements_count=managementsCount,
+                departments_count=departmentsCount,
+
             },
             Check = true
         };

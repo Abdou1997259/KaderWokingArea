@@ -20,7 +20,7 @@ public class CompaniesController(ICompanyService service) : ControllerBase
     [HttpGet(ApiRoutes.Company.GetCompanyById)]
     public async Task<IActionResult> GetCompanyByIdAsync(int id)
     {
-        var response = await service.GetCompanyByIdAsync(id);
+        var response = await service.GetCompanyByIdAsync(id,GetCurrentRequestLanguage());
         if (response.Check)
             return Ok(response);
         else if (!response.Check)

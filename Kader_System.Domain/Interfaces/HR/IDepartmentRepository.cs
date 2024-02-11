@@ -2,4 +2,5 @@
 
 public interface IDepartmentRepository : IBaseRepository<HrDepartment>
 {
+    IQueryable<HrDepartment> GetDepartmentsByCompanyId(int companyId);
 }
