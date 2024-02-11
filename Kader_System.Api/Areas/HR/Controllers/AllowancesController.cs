@@ -57,7 +57,16 @@ public class AllowancesController(IAllowanceService service) : ControllerBase
             return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
         return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
     }
-
+    [HttpPut(ApiRoutes.Allowance.RestoreAllowance)]
+    public async Task<IActionResult> RestoreAllowanceAsync([FromRoute] int id)
+    {
+        var response = await service.RestoreAllowanceAsync(id);
+        if (response.Check)
+            return Ok(response);
+        else if (!response.Check)
+            return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+        return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+    }
     #endregion
 
     #region Delete

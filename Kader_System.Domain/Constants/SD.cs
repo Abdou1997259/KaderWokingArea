@@ -183,6 +183,7 @@ public static class SD
             public const string GetAllAllowances = "allowance/getAll";
             public const string CreateAllowance = "allowance/create";
             public const string UpdateAllowance = "allowance/update/{id}";
+            public const string RestoreAllowance = "allowance/restore/{id}";
             public const string GetAllowanceById = "allowance/getById/{id}";
             public const string DeleteAllowance = "allowance/delete/{id}";
         }

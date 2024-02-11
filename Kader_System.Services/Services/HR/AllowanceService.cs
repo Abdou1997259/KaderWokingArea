@@ -43,7 +43,9 @@ public class AllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
     public async Task<Response<HrGetAllAllowancesResponse>> GetAllAllowancesAsync(string lang, HrGetAllFiltrationsForAllowancesRequest model,string host)
     {
         Expression<Func<HrAllowance, bool>> filter = x => x.IsDeleted == model.IsDeleted && 
-                                                          (string.IsNullOrEmpty(model.Word) ||x.Name_ar.Contains(model.Word)  ||x.Name_en.Contains(model.Word) );
+                                                          (string.IsNullOrEmpty(model.Word) 
+                                                           ||x.Name_ar.Contains(model.Word) 
+                                                           ||x.Name_en.Contains(model.Word) );
 
 
          var totalRecords = await _unitOfWork.Allowances.CountAsync(filter: filter);
@@ -62,15 +64,10 @@ public class AllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
         {
             TotalRecords = totalRecords ,
 
-            Items = (await _unitOfWork.Allowances.GetSpecificSelectAsync(filter: filter,
+            Items = ( _unitOfWork.Allowances.GetAllowanceInfo(filter: filter,
                  take: model.PageSize,
                  skip: (model.PageNumber - 1) * model.PageSize,
-                 select: x => new AllowanceData
-                 {
-                     Id = x.Id,
-                     Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en
-                 }, orderBy: x =>
-                   x.OrderByDescending(x => x.Id))).ToList(),
+                lang:lang )),
             CurrentPage = model.PageNumber,
             FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
             From = (page - 1) * model.PageSize + 1,
