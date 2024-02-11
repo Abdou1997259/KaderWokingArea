@@ -315,6 +315,7 @@ public static class SD
             public const string GetAllVacations = "Vacation/getAll";
             public const string CreateVacation = "Vacation/create";
             public const string UpdateVacation = "Vacation/update/{id}";
+            public const string RestoreVacation = "Vacation/restore/{id}";
             public const string GetVacationById = "Vacation/getById/{id}";
             public const string DeleteVacation = "Vacation/delete/{id}";
         }

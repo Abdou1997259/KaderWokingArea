@@ -65,6 +65,16 @@ namespace Kader_System.Api.Areas.HR.Controllers
                 return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
         }
+        [HttpPut(ApiRoutes.Vacation.RestoreVacation)]
+        public async Task<IActionResult> RestoreVacationAsync([FromRoute] int id)
+        {
+            var response = await service.RestoreVacationAsync(id);
+            if (response.Check)
+                return Ok(response);
+            else if (!response.Check)
+                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
 
         #endregion
 

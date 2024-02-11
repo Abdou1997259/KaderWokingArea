@@ -40,66 +40,15 @@ namespace Kader_System.Services.Services.HR
             };
         }
 
- 
-
-   
-
-        public async Task<Response<GetAllVacationResponse>> GetAllVacationsAsync(string lang, GetAllFilterationFoVacationRequest model)
-        {
-            Expression<Func<HrVacation, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-
-            
-            var result = new GetAllVacationResponse()
-            {
-                TotalRecords = await unitOfWork.Vacations.CountAsync(filter: filter),
-
-                Items = (await unitOfWork.Vacations.GetSpecificSelectAsync
-                    (filter: filter,
-                    includeProperties: nameof(instanceVacation.VacationType),
-                    take: model.PageSize,
-                    skip: (model.PageNumber - 1) * model.PageSize,
-                    select: x => new VacationData()
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
-                        VacationType = x.VacationType.Name,
-                        ApplyAfterMonth = x.ApplyAfterMonth,
-                        TotalBalance = x.TotalBalance,
-                        CanTransfer = x.CanTransfer,
-                        EmployeesCount = 0
-                    }
-                    , orderBy: x =>
-                        x.OrderByDescending(x => x.Id)))
-                    .ToList()
-            };
-
-            if (result.TotalRecords is 0)
-            {
-                string resultMsg = sharLocalizer[Localization.NotFoundData];
-
-                return new()
-                {
-                    Data = new()
-                    {
-                        Items = []
-                    },
-                    Error = resultMsg,
-                    Msg = resultMsg
-                };
-            }
-
-            return new()
-            {
-                Data = result,
-                Check = true
-            };
-        }
-
-
         public async Task<Response<GetAllVacationResponse>> GetAllVacationsWithJoinAsync(string lang,
             GetAllFilterationFoVacationRequest model,string host)
         {
-            Expression<Func<HrVacation, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+            Expression<Func<HrVacation, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                                                             && (string.IsNullOrEmpty(model.Word) || x.NameAr.Contains(model.Word)
+                                                                 || x.NameEn.Contains(model.Word)
+                                                                 ||x.VacationType!.Name!.Contains(model.Word)
+                                                                 || x.VacationType!.NameInEnglish!.Contains(model.Word)
+                                                             );
             var totalRecords = await unitOfWork.Vacations.CountAsync(filter: filter);
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
@@ -349,6 +298,77 @@ namespace Kader_System.Services.Services.HR
             }
         }
 
+        public async Task<Response<UpdateVacationRequest>> RestoreVacationAsync([FromRoute] int id)
+        {
+
+
+            HrVacation instanceVacation;
+            var obj = await unitOfWork.Vacations.GetFirstOrDefaultAsync(v => v.Id == id, nameof(instanceVacation.VacationDistributions));
+
+            if (obj == null)
+            {
+                string resultMsg = string.Format(sharLocalizer[Localization.CannotBeFound],
+                    sharLocalizer[Localization.Vacation]);
+
+                return new()
+                {
+                    Data = null,
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            using var transaction = unitOfWork.BeginTransaction();
+            try
+            {
+
+                obj.IsDeleted = false;
+               
+                unitOfWork.Vacations.Update(obj);
+
+                foreach (var v in obj.VacationDistributions)
+                {
+                    v.IsDeleted = false;
+                }
+                unitOfWork.VacationDistributions.UpdateRange(obj.VacationDistributions);
+
+                await unitOfWork.CompleteAsync();
+                transaction.Commit();
+                return new()
+                {
+                    Check = true,
+                    Data = new ()
+                    {
+                        NameAr = obj.NameAr,
+                        NameEn = obj.NameEn,
+                        ApplyAfterMonth = obj.ApplyAfterMonth,
+                        CanTransfer = obj.CanTransfer,
+                        TotalBalance = obj.TotalBalance,
+                        VacationTypeId = obj.VacationTypeId,
+                        VacationDistributions = obj.VacationDistributions.Select(d=>new UpdateVacationDistribution()
+                        {
+                            Id = d.Id,
+                            NameAr = d.NameAr,
+                            NameEn = d.NameEn,
+                            DaysCount = d.DaysCount,
+                            SalaryCalculatorId = d.SalaryCalculatorId,
+                            VacationId = d.VacationId
+                        }).ToList()
+                    },
+                    Msg = sharLocalizer[Localization.Updated]
+                };
+            }
+            catch (Exception e)
+            {
+                transaction.Rollback();
+                return new()
+                {
+                    Data = null,
+                    Error = e.InnerException!=null ? e.InnerException.Message:e.Message,
+                    Msg = e.Message
+                };
+            }
+        }
 
         public async Task<Response<string>> DeleteVacationAsync(int id)
         {
