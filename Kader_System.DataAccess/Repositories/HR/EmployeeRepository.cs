@@ -135,4 +135,37 @@ public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmplo
 
 
     }
+
+    public async Task<object> GetEmployeesDataAsLookUp(string lang)
+    {
+        return await context.Employees.
+            Where(e => !e.IsDeleted && e.IsActive)
+            .Include(j=>j.Job)
+            .Include(j => j.Company)
+            .Include(j => j.Nationality)
+            .Include(j => j.Management)
+            .Select(e => new
+            {
+                id=e.Id,
+                employee_image=e.EmployeeImage,
+                add_date=e.Add_date,
+                employee_name=lang==Localization.Arabic? e.FullNameAr:e.FullNameEn,
+                employee_job=lang==Localization.Arabic?e.Job!.NameAr:e.Job!.NameEn,
+                gender=e.GenderId,
+                hiring_date=e.HiringDate,
+                salary_fixed=e.FixedSalary,
+                salary_total=e.TotalSalary,
+                immediately_date=e.ImmediatelyDate,
+                is_active=e.IsActive,
+                employee_serial=e.JobNumber,
+                payment_method=e.SalaryPaymentWayId,
+                note=e.Note,
+                company_name=lang==Localization.Arabic? e.Company!.NameAr:e.Company!.NameEn,
+                nationality_name=lang==Localization.Arabic?e.Nationality!.Name:e.Nationality!.NameInEnglish,
+                management_id=e.ManagementId,
+                management_name=lang==Localization.Arabic?e.Management!.NameAr:e.Management!.NameEn,
+                department_id=e.DepartmentId,
+                marital_status=e.MaritalStatusId
+            }).ToListAsync();
+    }
 }

@@ -17,7 +17,7 @@
         [HttpGet(ApiRoutes.Contract.GetContractById)]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var response = await contractService.GetContractByIdAsync(id);
+            var response = await contractService.GetContractByIdAsync(id,GetCurrentRequestLanguage());
             if (response.Check)
                 return Ok(response);
             else if (!response.Check)
@@ -25,7 +25,16 @@
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
         }
 
-
+        [HttpGet(ApiRoutes.Contract.GetContractLookups)]
+        public async Task<IActionResult> GetLookups()
+        {
+            var response = await contractService.GetLookUps(GetCurrentRequestLanguage());
+            if (response.Check)
+                return Ok(response);
+            else if (!response.Check)
+                return BadRequest(response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
         #region Create
 
         [HttpPost(ApiRoutes.Contract.CreateContract)]
@@ -60,7 +69,16 @@
             }
             return BadRequest(request);
         }
+        [HttpPut(ApiRoutes.Contract.RestoreContract)]
+        public async Task<IActionResult> RestoreAsync([FromRoute] int id)
+        {
+          
+                var response = await contractService.RestoreContractAsync(id);
+                if (response.Check) return Ok(response);
+                else if (!response.Check) return BadRequest(response);
 
+                return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
 
         #endregion
 

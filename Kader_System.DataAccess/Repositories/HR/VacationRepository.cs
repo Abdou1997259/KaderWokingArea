@@ -27,12 +27,7 @@ public class VacationRepository(KaderDbContext context) : BaseRepository<HrVacat
                 (vacation, employee) => new { vacation.Vacation, Employee = employee });
 
 
-        if (skip.HasValue)
-            query = query.Skip(skip.Value);
-        if (take.HasValue)
-            query = query.Take(take.Value);
-
-        return query
+        var groupedQuery= query
                  .GroupBy(x => new { x.Vacation.Id, x.Vacation.NameAr, x.Vacation.NameEn,x.Vacation.ApplyAfterMonth,x.Vacation.TotalBalance,x.Vacation.CanTransfer ,x.Vacation.VacationType.Name })
                  .Select(group => new VacationData()
                  {
@@ -44,9 +39,12 @@ public class VacationRepository(KaderDbContext context) : BaseRepository<HrVacat
                      CanTransfer = group.Key.CanTransfer,
                      TotalBalance = group.Key.TotalBalance,
                      
-                 })
-                 .ToList();
-
+                 });
+        if (take.HasValue)
+            groupedQuery = groupedQuery.Take(take.Value);
+        if (skip.HasValue)
+            groupedQuery = groupedQuery.Skip(skip.Value);
+        return groupedQuery.ToList();
 
     }
 

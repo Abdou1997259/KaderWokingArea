@@ -2,6 +2,14 @@
 {
     public class GetContractByIdResponse
     {
+      public GetContractDataByIdResponse Master { get; set; }
+      public object employees { get; set; }
+      public object allowances { get; set; }
+
+    }
+
+    public class GetContractDataByIdResponse
+    {
         public int Id { get; set; }
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }

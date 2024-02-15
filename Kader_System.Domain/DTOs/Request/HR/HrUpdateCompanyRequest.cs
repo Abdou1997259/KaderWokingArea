@@ -21,3 +21,11 @@ public class HrUpdateCompanyRequest
     [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length), FileExtensionValidation(FileSettings.AllowedExtension)]
     public IFormFileCollection? Company_contracts { get; set; } = default!;
 }
+
+
+
+public class FileData
+{
+    public string FileName { get; set; }
+    public byte[] FileContent { get; set; }
+}

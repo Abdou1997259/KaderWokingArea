@@ -8,3 +8,4 @@ public class Response<T> where T : class
     public T Data { get; set; } = default!;
     public string Error { get; set; } = string.Empty;
 }
+

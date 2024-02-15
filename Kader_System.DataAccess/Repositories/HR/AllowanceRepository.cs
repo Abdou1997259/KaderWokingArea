@@ -38,4 +38,18 @@ public class AllowanceRepository(KaderDbContext context) : BaseRepository<HrAllo
             })
             .ToList();
     }
+
+
+    public async Task<object> GetAllowancesDataAsLookUp(string lang)
+    {
+        
+        return await context.Allowances.
+            Where(e => !e.IsDeleted)
+            .Select(a => new
+            {
+                id = a.Id,
+                name=lang==Localization.Arabic?a.Name_ar:a.Name_en
+
+            }).ToListAsync();
+    }
 }

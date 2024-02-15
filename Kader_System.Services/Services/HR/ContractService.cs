@@ -1,7 +1,5 @@
 ﻿
 using Kader_System.Domain.DTOs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 
 namespace Kader_System.Services.Services.HR
 {
@@ -54,7 +52,12 @@ namespace Kader_System.Services.Services.HR
             GetAlFilterationForContractRequest model,string host)
         {
 
-            Expression<Func<HrContract, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+            Expression<Func<HrContract, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                                                             && (string.IsNullOrEmpty(model.Word) ||
+                                                                 x.Employee!.FullNameEn!.Contains(model.Word)
+                                                                 || x.Employee!.FullNameAr!.Contains(model.Word)
+                                                                 || x.StartDate.ToString().Contains(model.Word)
+                                                                 || x.EndDate.ToString().Contains(model.Word));
             var totalRecords = await unitOfWork.Contracts.CountAsync(filter: filter);
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
@@ -69,7 +72,7 @@ namespace Kader_System.Services.Services.HR
             {
                 TotalRecords = totalRecords,
 
-                Items = (await unitOfWork.Contracts.GetAllContractsAsync
+                Items = ( unitOfWork.Contracts.GetAllContractsAsync
                 (contractFilter: filter,
                     lang: lang,
                     take: model.PageSize,
@@ -113,7 +116,7 @@ namespace Kader_System.Services.Services.HR
 
         }
 
-        public async Task<Response<GetContractByIdResponse>> GetContractByIdAsync(int id)
+        public async Task<Response<GetContractByIdResponse>> GetContractByIdAsync(int id,string lang)
         {
             Expression<Func<HrContract, bool>> filter = x => x.Id == id;
             var obj = await unitOfWork.Contracts.GetFirstOrDefaultAsync(filter,
@@ -136,25 +139,50 @@ namespace Kader_System.Services.Services.HR
             {
                 Data = new()
                 {
-                    Id = obj.Id,
-                    EmployeeId = obj.EmployeeId,
-                    EmployeeName = obj.Employee!.FullNameAr,
-                    StartDate = obj.StartDate,
-                    EndDate = obj.EndDate,
-                    TotalSalary = obj.TotalSalary,
-                    FixedSalary = obj.FixedSalary,
-                    HousingAllowance = obj.HousingAllowance,
-                    ContractFile =
-                        ManageFilesHelper.ConvertFileToBase64(GoRootPath.HRFilesPath+ obj.FileName),
-                    Details = obj.ListOfAllowancesDetails.Select(detail => new GetAllContractDetailsResponse()
+                    Master=new()
                     {
-                        AllowanceId = detail.AllowanceId,
-                        Value = detail.Value,
-                        IsPercent = detail.IsPercent
-                    }).ToList()
-
+                        Id = obj.Id,
+                        EmployeeId = obj.EmployeeId,
+                        EmployeeName = obj.Employee!.FullNameAr,
+                        StartDate = obj.StartDate,
+                        EndDate = obj.EndDate,
+                        TotalSalary = obj.TotalSalary,
+                        FixedSalary = obj.FixedSalary,
+                        HousingAllowance = obj.HousingAllowance,
+                        ContractFile =
+                            ManageFilesHelper.ConvertFileToBase64(GoRootPath.HRFilesPath + obj.FileName),
+                        Details = obj.ListOfAllowancesDetails.Select(detail => new GetAllContractDetailsResponse()
+                        {
+                            AllowanceId = detail.AllowanceId,
+                            Value = detail.Value,
+                            IsPercent = detail.IsPercent
+                        }).ToList(),
+                        
+                    },
+                    allowances =await unitOfWork.Allowances.GetAllowancesDataAsLookUp(lang:lang),
+                    employees = await unitOfWork.Employees.GetEmployeesDataAsLookUp(lang)
                 },
                 Check = true
+            };
+        }
+
+
+        public async Task<Response<object> > GetLookUps(string lang)
+        {
+            var employees =await unitOfWork.Employees.GetEmployeesDataAsLookUp(lang);
+            var allowances = await unitOfWork.Allowances.GetAllowancesDataAsLookUp(lang);
+            return new()
+            {
+                Check = true,
+                Error = string.Empty,
+                Msg = string.Empty,
+                Data = new
+                {
+                    employees,
+                    allowances
+                },
+                IsActive = true
+              
             };
         }
 
@@ -332,6 +360,74 @@ namespace Kader_System.Services.Services.HR
                 };
             }
            
+
+        }
+
+
+        public async Task<Response<CreateContractRequest>> RestoreContractAsync(int id)
+        {
+            using var transaction = unitOfWork.BeginTransaction();
+            try
+            {
+
+                var obj = await unitOfWork.Contracts.GetFirstOrDefaultAsync(c => c.Id == id,
+                    includeProperties: $"{nameof(_instanceContract.ListOfAllowancesDetails)}");
+                if (obj is null)
+                {
+                    string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
+                        shareLocalizer[Localization.Contract]);
+                    return new()
+                    {
+                        Check = false,
+                        Data = null,
+                        Error = resultMsg,
+                        Msg = resultMsg
+                    };
+                }
+
+                obj.IsDeleted = false;
+                if (obj != null && obj.ListOfAllowancesDetails.Any())
+                {
+                    foreach (var detail in obj.ListOfAllowancesDetails.ToList())
+                    {
+                        detail.IsDeleted = false;
+                    }
+
+                    unitOfWork.ContractAllowancesDetails.UpdateRange(obj.ListOfAllowancesDetails);
+                }
+
+
+
+                unitOfWork.Contracts.Update(obj);
+                await unitOfWork.CompleteAsync();
+                transaction.Commit();
+                return new()
+                {
+                    Msg = string.Format(shareLocalizer[Localization.Done],
+                        shareLocalizer[Localization.Contract]),
+                    Check = true,
+                    Data = new()
+                    {
+                        EmployeeId = obj.EmployeeId,
+                        StartDate = obj.StartDate,
+                        EndDate = obj.EndDate,
+                        FixedSalary = obj.FixedSalary,
+                        HousingAllowance = obj.HousingAllowance,
+                        TotalSalary = obj.TotalSalary,
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new()
+                {
+                    Msg = ex.Message,
+                    Check = true,
+                    Data = null,
+                    Error = ex.InnerException!=null ? ex.InnerException.Message :ex.Message
+                };
+            }
+
 
         }
 

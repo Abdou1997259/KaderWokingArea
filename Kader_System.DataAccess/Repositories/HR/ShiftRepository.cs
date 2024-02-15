@@ -31,12 +31,9 @@ public class ShiftRepository(KaderDbContext context) : BaseRepository<HrShift>(c
                 (shiftEmployee, user) => new { shiftEmployee.ShiftEmployee, User = user });
 
 
-        if (skip.HasValue)
-            query = query.Skip(skip.Value);
-        if (take.HasValue)
-            query = query.Take(take.Value);
 
-        return query
+
+        var groupedQuery = query
             .GroupBy(x => new { x.ShiftEmployee.Shift.Id, x.ShiftEmployee.Shift.Name_ar, x.ShiftEmployee.Shift.Name_en, x.ShiftEmployee.Shift.Start_shift, x.ShiftEmployee.Shift.End_shift })
             .Select(group => new ShiftData()
             {
@@ -46,9 +43,12 @@ public class ShiftRepository(KaderDbContext context) : BaseRepository<HrShift>(c
                 End_shift = group.Key.End_shift,
                 EmployeesCount = group.Count(x => x.ShiftEmployee.Employee != null),
                 AddedByUser = group.FirstOrDefault()!.User!.UserName,
-            })
-            .ToList();
+            });
 
-
+        if (take.HasValue)
+            groupedQuery = groupedQuery.Take(take.Value);
+        if (skip.HasValue)
+            groupedQuery = groupedQuery.Skip(skip.Value);
+        return groupedQuery.ToList();
     }
 }

@@ -74,7 +74,8 @@ public class QualificationService(IUnitOfWork unitOfWork, IStringLocalizer<Share
             NextPageUrl = page < totalPages ? host + $"?PageSize={model.PageSize}&PageNumber={page + 1}&IsDeleted={model.IsDeleted}" : null,
             Path = host,
             PerPage = model.PageSize,
-            Links = pageLinks
+            Links = pageLinks,
+            CurrentPage = page
         };
 
         if (result.TotalRecords is 0)

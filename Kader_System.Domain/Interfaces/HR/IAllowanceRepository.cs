@@ -9,4 +9,6 @@ public interface IAllowanceRepository : IBaseRepository<HrAllowance>
         int? skip = null,
         int? take = null
         , string lang = "ar");
+
+    Task<object> GetAllowancesDataAsLookUp(string lang);
 }

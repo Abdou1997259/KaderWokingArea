@@ -39,7 +39,10 @@ namespace Kader_System.Services.Services.HR
 
         public async Task<Response<HrGetAllJobsResponse>> GetAllJobsAsync(string lang, HrGetAllFilterationForJobRequest model,string host)
         {
-            Expression<Func<HrJob, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+            Expression<Func<HrJob, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                &&(string.IsNullOrEmpty(model.Word)
+                || x.NameAr.Contains(model.Word)
+                || x.NameEn.Contains(model.Word));
            
 
             var totalRecords = await unitOfWork.Jobs.CountAsync(filter: filter);

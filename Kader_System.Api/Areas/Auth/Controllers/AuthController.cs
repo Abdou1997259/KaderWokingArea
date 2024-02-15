@@ -25,7 +25,30 @@ public class AuthController(IAuthService service) : ControllerBase
             return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
         return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
     }
+    [AllowAnonymous]
+    [HttpPost("upload")]
+        public IActionResult UploadFile([FromForm] IFormFile file, [FromForm] CompanyContractModel model)
+        {
+            if (file != null && file.Length > 0)
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    // Copy the file stream to a memory stream
+                    file.CopyTo(memoryStream);
 
+                    // Set the model's FilePath property to the byte array
+                    model.FilePath = memoryStream.ToArray();
+                }
+
+                // Process the model as needed, e.g., save to a database
+                // ...
+
+                return Ok("File uploaded successfully");
+            }
+
+            return BadRequest("No file or empty file");
+        }
+    
     [AllowAnonymous]
     [HttpDelete(ApiRoutes.User.LogOutUser)]
     public async Task<IActionResult> LogOutUserAsync()
@@ -91,7 +114,12 @@ public class AuthController(IAuthService service) : ControllerBase
        return Ok(jsonObject);
     }
 
+    public class CompanyContractModel
+    {
+        // Other properties...
 
+        public byte[] FilePath { get; set; }
+    }
     //private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
     //{
     //    var cookieOptions = new CookieOptions

@@ -33,12 +33,7 @@ public class QualificationRepository(KaderDbContext context) : BaseRepository<Hr
                 (shiftEmployee, user) => new { shiftEmployee.QualificationEmployee, User = user });
 
 
-        if (skip.HasValue)
-            query = query.Skip(skip.Value);
-        if (take.HasValue)
-            query = query.Take(take.Value);
-
-        return query
+        var groupedQuery= query
             .GroupBy(x => new { x.QualificationEmployee.Qualification.Id, x.QualificationEmployee.Qualification.NameAr, x.QualificationEmployee.Qualification.NameEn })
             .Select(group => new QualificationData()
             {
@@ -46,9 +41,12 @@ public class QualificationRepository(KaderDbContext context) : BaseRepository<Hr
                 Name =lang==Localization.Arabic? group.Key.NameAr:group.Key.NameEn,
                 EmployeesCount = group.Count(x => x.QualificationEmployee.Employee != null),
                 AddedByUser = group.FirstOrDefault()!.User!.UserName,
-            })
-            .ToList();
-
+            });
+        if (take.HasValue)
+            groupedQuery = groupedQuery.Take(take.Value);
+        if (skip.HasValue)
+            groupedQuery = groupedQuery.Skip(skip.Value);
+        return groupedQuery.ToList();
 
     }
 }

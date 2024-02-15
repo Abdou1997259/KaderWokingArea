@@ -174,7 +174,9 @@ public static class SD
             public const string GetAllContracts = "contract";
             public const string CreateContract = "contract/create";
             public const string UpdateContract = "contract/update/{id}";
+            public const string RestoreContract = "contract/restore/{id}";
             public const string GetContractById = "contract/getById/{id}";
+            public const string GetContractLookups = "contract/getLookups";
             public const string DeleteContract = "contract/delete/{id}";
         }
         public class Allowance

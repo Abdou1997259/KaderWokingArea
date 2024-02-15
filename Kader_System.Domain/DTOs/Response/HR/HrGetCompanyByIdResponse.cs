@@ -9,8 +9,8 @@ public class HrGetCompanyByIdResponse
     public int Company_type { get; set; }
     public string Company_type_name { get; set; }
 
-    public List<CompanyContractResponse> Contracts { get; set; }
-    public List<CompanyLicenseResponse> Licenses { get; set; }
+    public List<CompanyContractResponse> Company_licenses { get; set; }
+    public List<CompanyLicenseResponse> Company_contracts { get; set; }
 
     public int employees_count { get; set; }
     public int managements_count { get; set; }

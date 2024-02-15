@@ -39,6 +39,9 @@ public static class ManageFilesHelper
         }
         return list;
     }
+
+
+
     public static GetFileNameAndExtension SaveBase64StringToFile(string base64String, string filePath,string fileName)
     {
         try

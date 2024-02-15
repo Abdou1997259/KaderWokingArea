@@ -16,16 +16,17 @@
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public string ContractFile { get; set; }
+        public string AddedByUser { get; set; }
         public List<GetAllContractDetailsResponse>? Details { get; set; } = [];
     }
 
 
     public class GetAllContractDetailsResponse
     {
-        public int AllowanceId { get; set; }
-        public string AllowanceName { get; set; }
-        public double Value { get; set; }
-        public bool IsPercent { get; set; }
+        public int? AllowanceId { get; set; }
+        public string? AllowanceName { get; set; }
+        public double? Value { get; set; }
+        public bool? IsPercent { get; set; }
     }
 
 
