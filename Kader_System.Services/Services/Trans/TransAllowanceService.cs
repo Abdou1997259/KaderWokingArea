@@ -1,6 +1,6 @@
 ﻿
 using Kader_System.Domain.DTOs;
-using Microsoft.Extensions.Hosting;
+
 
 namespace Kader_System.Services.Services.Trans;
 public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResource> sharLocalizer, IMapper mapper) :ITransAllowanceService
@@ -52,8 +52,23 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
     public async Task<Response<TransAllowanceGetAllResponse>> GetAllTransAllowancesAsync(string lang, 
         GetAllFilterationAllowanceRequest model,string host)
     {
-        Expression<Func<TransAllowance, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-        var totalRecords = await unitOfWork.TransAllowances.CountAsync(filter: filter);
+        Expression<Func<TransAllowance, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                                                             && (string.IsNullOrEmpty(model.Word) || x.ActionMonth.ToString().Contains(model.Word)
+                                                                 || x.Allowance!.Name_en.Contains(model.Word)
+                                                                 || x.Allowance!.Name_ar.Contains(model.Word)
+                                                                 || x.Employee!.FullNameEn.Contains(model.Word)
+                                                                 || x.Employee!.FullNameAr.Contains(model.Word))
+            ;
+
+        Expression<Func<TransAllowanceData, bool>> filterSearch = x =>
+            (string.IsNullOrEmpty(model.Word)
+             || x.AllowanceName.Contains(model.Word)
+             || x.EmployeeName.Contains(model.Word));
+
+        var totalRecords = await unitOfWork.TransAllowances.CountAsync(filter: filter,
+            includeProperties: $"{nameof(_insatance.Allowance)},{nameof(_insatance.Employee)},{nameof(_insatance.SalaryEffect)}");
+        
+        
         int page = 1;
         int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
         if (model.PageNumber < 1)
@@ -67,26 +82,9 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
         {
             TotalRecords = totalRecords,
 
-            Items = (await unitOfWork.TransAllowances.GetSpecificSelectAsync(filter: filter,
-                includeProperties: $"{nameof(_insatance.Allowance)},{nameof(_insatance.Employee)},{nameof(_insatance.SalaryEffect)}",
-                take: model.PageSize,
-                skip: (model.PageNumber - 1) * model.PageSize,
-                select: x => new TransAllowanceData()
-                {
-                    Id = x.Id,
-                    ActionMonth = x.ActionMonth,
-                    SalaryEffect = lang == Localization.Arabic ? x.SalaryEffect!.Name : x.SalaryEffect!.NameInEnglish,
-                    AddedOn = x.Add_date,
-                    AllowanceId = x.AllowanceId,
-                    AllowanceName = lang == Localization.Arabic ? x.Allowance!.Name_ar : x.Allowance!.Name_en,
-                    Amount = x.Amount,
-                    EmployeeId = x.EmployeeId,
-                    EmployeeName = lang == Localization.Arabic ? x.Employee!.FullNameAr : x.Employee!.FullNameEn,
-                    Notes = x.Notes,
-                    SalaryEffectId = x.SalaryEffectId
-
-                }, orderBy: x =>
-                    x.OrderByDescending(x => x.Id))).ToList(),
+            Items = unitOfWork.TransAllowances.GetTransAllowanceInfo(filter:filter,filterSearch:filterSearch,skip: (model.PageNumber - 1) * model.PageSize
+            ,take: model.PageSize,lang:lang)
+            ,
             CurrentPage = model.PageNumber,
             FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
             From = (page - 1) * model.PageSize + 1,
@@ -122,9 +120,10 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
         };
     }
 
-    public async Task<Response<TransactionAllowanceGetByIdResponse>> GetTransAllowanceByIdAsync(int id)
+    public async Task<Response<TransactionAllowanceGetByIdResponse>> GetTransAllowanceByIdAsync(int id,string lang)
     {
-        var obj = await unitOfWork.TransAllowances.GetByIdAsync(id);
+        var obj = await unitOfWork.TransAllowances.GetFirstOrDefaultAsync(a=>a.Id==id,
+            includeProperties: $"{nameof(_insatance.Allowance)},{nameof(_insatance.Employee)},{nameof(_insatance.SalaryEffect)}");
 
         if (obj is null)
         {
@@ -140,11 +139,78 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
 
         return new()
         {
-            Data = mapper.Map<TransactionAllowanceGetByIdResponse>(obj),
+            Data = new TransactionAllowanceGetByIdResponse()
+            {
+                ActionMonth = obj.ActionMonth,
+                AddedOn = obj.Add_date,
+                AllowanceId = obj.AllowanceId,
+                Amount = obj.Amount,
+                EmployeeId = obj.EmployeeId,
+                Id = obj.Id,
+                SalaryEffectId = obj.SalaryEffectId,
+                Notes = obj.Notes,
+                AllowanceName =lang==Localization.Arabic?  obj.Allowance!.Name_ar: obj.Allowance!.Name_en,
+                EmployeeName = lang==Localization.Arabic?obj.Employee!.FullNameAr:obj.Employee!.FullNameEn,
+                SalaryEffectName = lang==Localization.Arabic?obj.SalaryEffect!.Name:obj.SalaryEffect!.NameInEnglish
+            },
             Check = true
         };
     }
 
+
+    public async Task<Response<TransAllowanceLookUpsData>> GetAllowancesLookUpsData(string lang)
+    {
+        try
+        {
+            var employees = await unitOfWork.Employees.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                select: x => new
+                {
+                    Id = x.Id,
+                    Name = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn
+                });
+
+            var allowances = await unitOfWork.Allowances.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                select: x => new
+                {
+                    Id = x.Id,
+                    Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en
+                });
+
+            var salaryEffect = await unitOfWork.TransSalaryEffects.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                select: x => new
+                {
+                    Id = x.Id,
+                    Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+
+                });
+
+            return new Response<TransAllowanceLookUpsData>()
+            {
+                Check = true,
+                IsActive = true,
+                Error = "",
+                Msg = "",
+                Data = new TransAllowanceLookUpsData()
+                {
+                    allowances = allowances.ToArray(),
+                    employees = employees.ToArray(),
+                    salary_effects = salaryEffect.ToArray(),
+                }
+            };
+        }
+        catch (Exception exception)
+        {
+            return new Response<TransAllowanceLookUpsData>()
+            {
+                Error = exception.InnerException != null ? exception.InnerException.Message : exception.Message,
+                Msg = "Can not able to Get Data",
+                Check = false,
+                Data = null,
+                IsActive = false
+            };
+        }
+
+    }
     #endregion
 
     #region Create
@@ -201,7 +267,35 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
         throw new NotImplementedException();
     }
 
+    public async Task<Response<object>> RestoreTransAllowanceAsync(int id)
+    {
+        var obj = await unitOfWork.TransAllowances.GetByIdAsync(id);
 
+        if (obj is null)
+        {
+            string resultMsg = sharLocalizer[Localization.NotFoundData];
+
+            return new()
+            {
+                Data = new(),
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        obj.IsDeleted = false;
+
+        unitOfWork.TransAllowances.Update(obj);
+        await unitOfWork.CompleteAsync();
+        return new()
+        {
+            Error = string.Empty,
+            Check = true,
+            Data = obj,
+            LookUps = null,
+            Msg = sharLocalizer[Localization.Restored]
+        };
+    }
     #endregion
 
     #region Delete

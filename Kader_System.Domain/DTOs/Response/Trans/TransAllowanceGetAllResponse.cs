@@ -24,5 +24,6 @@
         public int AllowanceId { get; set; }
 
         public string AllowanceName { get; set; } 
+        public string AddedBy { get; set; } 
     }
 }

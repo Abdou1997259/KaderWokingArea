@@ -193,8 +193,10 @@ public static class SD
         {
             public const string ListOfTransAllowances = "transAllowance/getListOftransAllowances";
             public const string GetAllTransAllowances = "transAllowance/getAll";
+            public const string GetLookupsTransAllowances = "transAllowance/getLookUps";
             public const string CreateTransAllowance = "transAllowance/create";
             public const string UpdateTransAllowance = "transAllowance/update/{id}";
+            public const string RestoreTransAllowance = "transAllowance/restore/{id}";
             public const string GetTransAllowanceById = "transAllowance/getById/{id}";
             public const string DeleteTransAllowance = "transAllowance/delete/{id}";
         }
