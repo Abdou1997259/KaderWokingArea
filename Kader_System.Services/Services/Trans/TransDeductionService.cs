@@ -1,4 +1,5 @@
 ﻿using Kader_System.Domain.DTOs;
+using Kader_System.Domain.DTOs.Response;
 using Microsoft.Extensions.Hosting;
 
 namespace Kader_System.Services.Services.Trans
@@ -126,6 +127,69 @@ namespace Kader_System.Services.Services.Trans
             };
         }
 
+
+        public async Task<Response<DeductionLookUps>> GetDeductionsLookUpsData(string lang)
+        {
+            try
+            {
+                var employees = await unitOfWork.Employees.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn
+                    });
+
+                var deductions = await unitOfWork.Deductions.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id=x.Id,
+                        Name=lang==Localization.Arabic?x.Name_ar:x.Name_en
+                    });
+
+                var salaryEffect = await unitOfWork.TransSalaryEffects.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+
+                    });
+                var amountType = await unitOfWork.TransAmountTypes.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+
+                    });
+                
+                return new Response<DeductionLookUps>()
+                {
+                    Check = true,
+                    IsActive = true,
+                    Error = "",
+                    Msg = "",
+                    Data = new DeductionLookUps()
+                    {
+                       deductions = deductions.ToArray(),
+                       employees = employees.ToArray(),
+                       salary_effects = salaryEffect.ToArray(),
+                       trans_amount_types = amountType.ToArray()
+                    }
+                };
+            }
+            catch (Exception exception)
+            {
+                return new Response<DeductionLookUps>()
+                {
+                    Error = exception.InnerException!=null ? exception.InnerException.Message:exception.Message,
+                    Msg = "Can not able to Get Data",
+                    Check = false,
+                    Data = null,
+                    IsActive = false
+                };
+            }
+
+        }
+
         public async Task<Response<CreateTransDeductionRequest>> CreateTransDeductionAsync(CreateTransDeductionRequest model)
         {
             var newTrans = mapper.Map<TransDeduction>(model);
@@ -228,6 +292,37 @@ namespace Kader_System.Services.Services.Trans
                 Data = mapper.Map<GetTransDeductionById>(obj)
             };
         }
+
+        public async Task<Response<object>> RestoreTransDeductionAsync(int id)
+        {
+            var obj = await unitOfWork.TransDeductions.GetByIdAsync(id);
+
+            if (obj is null)
+            {
+                string resultMsg = sharLocalizer[Localization.NotFoundData];
+
+                return new()
+                {
+                    Data = new(),
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            obj.IsDeleted = false;
+
+            unitOfWork.TransDeductions.Update(obj);
+            await unitOfWork.CompleteAsync();
+            return new()
+            {
+                Error = string.Empty,
+                Check = true,
+                Data = obj,
+                LookUps = null,
+                Msg = sharLocalizer[Localization.Restored]
+            };
+        } 
+
 
         public Task<Response<string>> UpdateActiveOrNotTransDeductionAsync(int id)
         {

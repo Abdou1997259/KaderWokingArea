@@ -214,8 +214,10 @@ public static class SD
             public const string GetTransDeductions = "transDeduction/getAll";
             public const string CreateTransDeduction = "transDeduction/create";
             public const string UpdateTransDeduction = "transDeduction/update/{id}";
+            public const string RestoreTransDeduction = "transDeduction/restore/{id}";
             public const string GetTransDeductionById = "transDeduction/getById/{id}";
             public const string DeleteTransDeduction = "transDeduction/delete/{id}";
+            public const string GetLookUps = "transDeduction/getLookUps";
         }
         public class TransVacation
         {
