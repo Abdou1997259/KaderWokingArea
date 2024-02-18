@@ -45,10 +45,27 @@ namespace Kader_System.Services.Services.Trans
         }
 
         public async Task<Response<GetAllTransCovenantResponse>> GetAllTransCovenantsAsync(string lang,
-            GetAllFilterationForTransCovenant model,string host)
+            GetAllFilterationForTransCovenant model, string host)
         {
-            Expression<Func<TransCovenant, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-            var totalRecords = await unitOfWork.TransCovenants.CountAsync(filter: filter);
+            Expression<Func<TransCovenant, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                && (string.IsNullOrEmpty(model.Word)
+                   || x.NameAr.Contains(model.Word)
+                   || x.NameEn.Contains(model.Word)
+                   || x.Employee!.FullNameAr.Contains(model.Word)
+                   || x.Employee!.FullNameEn.Contains(model.Word));
+
+            Expression<Func<TransCovenantData, bool>> filterSearch = x =>
+                (string.IsNullOrEmpty(model.Word)
+                 || x.NameAr.Contains(model.Word)
+                 || x.EmployeeName.Contains(model.Word)
+                 || x.NameEn.Contains(model.Word)
+                 || x.EmployeeName.Contains(model.Word)
+                 || x.AddedBy!.Contains(model.Word));
+
+            var totalRecords = await unitOfWork.TransCovenants.CountAsync(filter: filter,
+                includeProperties: $"{nameof(_insatance.Employee)}");
+
+
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
             if (model.PageNumber < 1)
@@ -62,24 +79,10 @@ namespace Kader_System.Services.Services.Trans
             {
                 TotalRecords = totalRecords,
 
-                Items = (await unitOfWork.TransCovenants.GetSpecificSelectAsync(filter: filter,
-                    includeProperties: $"{nameof(_insatance.Employee)}",
-                    take: model.PageSize,
+                Items = unitOfWork.TransCovenants.GetTransCovenantDataInfo(filter: filter, filterSearch: filterSearch,
                     skip: (model.PageNumber - 1) * model.PageSize,
-                    select: x => new TransCovenantData()
-                    {
-                        Id = x.Id,
-                        Date = x.Date,
-                        NameAr = x.NameAr,
-                        NameEn = x.NameEn,
-                        Amount = x.Amount,
-                        EmployeeId = x.EmployeeId,
-                        EmployeeName = lang == Localization.Arabic ? x.Employee!.FullNameAr : x.Employee!.FullNameEn,
-                        Notes = x.Notes,
-                        AttachmentFile = ManageFilesHelper.ConvertFileToBase64(GoRootPath.TransFilesPath + x.Attachment)
-                        ,AddedOn = x.Add_date
-                    }, orderBy: x =>
-                        x.OrderByDescending(x => x.Id))).ToList(),
+                    take: model.PageSize, lang: lang)
+               ,
                 CurrentPage = model.PageNumber,
                 FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
@@ -144,9 +147,10 @@ namespace Kader_System.Services.Services.Trans
             };
         }
 
-        public async Task<Response<GetTransCovenantById>> GetTransCovenantByIdAsync(int id)
+        public async Task<Response<GetTransCovenantById>> GetTransCovenantByIdAsync(int id,string lang)
         {
-            var obj = await unitOfWork.TransCovenants.GetByIdAsync(id);
+            var obj = await unitOfWork.TransCovenants.GetFirstOrDefaultAsync(c=>c.Id==id, 
+                includeProperties: $"{nameof(_insatance.Employee)}");
 
             if (obj is null)
             {
@@ -162,7 +166,18 @@ namespace Kader_System.Services.Services.Trans
 
             return new()
             {
-                Data = mapper.Map<GetTransCovenantById>(obj),
+                Data = new GetTransCovenantById()
+                {
+                    AddedOn = obj.Add_date,
+                    Amount = obj.Amount,
+                    Date = obj.Date,
+                    NameAr = obj.NameAr,
+                    NameEn = obj.NameEn,
+                    Notes = obj.Notes,
+                    EmployeeId = obj.EmployeeId,
+                    EmployeeName =lang==Localization.Arabic? obj.Employee!.FullNameAr:obj.Employee!.FullNameEn,
+                    Id = obj.Id
+                },
                 Check = true
             };
         }
@@ -216,7 +231,35 @@ namespace Kader_System.Services.Services.Trans
                 Data = model
             };
         }
+        public async Task<Response<object>> RestoreTransCovenantAsync(int id)
+        {
+            var obj = await unitOfWork.TransCovenants.GetByIdAsync(id);
 
+            if (obj is null)
+            {
+                string resultMsg = sharLocalizer[Localization.NotFoundData];
+
+                return new()
+                {
+                    Data = new(),
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            obj.IsDeleted = false;
+
+            unitOfWork.TransCovenants.Update(obj);
+            await unitOfWork.CompleteAsync();
+            return new()
+            {
+                Error = string.Empty,
+                Check = true,
+                Data = obj,
+                LookUps = null,
+                Msg = sharLocalizer[Localization.Restored]
+            };
+        }
         public Task<Response<string>> UpdateActiveOrNotTransCovenantAsync(int id)
         {
             throw new NotImplementedException();

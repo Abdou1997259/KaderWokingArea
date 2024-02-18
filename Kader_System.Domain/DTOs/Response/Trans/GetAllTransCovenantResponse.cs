@@ -15,6 +15,6 @@
         public string EmployeeName { get; set; } = default!;
         public double Amount { get; set; }
         public string? Notes { get; set; }
-        public string? AttachmentFile { get; set; }
+        public string? AddedBy { get; set; }
     }
 }

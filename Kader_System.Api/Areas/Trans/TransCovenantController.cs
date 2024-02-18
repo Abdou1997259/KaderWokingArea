@@ -9,6 +9,8 @@ namespace Kader_System.Api.Areas.Trans
     [Route("api/v1/")]
     public class TransCovenantController(ITransCovenantService service) : ControllerBase
     {
+        #region Get
+
         [HttpGet(ApiRoutes.TransCovenant.ListOfTransCovenants)]
         public async Task<IActionResult> ListOfTransCovenants() =>
             Ok(await service.ListOfTransCovenantsAsync(GetCurrentRequestLanguage()));
@@ -16,6 +18,9 @@ namespace Kader_System.Api.Areas.Trans
         [HttpGet(ApiRoutes.TransCovenant.GetTransCovenants)]
         public async Task<IActionResult> GetAllTransCovenants([FromQuery] GetAllFilterationForTransCovenant request) =>
             Ok(await service.GetAllTransCovenantsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
+        #endregion
+
+        #region Create
 
         [HttpPost(ApiRoutes.TransCovenant.CreateTransCovenant)]
         public async Task<IActionResult> CreateTransCovenant([FromBody] CreateTransCovenantRequest request)
@@ -34,13 +39,15 @@ namespace Kader_System.Api.Areas.Trans
                 return BadRequest(ModelState);
             }
         }
+        #endregion
 
+        #region Put
         [HttpPut(ApiRoutes.TransCovenant.UpdateTransCovenant)]
         public async Task<IActionResult> UpdateTransCovenant([FromRoute] int id, [FromBody] CreateTransCovenantRequest request)
         {
             if (ModelState.IsValid)
             {
-                var response = await service.UpdateTransCovenantAsync(id,request);
+                var response = await service.UpdateTransCovenantAsync(id, request);
                 if (response.Check)
                     return Ok(response);
                 else if (!response.Check)
@@ -52,6 +59,26 @@ namespace Kader_System.Api.Areas.Trans
                 return BadRequest(ModelState);
             }
         }
+
+
+        [HttpPut(ApiRoutes.TransCovenant.RestoreTransCovenant)]
+        public async Task<IActionResult> RestoreTransCovenant([FromRoute] int id)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await service.RestoreTransCovenantAsync(id);
+                if (response.Check)
+                    return Ok(response);
+                else if (!response.Check)
+                    return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+                return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
+        #endregion
 
 
         #region Delete
