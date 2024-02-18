@@ -14,6 +14,7 @@
         public int VacationId { get; set; }
         public string VacationName { get; set; } 
         public string? Notes { get; set; }
-        public string? AttachmentFile { get; set; }
+        public string? AddedBy { get; set; }
+
     }
 }

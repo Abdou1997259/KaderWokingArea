@@ -227,8 +227,10 @@ public static class SD
         {
             public const string ListOfTransVacations = "transVacation/getListOftransVacations";
             public const string GetTransVacations = "transVacation/getAll";
+            public const string GetTransVacationsLookUps = "transVacation/getlookUps";
             public const string CreateTransVacation = "transVacation/create";
             public const string UpdateTransVacation = "transVacation/update/{id}";
+            public const string RestoreTransVacation = "transVacation/restore/{id}";
             public const string GetTransVacationById = "transVacation/getById/{id}";
             public const string DeleteTransVacation = "transVacation/delete/{id}";
         }

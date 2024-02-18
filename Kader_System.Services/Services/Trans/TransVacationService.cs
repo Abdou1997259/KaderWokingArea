@@ -1,5 +1,6 @@
 ﻿using Kader_System.Domain.DTOs;
-using Microsoft.Extensions.Hosting;
+using Kader_System.Domain.DTOs.Response;
+
 
 namespace Kader_System.Services.Services.Trans
 {
@@ -47,8 +48,23 @@ namespace Kader_System.Services.Services.Trans
         public async Task<Response<GetAllTransVacationResponse>> GetAllTransVacationsAsync(string lang, 
             GetAllFilterationForTransVacationRequest model,string host)
         {
-            Expression<Func<TransVacation, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-            var totalRecords = await unitOfWork.TransVacations.CountAsync(filter: filter);
+            Expression<Func<TransVacation, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                && (string.IsNullOrEmpty(model.Word)
+                || x.Employee!.FullNameEn.Contains(model.Word)
+                || x.Employee!.FullNameAr.Contains(model.Word)
+                || x.Vacation!.NameAr.Contains(model.Word)
+                || x.Vacation!.NameEn.Contains(model.Word));
+
+            Expression<Func<TransVacationData, bool>> filterSearch = x =>
+                (string.IsNullOrEmpty(model.Word)
+                 || x.EmployeeName.Contains(model.Word)
+                 || x.VacationName.Contains(model.Word)
+                 || x.EmployeeName.Contains(model.Word)
+                 || x.AddedBy!.Contains(model.Word));
+
+            var totalRecords = await unitOfWork.TransVacations.CountAsync(filter: filter,
+                includeProperties: $"{nameof(_insatance.Vacation)},{nameof(_insatance.Employee)}");
+          
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
             if (model.PageNumber < 1)
@@ -62,23 +78,9 @@ namespace Kader_System.Services.Services.Trans
             {
                 TotalRecords = totalRecords,
 
-                Items = (await unitOfWork.TransVacations.GetSpecificSelectAsync(filter: filter,
-                    includeProperties: $"{nameof(_insatance.Vacation)},{nameof(_insatance.Employee)}",
-                    take: model.PageSize,
+                Items = unitOfWork.TransVacations.GetTransVacationInfo(filter:filter,filterSearch:filterSearch,
                     skip: (model.PageNumber - 1) * model.PageSize,
-                    select: x => new TransVacationData()
-                    {
-                        Id = x.Id,
-                        StartDate = x.StartDate,
-                        DaysCount = x.DaysCount,
-                        VacationId = x.VacationId,
-                        VacationName = lang == Localization.Arabic ? x.Vacation!.NameAr : x.Vacation!.NameEn,
-                        EmployeeId = x.EmployeeId,
-                        EmployeeName = lang == Localization.Arabic ? x.Employee!.FullNameAr : x.Employee!.FullNameEn,
-                        Notes = x.Notes ,
-                        AttachmentFile = ManageFilesHelper.ConvertFileToBase64(GoRootPath.TransFilesPath + x.Attachment)
-                    }, orderBy: x =>
-                        x.OrderByDescending(x => x.Id))).ToList(),
+                    take: model.PageSize,lang:lang),
                 CurrentPage = model.PageNumber,
                 FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
@@ -113,6 +115,52 @@ namespace Kader_System.Services.Services.Trans
                 Check = true
             };
         }
+        public async Task<Response<TransVacationLookUpsData>> GetTransVacationLookUpsData(string lang)
+        {
+            try
+            {
+                var employees = await unitOfWork.Employees.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn
+                    });
+
+                var vacations = await unitOfWork.Vacations.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
+                    });
+
+                return new Response<TransVacationLookUpsData>()
+                {
+                    Check = true,
+                    IsActive = true,
+                    Error = "",
+                    Msg = "",
+                    Data = new TransVacationLookUpsData()
+                    {
+                        vacayions = vacations.ToArray(),
+                        employees = employees.ToArray(),
+                      
+                    }
+                };
+            }
+            catch (Exception exception)
+            {
+                return new Response<TransVacationLookUpsData>()
+                {
+                    Error = exception.InnerException != null ? exception.InnerException.Message : exception.Message,
+                    Msg = "Can not able to Get Data",
+                    Check = false,
+                    Data = null,
+                    IsActive = false
+                };
+            }
+
+        }
+
 
         public async Task<Response<CreateTransVacationRequest>> CreateTransVacationAsync(CreateTransVacationRequest model)
         {
@@ -143,7 +191,7 @@ namespace Kader_System.Services.Services.Trans
             };
         }
 
-        public async Task<Response<GetTransVacationById>> GetTransVacationByIdAsync(int id)
+        public async Task<Response<GetTransVacationById>> GetTransVacationByIdAsync(int id,string lang)
         {
             var obj = await unitOfWork.TransVacations.GetFirstOrDefaultAsync(v=>v.Id==id
                 ,includeProperties: $"{nameof(_insatance.Vacation)},{nameof(_insatance.Employee)}");
@@ -162,7 +210,18 @@ namespace Kader_System.Services.Services.Trans
 
             return new()
             {
-                Data = mapper.Map<GetTransVacationById>(obj),
+                Data = new GetTransVacationById()
+                {
+                    DaysCount = obj.DaysCount,
+                    EmployeeId = obj.EmployeeId,
+                    EmployeeName =lang==Localization.Arabic? obj.Employee!.FullNameAr : obj.Employee!.FullNameEn,
+                    StartDate = obj.StartDate,
+                    Id = obj.Id,
+                    Notes = obj.Notes,
+                    VacationId = obj.VacationId,
+                    VacationName =lang==Localization.Arabic? obj.Vacation!.NameAr : obj.Vacation!.NameEn,
+                    
+                },
                 Check = true
             };
         }
@@ -219,6 +278,35 @@ namespace Kader_System.Services.Services.Trans
         public Task<Response<string>> UpdateActiveOrNotTransVacationAsync(int id)
         {
             throw new NotImplementedException();
+        }
+        public async Task<Response<object>> RestoreTransVacationAsync(int id)
+        {
+            var obj = await unitOfWork.TransVacations.GetByIdAsync(id);
+
+            if (obj is null)
+            {
+                string resultMsg = sharLocalizer[Localization.NotFoundData];
+
+                return new()
+                {
+                    Data = new(),
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            obj.IsDeleted = false;
+
+            unitOfWork.TransVacations.Update(obj);
+            await unitOfWork.CompleteAsync();
+            return new()
+            {
+                Error = string.Empty,
+                Check = true,
+                Data = obj,
+                LookUps = null,
+                Msg = sharLocalizer[Localization.Restored]
+            };
         }
 
         public async Task<Response<string>> DeleteTransVacationAsync(int id)

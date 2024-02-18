@@ -11,13 +11,39 @@ namespace Kader_System.Api.Areas.Trans
     [Route("api/v1/")]
     public class TransVacationController(ITransVacationService service) : ControllerBase
     {
+        #region Retrieve
+
         [HttpGet(ApiRoutes.TransVacation.ListOfTransVacations)]
         public async Task<IActionResult> ListOfTransVacations() =>
             Ok(await service.ListOfTransVacationsAsync(GetCurrentRequestLanguage()));
 
         [HttpGet(ApiRoutes.TransVacation.GetTransVacations)]
         public async Task<IActionResult> GetAllTransVacations([FromQuery] GetAllFilterationForTransVacationRequest request) =>
-            Ok(await service.GetAllTransVacationsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
+            Ok(await service.GetAllTransVacationsAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
+
+        [HttpGet(ApiRoutes.TransVacation.GetTransVacationsLookUps)]
+        public async Task<IActionResult> GetTransVacationLookUpsData([FromQuery] GetAllFilterationForTransVacationRequest request) =>
+            Ok(await service.GetTransVacationLookUpsData(GetCurrentRequestLanguage()));
+
+        [HttpGet(ApiRoutes.TransVacation.GetTransVacationById)]
+        public async Task<IActionResult> GetTransVacationById([FromRoute] int id)
+        {
+            var response = await service.GetTransVacationByIdAsync(id, GetCurrentRequestLanguage());
+            var lookUps =await service.GetTransVacationLookUpsData(GetCurrentRequestLanguage());
+            if (response.Check)
+            {
+                response.LookUps = lookUps.Data;
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response);
+            }
+        }
+           
+        #endregion
+
+        #region Create
 
         [HttpPost(ApiRoutes.TransVacation.CreateTransVacation)]
         public async Task<IActionResult> CreateTransVacation([FromBody] CreateTransVacationRequest request)
@@ -36,13 +62,15 @@ namespace Kader_System.Api.Areas.Trans
                 return BadRequest(ModelState);
             }
         }
+        #endregion
 
+        #region Update
         [HttpPut(ApiRoutes.TransVacation.UpdateTransVacation)]
         public async Task<IActionResult> UpdateTransVacation([FromRoute] int id, [FromBody] CreateTransVacationRequest request)
         {
             if (ModelState.IsValid)
             {
-                var response = await service.UpdateTransVacationAsync(id,request);
+                var response = await service.UpdateTransVacationAsync(id, request);
                 if (response.Check)
                     return Ok(response);
                 else if (!response.Check)
@@ -55,6 +83,18 @@ namespace Kader_System.Api.Areas.Trans
             }
         }
 
+        [HttpPut(ApiRoutes.TransVacation.RestoreTransVacation)]
+        public async Task<IActionResult> RestoreTransVacation([FromRoute] int id)
+        {
+
+            var response = await service.RestoreTransVacationAsync(id);
+            if (response.Check)
+                return Ok(response);
+            else if (!response.Check)
+                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
+        #endregion
 
         #region Delete
 
