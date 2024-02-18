@@ -153,6 +153,9 @@
   <data name="Qualification" xml:space="preserve">
     <value>Qualification</value>
   </data>
+  <data name="Restored" xml:space="preserve">
+    <value>Restored Successfully</value>
+  </data>
   <data name="Role" xml:space="preserve">
     <value>Role</value>
   </data>

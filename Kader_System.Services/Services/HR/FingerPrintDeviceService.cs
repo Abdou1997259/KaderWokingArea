@@ -106,7 +106,7 @@ namespace Kader_System.Services.Services.HR
                 Error = string.Empty,
                 Msg = string.Empty,
                 IsActive = obj.IsActive,
-                Data = mapper.Map<GetFingerPrintDeviceByIdResponse>(obj)
+                Data = mapper.Map<GetFingerPrintDeviceByIdResponse>(obj),
             };
         }
 
@@ -220,7 +220,40 @@ namespace Kader_System.Services.Services.HR
             throw new NotImplementedException();
         }
 
+        public async Task<Response<object>> RestoreFingerPrintAsync(int id)
+        {
+            var obj = await unitOfWork.FingerPrints.GetByIdAsync(id);
+            if (obj == null)
+            {
+                string resultMsg = string.Format(shareLocalizer[Localization.CannotBeFound],
+                    shareLocalizer[Localization.FingerPrintDevice]);
 
+                return new()
+                {
+                    Data = string.Empty,
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            obj.IsDeleted = false;
+            unitOfWork.FingerPrints.Update(obj);
+            await unitOfWork.CompleteAsync();
+            var newObject = new
+            {
+                Id = obj.Id,
+                NameAr = obj.NameAr,
+                NameEn = obj.NameEn
+            };
+            return new()
+            {
+                Data = newObject
+                ,
+                Error = string.Empty,
+                Msg = shareLocalizer[Localization.Restored],
+                Check = true
+            };
+        }
         #endregion
 
 

@@ -289,7 +289,9 @@ public static class SD
             public const string ListOfFingerPrintDevices = "fingerPrint/getListOfFingerPrintDevices";
             public const string GetAllFingerPrintDevices = "fingerPrint/getAll";
             public const string CreateFingerPrintDevice = "fingerPrint/create";
+            public const string GetLookup = "fingerPrint/getLookup";
             public const string UpdateFingerPrintDevice = "fingerPrint/update/{id}";
+            public const string RestoreFingerPrint = "fingerPrint/restore/{id}";
             public const string GetFingerPrintDeviceById = "fingerPrint/getById/{id}";
             public const string DeleteFingerPrintDevice = "fingerPrint/delete/{id}";
         }
@@ -362,21 +364,13 @@ public static class SD
         public const string ItIsNecessaryThatAmountMoreThanZero = "ItIsNecessaryThatAmountMoreThanZero";
         public const string Used = "Used";
         public const string CannotBeFound = "CannotBeFound";
+
+        public const string Restored = "Restored";
         public const string Departments = "Departments";
 
         public const string MainScreenCategory = "MainScreenCategory";
         public const string MainScreen = "MainScreen";
         public const string SubMainScreen = "SubMainScreen";
-
-
-
-
-
-
-
-
-
-
 
         public const string DepartmentsExist = "DepartmentsExist";
         public const string Jobs = "Jobs";
@@ -391,7 +385,6 @@ public static class SD
         public const string News = "News";
         public const string Updated = "Updated";
         public const string Deleted = "Deleted";
-        public const string Restored = "Restored";
         public const string CurrentAndNewPasswordIsTheSame = "CurrentAndNewPasswordIsTheSame";
         public const string CurrentPasswordIsIncorrect = "CurrentPasswordIsIncorrect";
         public const string UserName = "UserName";

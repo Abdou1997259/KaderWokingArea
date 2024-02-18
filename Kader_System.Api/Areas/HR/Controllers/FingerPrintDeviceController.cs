@@ -5,7 +5,7 @@
     [ApiController]
     [Authorize(Permissions.HR.View)]
     [Route("api/v1/")]
-    public class FingerPrintDeviceController(IFingerPrintDeviceService fingerPrintDeviceService) : ControllerBase
+    public class FingerPrintDeviceController(IFingerPrintDeviceService fingerPrintDeviceService,ICompanyService companyService) : ControllerBase
     {
         #region Get Methods
 
@@ -20,7 +20,25 @@
         {
             var response = await fingerPrintDeviceService.GetFingerPrintDeviceByIdAsync(id);
             if (response.Check)
+            {
+                response.LookUps = await companyService.ListOfCompaniesAsync(GetCurrentRequestLanguage());
                 return Ok(response);
+            }
+               
+            else if (!response.Check)
+                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
+
+        [HttpGet(ApiRoutes.FingerPrint.GetLookup)]
+        public async Task<IActionResult> GetLookup()
+        {
+            var response = await companyService.ListOfCompaniesAsync(GetCurrentRequestLanguage());
+            if (response.Check)
+            {
+                return Ok(response);
+            }
+
             else if (!response.Check)
                 return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
@@ -64,6 +82,16 @@
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
         }
 
+        [HttpPut(ApiRoutes.FingerPrint.RestoreFingerPrint)]
+        public async Task<IActionResult> RestoreFingerPrint([FromRoute] int id)
+        {
+            var response = await fingerPrintDeviceService.RestoreFingerPrintAsync(id);
+            if (response.Check)
+                return Ok(response);
+            else if (!response.Check)
+                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
         #endregion
 
 

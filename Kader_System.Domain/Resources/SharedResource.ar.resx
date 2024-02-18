@@ -153,6 +153,9 @@
   <data name="Qualification" xml:space="preserve">
     <value>المؤهل</value>
   </data>
+  <data name="Restored" xml:space="preserve">
+    <value>تمت الاستعاده بنجاح</value>
+  </data>
   <data name="Role" xml:space="preserve">
     <value>المسئولية</value>
   </data>
