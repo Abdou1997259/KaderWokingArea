@@ -1,4 +1,5 @@
 ﻿using Kader_System.Domain.DTOs;
+using Kader_System.Domain.DTOs.Response;
 using Microsoft.Extensions.Hosting;
 
 namespace Kader_System.Services.Services.Trans
@@ -52,8 +53,26 @@ namespace Kader_System.Services.Services.Trans
         public async Task<Response<GetAllTransBenefitResponse>> GetAllTransBenefitsAsync(string lang, 
             GetAllFilterationForTransBenefitRequest model,string host)
         {
-            Expression<Func<TransBenefit, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-            var totalRecords = await unitOfWork.TransBenefits.CountAsync(filter: filter);
+
+
+            Expression<Func<TransBenefit, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                && (string.IsNullOrEmpty(model.Word) || x.ActionMonth.ToString().Contains(model.Word)
+                || x.AmountType!.Name.Contains(model.Word)|| x.AmountType!.NameInEnglish.Contains(model.Word)
+                || x.Benefit!.Name_en.Contains(model.Word)
+                || x.Benefit!.Name_ar.Contains(model.Word)
+                || x.Employee!.FullNameEn.Contains(model.Word)
+                || x.Employee!.FullNameAr.Contains(model.Word)
+                    );
+            Expression<Func<TransBenefitData, bool>> filterSearch = x =>
+                (string.IsNullOrEmpty(model.Word)
+                 || x.BenefitName.Contains(model.Word)
+                 || x.EmployeeName.Contains(model.Word)
+                 || x.ValueTypeName.Contains(model.Word));
+
+            var totalRecords = await unitOfWork.TransBenefits.CountAsync(filter: filter,
+                includeProperties: $"{nameof(_insatance.Benefit)},{nameof(_insatance.Employee)}," +
+                $"{nameof(_insatance.SalaryEffect)}" +
+                $",{nameof(_insatance.AmountType)}");
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
             if (model.PageNumber < 1)
@@ -67,30 +86,9 @@ namespace Kader_System.Services.Services.Trans
             {
                 TotalRecords = totalRecords,
 
-                Items = (await unitOfWork.TransBenefits.GetSpecificSelectAsync(filter: filter,
-                    includeProperties: $"{nameof(_insatance.Benefit)},{nameof(_insatance.Employee)},{nameof(_insatance.SalaryEffect)}" +
-                                       $",{nameof(_insatance.AmountType)}",
-                    take: model.PageSize,
-                    skip: (model.PageNumber - 1) * model.PageSize,
-                    select: x => new TransBenefitData()
-                    {
-                        Id = x.Id,
-                        ActionMonth = x.ActionMonth,
-                        SalaryEffect = lang == Localization.Arabic ? x.SalaryEffect!.Name : x.SalaryEffect!.NameInEnglish,
-                        AddedOn = x.Add_date,
-                        BenefitId = x.BenefitId,
-                        BenefitName = lang == Localization.Arabic ? x.Benefit!.Name_ar : x.Benefit!.Name_en,
-                        Amount = x.Amount,
-                        EmployeeId = x.EmployeeId,
-                        EmployeeName = lang == Localization.Arabic ? x.Employee!.FullNameAr : x.Employee!.FullNameEn,
-                        Notes = x.Notes,
-                        SalaryEffectId = x.SalaryEffectId,
-                        AmountTypeId = x.AmountTypeId,
-                        ValueTypeName = lang == Localization.Arabic ? x.AmountType!.Name : x.AmountType!.NameInEnglish,
-                        AttachmentFile = ManageFilesHelper.ConvertFileToBase64(GoRootPath.TransFilesPath+ x.Attachment)
-
-                    }, orderBy: x =>
-                        x.OrderByDescending(x => x.Id))).ToList(),
+                Items = ( unitOfWork.TransBenefits.GetTransBenefitInfo(filter:filter,filterSearch:filterSearch,
+                    skip: (model.PageNumber - 1) * model.PageSize,take: model.PageSize,lang))
+                ,
                 CurrentPage = model.PageNumber,
                 FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
@@ -126,6 +124,68 @@ namespace Kader_System.Services.Services.Trans
             };
         }
 
+        public async Task<Response<BenefitLookUps>> GetBenefitsLookUpsData(string lang)
+        {
+            try
+            {
+                var employees = await unitOfWork.Employees.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn
+                    });
+
+                var benefits = await unitOfWork.Benefits.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en
+                    });
+
+                var salaryEffect = await unitOfWork.TransSalaryEffects.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+
+                    });
+                var amountType = await unitOfWork.TransAmountTypes.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+
+                    });
+
+                return new Response<BenefitLookUps>()
+                {
+                    Check = true,
+                    IsActive = true,
+                    Error = "",
+                    Msg = "",
+                    Data = new BenefitLookUps()
+                    {
+                        benefit = benefits.ToArray(),
+                        employees = employees.ToArray(),
+                        salary_effects = salaryEffect.ToArray(),
+                        trans_amount_types = amountType.ToArray()
+                    }
+                };
+            }
+            catch (Exception exception)
+            {
+                return new Response<BenefitLookUps>()
+                {
+                    Error = exception.InnerException != null ? exception.InnerException.Message : exception.Message,
+                    Msg = "Can not able to Get Data",
+                    Check = false,
+                    Data = null,
+                    IsActive = false
+                };
+            }
+
+        }
+
         public async Task<Response<CreateTransBenefitRequest>> CreateTransBenefitAsync(CreateTransBenefitRequest model)
         {
             var newTrans = mapper.Map<TransBenefit>(model);
@@ -155,9 +215,12 @@ namespace Kader_System.Services.Services.Trans
             };
         }
 
-        public async Task<Response<GetTransBenefitById>> GetTransBenefitByIdAsync(int id)
+        public async Task<Response<GetTransBenefitById>> GetTransBenefitByIdAsync(int id,string lang)
         {
-            var obj = await unitOfWork.TransBenefits.GetByIdAsync(id);
+            var obj = await unitOfWork.TransBenefits.GetFirstOrDefaultAsync(b=>b.Id==id,
+                includeProperties: $"{nameof(_insatance.Benefit)},{nameof(_insatance.Employee)}," +
+                                   $"{nameof(_insatance.SalaryEffect)}" +
+                                   $",{nameof(_insatance.AmountType)}");
 
             if (obj is null)
             {
@@ -173,7 +236,20 @@ namespace Kader_System.Services.Services.Trans
 
             return new()
             {
-                Data = mapper.Map<GetTransBenefitById>(obj),
+                Data = new GetTransBenefitById()
+                {
+                    ActionMonth = obj.ActionMonth,
+                    AddedOn = obj.Add_date,
+                    BenefitId = obj.BenefitId,
+                    BenefitName = lang == Localization.Arabic ? obj.Benefit!.Name_ar : obj.Benefit!.Name_en,
+                    EmployeeId = obj.EmployeeId,
+                    EmployeeName = lang == Localization.Arabic ? obj.Employee!.FullNameAr : obj.Employee.FullNameEn,
+                    Id = obj.Id,
+                    SalaryEffect = lang == Localization.Arabic ? obj.SalaryEffect!.Name : obj.SalaryEffect!.NameInEnglish,
+                    SalaryEffectId = obj.SalaryEffectId,
+                    Notes = obj.Notes,
+                    ValueTypeId = obj.AmountTypeId,
+                },
                 Check = true
             };
         }
@@ -232,6 +308,37 @@ namespace Kader_System.Services.Services.Trans
         public Task<Response<string>> UpdateActiveOrNotTransBenefitAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+
+        public async Task<Response<object>> RestoreTransBenefitAsync(int id)
+        {
+            var obj = await unitOfWork.TransBenefits.GetByIdAsync(id);
+
+            if (obj is null)
+            {
+                string resultMsg = sharLocalizer[Localization.NotFoundData];
+
+                return new()
+                {
+                    Data = new(),
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            obj.IsDeleted = false;
+
+            unitOfWork.TransBenefits.Update(obj);
+            await unitOfWork.CompleteAsync();
+            return new()
+            {
+                Error = string.Empty,
+                Check = true,
+                Data = obj,
+                LookUps = null,
+                Msg = sharLocalizer[Localization.Restored]
+            };
         }
 
         public async Task<Response<string>> DeleteTransBenefitAsync(int id)

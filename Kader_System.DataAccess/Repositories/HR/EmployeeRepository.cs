@@ -1,8 +1,4 @@
-﻿using Kader_System.Domain.DTOs.Request.HR;
-using Kader_System.Domain.DTOs.Response.HR;
-using Kader_System.Domain.Interfaces;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System.Linq;
+﻿using Kader_System.Domain.DTOs.Response.HR;
 
 namespace Kader_System.DataAccess.Repositories.HR;
 

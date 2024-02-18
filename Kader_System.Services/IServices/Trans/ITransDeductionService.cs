@@ -8,7 +8,7 @@ public interface ITransDeductionService
     Task<Response<GetAllTransDeductionResponse>> GetAllTransDeductionsAsync(string lang, GetAllFilterationForTransDeductionRequest model, string host);
     Task<Response<CreateTransDeductionRequest>> CreateTransDeductionAsync(CreateTransDeductionRequest model);
     Task<Response<DeductionLookUps>> GetDeductionsLookUpsData(string lang);
-    Task<Response<GetTransDeductionById>> GetTransDeductionByIdAsync(int id);
+    Task<Response<GetTransDeductionById>> GetTransDeductionByIdAsync(int id, string lang);
     Task<Response<GetTransDeductionById>> UpdateTransDeductionAsync(int id, CreateTransDeductionRequest model);
     Task<Response<object>> RestoreTransDeductionAsync(int id);
     Task<Response<string>> UpdateActiveOrNotTransDeductionAsync(int id);

@@ -19,6 +19,7 @@
         public double Amount { get; set; }
         public string DeductionName { get; set; } = default!;
         public string? Notes { get; set; }
-        public string? AttachmentFile { get; set; }
+        public string? AddedBy { get; set; }
+
     }
 }

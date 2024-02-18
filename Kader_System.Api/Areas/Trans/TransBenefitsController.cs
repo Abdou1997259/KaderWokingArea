@@ -11,13 +11,50 @@ namespace Kader_System.Api.Areas.Trans
     [Route("api/v1/")]
     public class TransBenefitsController(ITransBenefitService service) : ControllerBase
     {
+        #region Get
+
         [HttpGet(ApiRoutes.TransBenefit.ListOfTransBenefits)]
         public async Task<IActionResult> ListOfTransBenefits() =>
             Ok(await service.ListOfTransBenefitsAsync(GetCurrentRequestLanguage()));
 
         [HttpGet(ApiRoutes.TransBenefit.GetTransBenefits)]
         public async Task<IActionResult> GetAllTransBenefits([FromQuery] GetAllFilterationForTransBenefitRequest request) =>
-            Ok(await service.GetAllTransBenefitsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
+            Ok(await service.GetAllTransBenefitsAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
+        [HttpGet(ApiRoutes.TransBenefit.GetTransBenefitById)]
+        public async Task<IActionResult> GetTransDeductionById(int id)
+        {
+            var response = await service.GetTransBenefitByIdAsync(id,GetCurrentRequestLanguage());
+
+            var lookUps = await service.GetBenefitsLookUpsData(GetCurrentRequestLanguage());
+
+
+            if (response.Check)
+            {
+                response.LookUps = lookUps.Data;
+                return Ok(response);
+            }
+
+            else if (!response.Check)
+                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+
+
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
+
+        [HttpGet(ApiRoutes.TransBenefit.GetLookUps)]
+        public async Task<IActionResult> GetLookUpsAsync()
+        {
+            var response = await service.GetBenefitsLookUpsData(GetCurrentRequestLanguage());
+            if (response.Check)
+                return Ok(response);
+            else
+                return BadRequest(response);
+        }
+
+        #endregion
+
+
+        #region Create
 
         [HttpPost(ApiRoutes.TransBenefit.CreateTransBenefit)]
         public async Task<IActionResult> CreateTransBenefit([FromBody] CreateTransBenefitRequest request)
@@ -37,12 +74,16 @@ namespace Kader_System.Api.Areas.Trans
             }
         }
 
+        #endregion
+
+        #region Update
+
         [HttpPut(ApiRoutes.TransBenefit.UpdateTransBenefit)]
         public async Task<IActionResult> UpdateTransBenefit([FromRoute] int id, [FromBody] CreateTransBenefitRequest request)
         {
             if (ModelState.IsValid)
             {
-                var response = await service.UpdateTransBenefitAsync(id,request);
+                var response = await service.UpdateTransBenefitAsync(id, request);
                 if (response.Check)
                     return Ok(response);
                 else if (!response.Check)
@@ -55,6 +96,25 @@ namespace Kader_System.Api.Areas.Trans
             }
         }
 
+        [HttpPut(ApiRoutes.TransBenefit.RestoreTransBenefit)]
+        public async Task<IActionResult> RestoreTransBenefit([FromRoute] int id)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await service.RestoreTransBenefitAsync(id);
+                if (response.Check)
+                    return Ok(response);
+                else if (!response.Check)
+                    return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+                return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
+
+        #endregion
 
         #region Delete
 

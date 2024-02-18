@@ -53,8 +53,24 @@ namespace Kader_System.Services.Services.Trans
         public async Task<Response<GetAllTransDeductionResponse>> GetAllTransDeductionsAsync(string lang,
             GetAllFilterationForTransDeductionRequest model,string host)
         {
-            Expression<Func<TransDeduction, bool>> filter = x => x.IsDeleted == model.IsDeleted;
-            var totalRecords = await unitOfWork.TransDeductions.CountAsync(filter: filter);
+            Expression<Func<TransDeduction, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                                                                 && (string.IsNullOrEmpty(model.Word) || x.ActionMonth.ToString().Contains(model.Word)
+                                                                     || x.AmountType!.Name.Contains(model.Word) || x.AmountType!.NameInEnglish.Contains(model.Word)
+                                                                     || x.Deduction!.Name_en.Contains(model.Word)
+                                                                     || x.Deduction!.Name_ar.Contains(model.Word)
+                                                                     || x.Employee!.FullNameEn.Contains(model.Word)
+                                                                     || x.Employee!.FullNameAr.Contains(model.Word))
+                ;
+            Expression<Func<TransDeductionData, bool>> filterSearch = x =>
+                (string.IsNullOrEmpty(model.Word)
+                 || x.DeductionName.Contains(model.Word)
+                 || x.EmployeeName.Contains(model.Word)
+                 || x.ValueTypeName.Contains(model.Word));
+
+            var totalRecords = await unitOfWork.TransDeductions.CountAsync(filter: filter,
+                includeProperties: $"{nameof(_insatance.Deduction)},{nameof(_insatance.Employee)}," +
+                                   $"{nameof(_insatance.SalaryEffect)}" +
+                                   $",{nameof(_insatance.AmountType)}");
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
             if (model.PageNumber < 1)
@@ -66,32 +82,11 @@ namespace Kader_System.Services.Services.Trans
                 .ToList();
             var result = new GetAllTransDeductionResponse
             {
-                TotalRecords = await unitOfWork.TransDeductions.CountAsync(filter: filter),
+                TotalRecords = totalRecords,
 
-                Items = (await unitOfWork.TransDeductions.GetSpecificSelectAsync(filter: filter,
-                    includeProperties: $"{nameof(_insatance.Deduction)},{nameof(_insatance.Employee)},{nameof(_insatance.SalaryEffect)}" +
-                                       $",{nameof(_insatance.AmountType)}",
-                    take: model.PageSize,
-                    skip: (model.PageNumber - 1) * model.PageSize,
-                    select: x => new TransDeductionData()
-                    {
-                        Id = x.Id,
-                        ActionMonth = x.ActionMonth,
-                        SalaryEffect = lang == Localization.Arabic ? x.SalaryEffect!.Name : x.SalaryEffect!.NameInEnglish,
-                        AddedOn = x.Add_date,
-                        DeductionId = x.DeductionId,
-                        DeductionName = lang == Localization.Arabic ? x.Deduction!.Name_ar : x.Deduction!.Name_en,
-                        Amount = x.Amount,
-                        EmployeeId = x.EmployeeId,
-                        EmployeeName = lang == Localization.Arabic ? x.Employee!.FullNameAr : x.Employee!.FullNameEn,
-                        Notes = x.Notes,
-                        SalaryEffectId = x.SalaryEffectId,
-                        AmountTypeId = x.AmountTypeId,
-                        ValueTypeName = lang == Localization.Arabic ? x.AmountType!.Name : x.AmountType!.NameInEnglish,
-                        AttachmentFile = ManageFilesHelper.ConvertFileToBase64(GoRootPath.TransFilesPath+ x.Attachment)
-
-                    }, orderBy: x =>
-                        x.OrderByDescending(x => x.Id))).ToList(),
+                Items =unitOfWork.TransDeductions.GetTransDeductionInfo(filter:filter, filterSearch:filterSearch, skip: (model.PageNumber - 1) * model.PageSize
+                    ,take: model.PageSize,lang:lang)
+                ,
                 CurrentPage = model.PageNumber,
                 FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
@@ -219,9 +214,12 @@ namespace Kader_System.Services.Services.Trans
             };
         }
 
-        public async Task<Response<GetTransDeductionById>> GetTransDeductionByIdAsync(int id)
+        public async Task<Response<GetTransDeductionById>> GetTransDeductionByIdAsync(int id,string lang)
         {
-            var obj = await unitOfWork.TransDeductions.GetByIdAsync(id);
+            var obj = await unitOfWork.TransDeductions.GetFirstOrDefaultAsync(d=>d.Id==id,
+                includeProperties: $"{nameof(_insatance.Deduction)},{nameof(_insatance.Employee)}," +
+                                   $"{nameof(_insatance.SalaryEffect)}" +
+                                   $",{nameof(_insatance.AmountType)}");
 
             if (obj is null)
             {
@@ -237,7 +235,22 @@ namespace Kader_System.Services.Services.Trans
 
             return new()
             {
-                Data = mapper.Map<GetTransDeductionById>(obj),
+                Data = new GetTransDeductionById()
+                {
+                    ActionMonth = obj.ActionMonth,
+                    AddedOn = obj.Add_date,
+                    DeductionId = obj.DeductionId,
+                    DeductionName =lang==Localization.Arabic? obj.Deduction!.Name_ar:obj.Deduction!.Name_en,
+                    EmployeeId = obj.EmployeeId,
+                    EmployeeName = lang==Localization.Arabic?obj.Employee!.FullNameAr:obj.Employee.FullNameEn,
+                    Id = obj.Id,
+                    SalaryEffect = lang==Localization.Arabic?obj.SalaryEffect!.Name: obj.SalaryEffect!.NameInEnglish,
+                    SalaryEffectId = obj.SalaryEffectId,
+                    Notes = obj.Notes,
+                    ValueTypeId = obj.AmountTypeId,
+                    
+                    
+                },
                 Check = true
             };
         }

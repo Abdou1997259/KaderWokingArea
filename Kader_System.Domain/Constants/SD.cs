@@ -202,7 +202,9 @@ public static class SD
         {
             public const string ListOfTransBenefits = "transBenefit/getListOftransBenefits";
             public const string GetTransBenefits = "transBenefit/getAll";
+            public const string GetLookUps = "transBenefit/getLookUps";
             public const string CreateTransBenefit = "transBenefit/create";
+            public const string RestoreTransBenefit = "transBenefit/restore/{id}";
             public const string UpdateTransBenefit = "transBenefit/update/{id}";
             public const string GetTransBenefitById = "transBenefit/getById/{id}";
             public const string DeleteTransBenefit = "transBenefit/delete/{id}";

@@ -317,7 +317,7 @@ namespace Kader_System.Services.Services.HR
 
                 newEmployee.EmployeeImage = imageFile?.FileName;
                 newEmployee.EmployeeImageExtension = imageFile?.FileExtension;
-                newEmployee.ListOfAttachments = employeeAttachments?.Select(f => new HrEmployeeAttachment
+                newEmployee.ListOfAttachments = employeeAttachments.Select(f => new HrEmployeeAttachment
                 {
                     FileExtension = f.FileExtension,
                     FileName = f.FileName,

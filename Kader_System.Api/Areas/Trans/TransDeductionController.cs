@@ -20,10 +20,9 @@ namespace Kader_System.Api.Areas.Trans
         public async Task<IActionResult> GetAllTransDeductions([FromQuery] GetAllFilterationForTransDeductionRequest request) =>
             Ok(await service.GetAllTransDeductionsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
         [HttpGet(ApiRoutes.TransDeduction.GetTransDeductionById)]
-
         public async Task<IActionResult> GetTransDeductionById(int id)
         {
-            var response =await service.GetTransDeductionByIdAsync(id);
+            var response =await service.GetTransDeductionByIdAsync(id,GetCurrentRequestLanguage());
 
             var lookUps = await service.GetDeductionsLookUpsData(GetCurrentRequestLanguage());
 
