@@ -86,6 +86,6 @@
         public string company_name { get; set; }
         public string department_name { get; set; }
         public int vacation_days_count { get; set; }
-
+        public bool IsDeleted { get; set; }
     }
 }

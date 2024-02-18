@@ -25,6 +25,11 @@
         public async Task<IActionResult> GetEmployeeByIdAsync(int id)
         {
             var response =  employeeService.GetEmployeeById(id,GetCurrentRequestLanguage());
+
+            var lookUps =await employeeService.GetEmployeesLookUpsData(GetCurrentRequestLanguage());
+
+            response.LookUps=lookUps.Data;
+
             if (response.Check)
                 return Ok(response);
             else if (!response.Check)
@@ -36,7 +41,11 @@
         {
           return Ok(await employeeService.GetEmployeesLookUpsData(GetCurrentRequestLanguage()));
         }
-
+        [HttpGet(ApiRoutes.Employee.GetAllEmpByCompanyId)]
+        public async Task<IActionResult> GetAllEmpByCompanyId([FromRoute]int companyId, [FromQuery] GetAllEmployeesFilterRequest request)
+        {
+            return Ok(await employeeService.GetAllEmployeesByCompanyIdAsync(lang:GetCurrentRequestLanguage(),companyId: companyId,model:request,host:GetCurrentHost()));
+        }
         #endregion
 
 

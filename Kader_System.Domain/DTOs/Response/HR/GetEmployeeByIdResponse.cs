@@ -1,4 +1,5 @@
 ﻿using System.Xml.Schema;
+using Kader_System.Domain.DTOs.Request.HR;
 
 namespace Kader_System.Domain.DTOs.Response.HR
 {
@@ -103,5 +104,12 @@ namespace Kader_System.Domain.DTOs.Response.HR
         public double allowances_sum { get; set; }
         public double employee_loans_sum { get; set; }
 
+    }
+
+
+    public class ShowEmployee
+    {
+        public GetEmployeeByIdResponse EmployeeData { get; set; }
+        public object LookUps { get; set; }
     }
 }

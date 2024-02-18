@@ -6,4 +6,11 @@ public interface IEmployeeRepository : IBaseRepository<HrEmployee>
 {
     Response<GetEmployeeByIdResponse> GetEmployeeByIdAsync(int id, string lang);
     Task<object> GetEmployeesDataAsLookUp(string lang);
+
+    List<EmployeesData> GetEmployeesInfo(
+        Expression<Func<HrEmployee, bool>> filter,
+        Expression<Func<EmployeesData, bool>> filterSearch,
+        int? skip = null,
+        int? take = null, string lang = "ar"
+    );
 }

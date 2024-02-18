@@ -15,13 +15,14 @@ namespace Kader_System.Services.Services.HR
                 await unitOfWork.Employees.GetSpecificSelectAsync(null!
                     , includeProperties: $"{nameof(_instanceEmployee.Company)},{nameof(_instanceEmployee.Management)}," +
                                          $"{nameof(_instanceEmployee.Department)},{nameof(_instanceEmployee.MaritalStatus)}," +
-                                         $"{nameof(_instanceEmployee.Nationality)}",
+                                         $"{nameof(_instanceEmployee.Nationality)},{nameof(_instanceEmployee.Job)}",
                     select: x => new ListOfEmployeesResponse
                     {
                         Id = x.Id,
                         FullName = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn,
                         Company = lang == Localization.Arabic ? x.Company!.NameAr : x.Company!.NameEn,
                         Management = lang == Localization.Arabic ? x.Management!.NameAr : x.Management!.NameEn,
+                        Job = lang == Localization.Arabic ? x.Job!.NameAr : x.Job!.NameEn,
                         HiringDate = x.HiringDate,
                         IsActive = x.IsActive,
                         Address = x.Address,
@@ -143,13 +144,16 @@ namespace Kader_System.Services.Services.HR
         public async Task<Response<GetAllEmployeesResponse>> GetAllEmployeesAsync(string lang,
             GetAllEmployeesFilterRequest model,string host)
         {
-            Expression<Func<HrEmployee, bool>> filter = x => x.IsDeleted == model.IsDeleted &&
-                                                             (string.IsNullOrEmpty(model.Word) || x.FullNameEn.Contains(model.Word)
-                                                                 || x.FullNameEn.Contains(model.Word)
-                                                                 ||x.Job!.NameAr.Contains(model.Word)
-                                                                 ||x.Department!.NameAr.Contains(model.Word)
-                                                                 ||x.Nationality!.Name.Contains(model.Word)
-                                                                 ||x.Company!.NameAr.Contains(model.Word));
+            Expression<Func<HrEmployee, bool>> filter = x => x.IsDeleted == model.IsDeleted ;
+
+            Expression<Func<EmployeesData, bool>> filterSearch = x =>
+                (string.IsNullOrEmpty(model.Word)
+                 || x.FullName.Contains(model.Word)
+                 || x.Job.Contains(model.Word)
+                 || x.Department.Contains(model.Word)
+                 || x.Nationality.Contains(model.Word)
+                 || x.Company.Contains(model.Word)
+                 || x.Management.Contains(model.Word));
 
             var totalRecords = await unitOfWork.Employees.CountAsync(filter: filter);
             int page = 1;
@@ -165,49 +169,7 @@ namespace Kader_System.Services.Services.HR
             {
                 TotalRecords = totalRecords,
 
-                Items = (await unitOfWork.Employees.GetSpecificSelectAsync(filter: filter,
-                    includeProperties: $"{nameof(_instanceEmployee.Company)},{nameof(_instanceEmployee.Management)}," +
-                    $"{nameof(_instanceEmployee.Department)},{nameof(_instanceEmployee.MaritalStatus)}," +
-                    $"{nameof(_instanceEmployee.Nationality)},{nameof(_instanceEmployee.FingerPrint)}," +
-                    $"{nameof(_instanceEmployee.EmployeeType)},{nameof(_instanceEmployee.Gender)}," +
-                    $"{nameof(_instanceEmployee.Job)},{nameof(_instanceEmployee.Qualification)},{nameof(_instanceEmployee.Vacation)}," +
-                    $"{nameof(_instanceEmployee.Shift)},{nameof(_instanceEmployee.Religion)}," +
-                    $"{nameof(_instanceEmployee.SalaryPaymentWay)},{nameof(_instanceEmployee.User)},",
-                    take: model.PageSize,
-                    skip: (model.PageNumber - 1) * model.PageSize,
-                    select: x => new EmployeesData
-                    {
-                        Id = x.Id,
-                        FullName = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn,
-                        company_name = lang == Localization.Arabic ? x.Company!.NameAr : x.Company!.NameEn,
-                        Management = lang == Localization.Arabic ? x.Management!.NameAr : x.Management!.NameEn,
-                        HiringDate = x.HiringDate,
-                        IsActive = x.IsActive,
-                        Address = x.Address,
-                        ImmediatelyDate = x.ImmediatelyDate,
-                        MaritalStatus = lang == Localization.Arabic ? x.MaritalStatus!.Name : x.MaritalStatus!.NameInEnglish,
-                        Nationality = lang == Localization.Arabic ? x.Nationality!.Name : x.Nationality!.NameInEnglish,
-                        department_name = lang == Localization.Arabic ? x.Department!.NameAr : x.Department!.NameEn,
-                        FingerPrint = lang == Localization.Arabic ? x.FingerPrint!.NameAr : x.FingerPrint!.NameEn,
-                        BirthDate = x.BirthDate,
-                        ChildrenNumber = x.ChildrenNumber,
-                        Email = x.Email,
-                        EmployeeType = lang == Localization.Arabic ? x.EmployeeType!.Name : x.EmployeeType!.NameInEnglish,
-                        FingerPrintCode = x.FingerPrintCode,
-                        Gender = lang == Localization.Arabic ? x.Gender!.Name : x.Gender!.NameInEnglish,
-                        job_name = lang == Localization.Arabic ? x.Job!.NameAr : x.Job!.NameEn,
-                        JobNumber = x.JobNumber,
-                        NationalId = x.NationalId,
-                        Phone = x.Phone,
-                        qualification_name= lang == Localization.Arabic ? x.Qualification!.NameAr : x.Qualification!.NameEn,
-                        Username = x.User!.UserName,
-                        Shift = lang == Localization.Arabic ? x.Shift!.Name_ar : x.Shift!.Name_en,
-                        Vacation = lang == Localization.Arabic ? x.Vacation!.NameAr : x.Vacation!.NameEn,
-                        Religion = lang == Localization.Arabic ? x.Religion!.Name : x.Religion!.NameInEnglish,
-                        SalaryPaymentWay = lang == Localization.Arabic ? x.SalaryPaymentWay!.Name : x.SalaryPaymentWay!.NameInEnglish,
-                        employee_loans_count = 0,
-                    }, orderBy: x =>
-                        x.OrderByDescending(x => x.Id))).ToList(),
+                Items = unitOfWork.Employees.GetEmployeesInfo(filter: filter, filterSearch: filterSearch, skip: (model.PageNumber - 1) * model.PageSize, take: model.PageSize),
                 CurrentPage = model.PageNumber,
                 FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
@@ -242,6 +204,73 @@ namespace Kader_System.Services.Services.HR
                 Check = true
             };
         }
+
+
+        public async Task<Response<GetAllEmployeesResponse>> GetAllEmployeesByCompanyIdAsync(string lang,
+           GetAllEmployeesFilterRequest model, string host,int companyId)
+        {
+            Expression<Func<HrEmployee, bool>> filter = x => x.IsDeleted == model.IsDeleted && x.CompanyId== companyId ;
+
+            Expression<Func<EmployeesData, bool>> filterSearch = x=>
+                                                             (string.IsNullOrEmpty(model.Word)
+                                                              || x.FullName.Contains(model.Word)
+                                                              || x.Job.Contains(model.Word)
+                                                              || x.Department.Contains(model.Word)
+                                                              || x.Nationality.Contains(model.Word)
+                                                              || x.Company.Contains(model.Word)
+                                                              || x.Management.Contains(model.Word));
+
+
+            var totalRecords = await unitOfWork.Employees.CountAsync(filter: filter);
+            int page = 1;
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
+            if (model.PageNumber < 1)
+                page = 1;
+            else
+                page = model.PageNumber;
+            var pageLinks = Enumerable.Range(1, totalPages)
+                .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
+                .ToList();
+            var result = new GetAllEmployeesResponse
+            {
+                TotalRecords = totalRecords,
+
+                Items = unitOfWork.Employees.GetEmployeesInfo(filter:filter,filterSearch:filterSearch,skip: (model.PageNumber - 1) * model.PageSize, take:model.PageSize),
+                CurrentPage = model.PageNumber,
+                FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
+                From = (page - 1) * model.PageSize + 1,
+                To = Math.Min(page * model.PageSize, totalRecords),
+                LastPage = totalPages,
+                LastPageUrl = host + $"?PageSize={model.PageSize}&PageNumber={totalPages}&IsDeleted={model.IsDeleted}",
+                PreviousPage = page > 1 ? host + $"?PageSize={model.PageSize}&PageNumber={page - 1}&IsDeleted={model.IsDeleted}" : null,
+                NextPageUrl = page < totalPages ? host + $"?PageSize={model.PageSize}&PageNumber={page + 1}&IsDeleted={model.IsDeleted}" : null,
+                Path = host,
+                PerPage = model.PageSize,
+                Links = pageLinks
+            };
+
+            if (result.TotalRecords is 0)
+            {
+                string resultMsg = shareLocalizer[Localization.NotFoundData];
+
+                return new()
+                {
+                    Data = new()
+                    {
+                        Items = []
+                    },
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            return new()
+            {
+                Data = result,
+                Check = true
+            };
+        }
+
         #endregion
 
 

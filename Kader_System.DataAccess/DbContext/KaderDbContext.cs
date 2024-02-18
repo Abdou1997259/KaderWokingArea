@@ -33,6 +33,7 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<HrFingerPrint> FingerPrints { get; set; }
     public DbSet<HrSection> Sections { get; set; }
     public DbSet<HrSalaryPaymentWay> SalaryPaymentWays { get; set; }
+    public DbSet<HrGender> Genders { get; set; }
     public DbSet<HrSectionDepartment> SectionDepartments { get; set; }
     public DbSet<HrVacationDistribution> VacationDistributions { get; set; }
     public DbSet<HrShift> Shifts { get; set; }

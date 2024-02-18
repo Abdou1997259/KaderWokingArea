@@ -9,7 +9,7 @@
         public string Nationality { get; set; }
         public string Company { get; set; }
         public string Management { get; set; }
-
+        public string Job { get; set; }
 
 
         public string Address { get; set; }
