@@ -685,6 +685,7 @@ namespace Kader_System.Services.Services.HR
                     {
                         Id = x.Id,
                         Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+                        ManagementId =x.ManagementId
 
                     });
                 var jobs = await unitOfWork.Jobs.GetSpecificSelectAsync(
@@ -715,6 +716,7 @@ namespace Kader_System.Services.Services.HR
                     {
                         Id = x.Id,
                         Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+                        CompanyId =x.CompanyId,
                     });
                 var nationalities = await unitOfWork.Nationalities.GetSpecificSelectAsync(
                     filter: filter => filter.IsDeleted == false
