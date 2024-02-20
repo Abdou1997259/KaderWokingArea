@@ -119,7 +119,7 @@ namespace Kader_System.Services.Services.HR
                     ShiftId = obj.ShiftId,
                     TotalSalary = obj.TotalSalary,
                     Username = obj.User!.UserName,
-                    EmployeeImage = $"{GoRootPath.EmployeeImagesPath}{obj.EmployeeImage}",
+                    EmployeeImage = $"{ReadRootPath.EmployeeImagesPath}{obj.EmployeeImage}",
                     qualification_name =lang==Localization.Arabic?  obj.Qualification!.NameAr : obj.Qualification!.NameEn,
                     company_name = lang==Localization.Arabic?obj.Company!.NameAr:obj.Company!.NameEn,
                     management_name = lang==Localization.Arabic?obj.Management!.NameAr:obj.Management!.NameEn,
@@ -303,9 +303,9 @@ namespace Kader_System.Services.Services.HR
                 var newEmployee = mapper.Map<HrEmployee>(model);
 
                 GetFileNameAndExtension imageFile = new();
-                if (model.employee_image_file != null)
+                if (model.employee_image != null)
                 {
-                    imageFile = ManageFilesHelper.UploadFile(model.employee_image_file, GoRootPath.EmployeeImagesPath);
+                    imageFile = ManageFilesHelper.UploadFile(model.employee_image, GoRootPath.EmployeeImagesPath);
                 }
 
                 List<GetFileNameAndExtension> employeeAttachments = [];
@@ -327,9 +327,9 @@ namespace Kader_System.Services.Services.HR
 
                 var newUser = await unitOfWork.Users.AddAsync(new ApplicationUser()
                 {
-                    UserName = model.user_name,
+                    UserName = model.username,
                     Id = Guid.NewGuid().ToString(),
-                    NormalizedUserName = model.user_name.ToUpper(),
+                    NormalizedUserName = model.username.ToUpper(),
                     Email = newEmployee.Email,
                     NormalizedEmail = newEmployee.Email.ToUpper(),
                     EmailConfirmed = true,
@@ -438,9 +438,9 @@ namespace Kader_System.Services.Services.HR
 
 
                 GetFileNameAndExtension imageFile = new();
-                if (model.employee_image_file != null)
+                if (model.employee_image != null)
                 {
-                    imageFile = ManageFilesHelper.UploadFile(model.employee_image_file, GoRootPath.EmployeeImagesPath);
+                    imageFile = ManageFilesHelper.UploadFile(model.employee_image, GoRootPath.EmployeeImagesPath);
                 }
 
                 List<GetFileNameAndExtension> employeeAttachments = [];
@@ -467,7 +467,7 @@ namespace Kader_System.Services.Services.HR
                 obj.GrandFatherNameEn = model.grand_father_name_en;
                 obj.FingerPrintCode = model.finger_print_code;
                 obj.FingerPrintId = model.finger_print_id;
-              
+                obj.Note = model.note;
                 obj.Phone = model.phone;
                 obj.GenderId = model.gender_id;
                 obj.QualificationId = model.qualification_id;
@@ -490,7 +490,7 @@ namespace Kader_System.Services.Services.HR
                 unitOfWork.Employees.Update(obj);
 
 
-                var userExist = await userManager.FindByNameAsync(model.user_name);
+                var userExist = await userManager.FindByNameAsync(model.username);
                 if (userExist != null)
                 {
                     userExist.VisiblePassword = model.password;
@@ -513,8 +513,8 @@ namespace Kader_System.Services.Services.HR
                         IsActive = true,
                         PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!,model.password),
                         Id = Guid.NewGuid().ToString(),
-                        UserName = model.user_name,
-                        NormalizedUserName = model.user_name.ToUpper(),
+                        UserName = model.username,
+                        NormalizedUserName = model.username.ToUpper(),
                         
                     });
                     if (newUser != null)
@@ -548,7 +548,7 @@ namespace Kader_System.Services.Services.HR
                     Msg = shareLocalizer[Localization.Error],
                     Check = false,
                     Data = model,
-                    Error = e.Message
+                    Error =e.InnerException!=null ? e.InnerException.Message:e.Message
                 };
             }
         }

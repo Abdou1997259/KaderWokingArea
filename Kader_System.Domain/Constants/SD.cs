@@ -28,6 +28,7 @@ public static class SD
         public const string HRFilesPath = "Files/HR/";
         public const string HRAudiosPath = "Audios/HR/";
         public const string HRVideosPath = "Videos/HR/";
+        public const string TransFilesPath = "Files/Trans/";
     }
 
     public static class FileSettings

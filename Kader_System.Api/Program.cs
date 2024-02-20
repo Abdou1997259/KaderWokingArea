@@ -46,6 +46,7 @@ builder.Host.UseSerilog();
 //});
 builder.Services.AddCors();
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

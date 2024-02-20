@@ -151,13 +151,13 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
                 Company_type_name = lang == Localization.Arabic ? obj.CompanyType!.Name : obj.CompanyType!.NameInEnglish,
                 Company_licenses = obj.ListOfsContract.Select(c => new CompanyContractResponse()
                 {
-                    Contract = $"{GoRootPath.HRFilesPath}{c.CompanyContracts}",
+                    Contract = $"{ReadRootPath.HRFilesPath}{c.CompanyContracts}",
                     Id = c.Id
                 }).ToList(),
                 Company_contracts = obj.Licenses.Select(l => new CompanyLicenseResponse()
                 {
                     Id = l.Id,
-                    License = $"{GoRootPath.HRFilesPath}{l.LicenseName}",
+                    License = $"{ReadRootPath.HRFilesPath}{l.LicenseName}",
 
                 }).ToList(),
                 employees_count = employeesCount,
@@ -282,14 +282,22 @@ public class CompanyService(IUnitOfWork unitOfWork, IStringLocalizer<SharedResou
 
 
             List<GetFileNameAndExtension> getFileNameAnds = [];
-            if (model.Company_contracts is not null && model.Company_contracts.Any())
+            if (model.company_contracts is not null && model.company_contracts.Any())
             {
-                getFileNameAnds = ManageFilesHelper.UploadFiles(model.Company_contracts, GoRootPath.HRFilesPath);
+                foreach (var file in model.company_contracts)
+                {
+                    getFileNameAnds.Add(ManageFilesHelper.UploadFile(file, GoRootPath.HRFilesPath)); 
+                }
+               
             }
             List<GetFileNameAndExtension> getLicenseFileNameAnds = [];
-            if (model.Company_licenses is not null && model.Company_licenses.Any())
+            if (model.company_licenses is not null && model.company_licenses.Any())
             {
-                getLicenseFileNameAnds = ManageFilesHelper.UploadFiles(model.Company_licenses, GoRootPath.HRFilesPath);
+                foreach (var file in model.company_licenses)
+                {
+                    getLicenseFileNameAnds.Add(ManageFilesHelper.UploadFile(file, GoRootPath.HRFilesPath));
+                }
+              //  getLicenseFileNameAnds = ManageFilesHelper.UploadFiles(model.company_licenses, GoRootPath.HRFilesPath);
             }
 
             if (getFileNameAnds.Any())

@@ -70,8 +70,8 @@
         public int salary_payment_way_id { get; set; }
 
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
-        [JsonProperty(PropertyName = "user_name")]
-        public  string user_name { get; set; }
+        [JsonProperty(PropertyName = "username")]
+        public  string username { get; set; }
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
         [JsonProperty(PropertyName = "password")]
         public  string password { get; set; }
@@ -131,8 +131,12 @@
         [Display(Name = "account_no")]
         public long? account_no { get; set; }
 
+        [JsonProperty(PropertyName = "note")]
+        [Display(Name = "note")]
+        public string? note { get; set; }
+
         [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length), FileExtensionValidation(FileSettings.AllowedExtension)]
-        public IFormFile? employee_image_file { get; set; } = default!;
+        public IFormFile? employee_image { get; set; } = default!;
 
         [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length),
          FileExtensionValidation(FileSettings.AllowedExtension)]

@@ -15,11 +15,11 @@ public class HrUpdateCompanyRequest
     public int Company_type { get; set; }
 
     [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length), FileExtensionValidation(FileSettings.AllowedExtension)]
-    public IFormFileCollection? Company_licenses { get; set; }
+    public List<IFormFile>? company_licenses { get; set; }
 
 
     [AllowedLetters(FileSettings.SpecialChar), MaxFileLettersCount(FileSettings.Length), FileExtensionValidation(FileSettings.AllowedExtension)]
-    public IFormFileCollection? Company_contracts { get; set; } = default!;
+    public List<IFormFile>? company_contracts { get; set; } = default!;
 }
 
 

@@ -1,4 +1,7 @@
-﻿namespace Kader_System.Api.Areas.Setting.Controllers;
+﻿using Newtonsoft.Json;
+using Serilog;
+
+namespace Kader_System.Api.Areas.Setting.Controllers;
 
 [Area(Modules.HR)]
 [ApiExplorerSettings(GroupName = Modules.HR)]
@@ -51,6 +54,8 @@ public class CompaniesController(ICompanyService service) : ControllerBase
     [HttpPut(ApiRoutes.Company.UpdateCompany)]
     public async Task<IActionResult> UpdateCompanyAsync([FromRoute] int id, [FromForm] HrUpdateCompanyRequest model)
     {
+        
+        Log.Information(JsonConvert.SerializeObject(model));
         var response = await service.UpdateCompanyAsync(id, model);
         if (response.Check)
             return Ok(response);

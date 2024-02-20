@@ -84,7 +84,7 @@ public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmplo
                              ShiftId = employee.ShiftId,
                              TotalSalary = employee.TotalSalary,
                              Username = usr.UserName,
-                             EmployeeImage = $"{GoRootPath.EmployeeImagesPath}{employee.EmployeeImage}",
+                             EmployeeImage = $"{ReadRootPath.EmployeeImagesPath}{employee.EmployeeImage}",
                              qualification_name = lang == Localization.Arabic ? qual.NameAr : qual.NameEn,
                              company_name = lang == Localization.Arabic ? com.NameAr : com.NameEn,
                              management_name = lang == Localization.Arabic ? man.NameAr : man.NameEn,
