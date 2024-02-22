@@ -46,10 +46,12 @@ public static class ManageFilesHelper
     {
         try
         {
-            string createdFileName = Guid.NewGuid() +"_"+ fileName;
-            string finalFilePath = Path.Combine(Directory.GetCurrentDirectory()+ filePath, createdFileName);
+           
             // Convert Base64 string to byte array
             byte[] fileBytes = Convert.FromBase64String(base64String);
+            var extension= GetFileExtension(fileBytes);
+            string createdFileName = Guid.NewGuid() + "_" + fileName + extension;
+            string finalFilePath = Path.Combine(Directory.GetCurrentDirectory() + filePath, createdFileName);
             if (Directory.Exists(Directory.GetCurrentDirectory()+filePath))
             {
                 // Save byte array to a file
@@ -57,8 +59,8 @@ public static class ManageFilesHelper
 
                 return new GetFileNameAndExtension
                 {
-                    FileName = createdFileName,
-                    FileExtension = GetFileExtension(fileBytes)
+                    FileName = createdFileName+ extension,
+                    FileExtension = extension
                 };
             }
 
@@ -98,7 +100,8 @@ public static class ManageFilesHelper
                 return ".jpeg";
             case "504B0304": // ZIP
                 return ".zip";
-           
+            case "FFD8FFE000104A46":
+                return ".jpg";
             case "504B030414000600": // Microsoft Office Open XML Format (DOCX)
                 return ".docx";
             case "504B030414000800": // Microsoft Office Open XML Format (XLSX)

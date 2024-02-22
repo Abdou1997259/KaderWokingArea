@@ -10,4 +10,6 @@ public interface IContractRepository : IBaseRepository<HrContract>
         string lang,
         int? skip = null,
         int? take = null);
+
+    GetContractDataByIdResponse GetContractById(int id, string lang);
 }

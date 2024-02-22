@@ -25,41 +25,50 @@ public class AuthController(IAuthService service) : ControllerBase
             return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
         return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
     }
+    //[AllowAnonymous]
+    //[HttpPost("upload")]
+    //public IActionResult UploadFile([FromForm] IFormFileCollection company_contracts)
+    //{ // Combine the directory path and the file name
+    //    string filePath = Path.Combine(Directory.GetCurrentDirectory() + GoRootPath.HRFilesPath, company_contracts[0].FileName);
+    //    string uploadDirectory = Directory.GetCurrentDirectory() + GoRootPath.HRFilesPath;
+    //    foreach (var file in company_contracts)
+    //    {
+    //        if (file != null && file.Length > 0)
+    //        {
+    //            ManageFilesHelper.UploadFile(file, GoRootPath.HRFilesPath);
+    //            //// Create the directory if it doesn't exist
+    //            //if (!Directory.Exists(uploadDirectory))
+    //            //{
+    //            //    Directory.CreateDirectory(uploadDirectory);
+    //            //}
+
+    //            //// Create a FileStream to write the uploaded file
+    //            //using (var stream = new FileStream(filePath, FileMode.Create))
+    //            //{
+    //            //    // Copy the file stream to the FileStream
+    //            //    file.CopyTo(stream);
+    //            //}
+
+    //            // Process the model as needed, e.g., save to a database
+    //            // ...
+
+
+    //        }
+
+    //        return Ok("File uploaded successfully");
+    //    }
+
+
+    //    return BadRequest("No file or empty file");
+    //}
+
     [AllowAnonymous]
     [HttpPost("upload")]
-    public IActionResult UploadFile([FromForm] IFormFileCollection company_contracts)
-    { // Combine the directory path and the file name
-        string filePath = Path.Combine(Directory.GetCurrentDirectory() + GoRootPath.HRFilesPath, company_contracts[0].FileName);
-        string uploadDirectory = Directory.GetCurrentDirectory() + GoRootPath.HRFilesPath;
-        foreach (var file in company_contracts)
-        {
-            if (file != null && file.Length > 0)
-            {
-                ManageFilesHelper.UploadFile(file, GoRootPath.HRFilesPath);
-                //// Create the directory if it doesn't exist
-                //if (!Directory.Exists(uploadDirectory))
-                //{
-                //    Directory.CreateDirectory(uploadDirectory);
-                //}
+    public IActionResult UploadFile([FromBody]string image)
+    {
+       var ii= ManageFilesHelper.SaveBase64StringToFile(image, Directory.GetCurrentDirectory(), "test");
 
-                //// Create a FileStream to write the uploaded file
-                //using (var stream = new FileStream(filePath, FileMode.Create))
-                //{
-                //    // Copy the file stream to the FileStream
-                //    file.CopyTo(stream);
-                //}
-
-                // Process the model as needed, e.g., save to a database
-                // ...
-
-                
-            }
-
-            return Ok("File uploaded successfully");
-        }
-       
-
-        return BadRequest("No file or empty file");
+        return Ok(ii.FileExtension);
     }
 
     [AllowAnonymous]

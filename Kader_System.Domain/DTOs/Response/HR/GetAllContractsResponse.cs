@@ -23,10 +23,12 @@
 
     public class GetAllContractDetailsResponse
     {
+        public int Id { get; set; }
         public int? AllowanceId { get; set; }
         public string? AllowanceName { get; set; }
         public double? Value { get; set; }
         public bool? IsPercent { get; set; }
+        public RowStatus Status { get; set;}
     }
 
 

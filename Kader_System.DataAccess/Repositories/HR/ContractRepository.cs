@@ -1,10 +1,13 @@
-﻿using Kader_System.Domain.DTOs.Response.HR;
+﻿using Kader_System.Domain.Constants.Enums;
+using Kader_System.Domain.DTOs.Response.HR;
+using System.Text.RegularExpressions;
+using static Kader_System.Domain.Constants.SD.ApiRoutes;
 
 namespace Kader_System.DataAccess.Repositories.HR;
 
 public class ContractRepository(KaderDbContext context) : BaseRepository<HrContract>(context), IContractRepository
 {
-    public  List<ContractData> GetAllContractsAsync(
+    public List<ContractData> GetAllContractsAsync(
         Expression<Func<HrContract, bool>> contractFilter,
         string lang,
         int? skip = null,
@@ -67,8 +70,8 @@ public class ContractRepository(KaderDbContext context) : BaseRepository<HrContr
                          AddedByUser = groupedContract.Key!.UserName ?? "N/A",
                          Details = groupedContract.Select(a => new GetAllContractDetailsResponse()
                          {
-                             AllowanceId = a.AllowanceId ,  // Provide a default value if AllowanceId is nullable
-                             Value = a.AllowanceValue ,  // Provide a default value if AllowanceValue is nullable
+                             AllowanceId = a.AllowanceId,  // Provide a default value if AllowanceId is nullable
+                             Value = a.AllowanceValue,  // Provide a default value if AllowanceValue is nullable
                              AllowanceName = a.AllowanceNameAr ?? "N/A",  // Provide a default value if AllowanceNameAr is nullable
                              IsPercent = a.IsPercent   // Provide a default value if IsPercent is nullable
                          }).ToList()
@@ -83,6 +86,48 @@ public class ContractRepository(KaderDbContext context) : BaseRepository<HrContr
         return query.ToList();
     }
 
+
+
+    public GetContractDataByIdResponse GetContractById(int id, string lang)
+    {
+
+
+        var query = from contract in context.Contracts
+            where contract.Id == id
+            join details in context.ContractAllowancesDetails on contract.Id equals details.ContractId into contractDetails
+            from detail in contractDetails.DefaultIfEmpty()
+            join allowance in context.Allowances on detail.AllowanceId equals allowance.Id into allowanceDetails
+            from allowanceDetail in allowanceDetails.DefaultIfEmpty()
+            join employee in context.Employees on contract.EmployeeId equals employee.Id into employeeDetails
+            from Employee in employeeDetails.DefaultIfEmpty()
+            group new { contract, detail, Employee } by contract into grouped
+
+            select new GetContractDataByIdResponse()
+            {
+                ContractFile = $"{ReadRootPath.HRFilesPath}{grouped.Key.FileName}{grouped.Key.FileExtension}",
+                EmployeeId = grouped.Key.EmployeeId,
+                EmployeeName = lang == Localization.Arabic ? grouped.FirstOrDefault().Employee.FullNameAr : grouped.FirstOrDefault().Employee.FullNameEn,
+                EndDate = grouped.Key.EndDate,
+                FixedSalary = grouped.Key.FixedSalary,
+                StartDate = grouped.Key.StartDate,
+                TotalSalary = grouped.Key.TotalSalary,
+                HousingAllowance = grouped.Key.HousingAllowance,
+                Id = grouped.Key.Id,
+                Details = grouped.Select(x => new GetAllContractDetailsResponse
+                {
+                    Id = x.detail.Id,
+                    AllowanceId = x.detail.AllowanceId,
+                    Value = x.detail.Value,
+                    AllowanceName = lang == Localization.Arabic ? x.detail.Allowance.Name_ar : x.detail.Allowance.Name_en,
+                    IsPercent = x.detail.IsPercent,
+                    Status = RowStatus.None
+                }).ToList()
+            };
+
+
+        
+        return query?.FirstOrDefault();
+    }
 
 }
 

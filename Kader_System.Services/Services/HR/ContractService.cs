@@ -1,5 +1,6 @@
 ﻿
 using Kader_System.Domain.DTOs;
+using static Kader_System.Domain.Constants.SD.ApiRoutes;
 
 namespace Kader_System.Services.Services.HR
 {
@@ -118,10 +119,13 @@ namespace Kader_System.Services.Services.HR
 
         public async Task<Response<GetContractByIdResponse>> GetContractByIdAsync(int id,string lang)
         {
-            Expression<Func<HrContract, bool>> filter = x => x.Id == id;
-            var obj = await unitOfWork.Contracts.GetFirstOrDefaultAsync(filter,
-                includeProperties:
-                $"{nameof(_instanceContract.Employee)},{nameof(_instanceContract.ListOfAllowancesDetails)}");
+            //Expression<Func<HrContract, bool>> filter = x => x.Id == id;
+            //var obj = await unitOfWork.Contracts.GetFirstOrDefaultAsync(filter,
+            //    includeProperties:
+            //    $"{nameof(_instanceContract.Employee)},{nameof(_instanceContract.ListOfAllowancesDetails)}");
+
+            var obj = unitOfWork.Contracts.GetContractById(id, lang);
+
 
             if (obj is null)
             {
@@ -139,26 +143,7 @@ namespace Kader_System.Services.Services.HR
             {
                 Data = new()
                 {
-                    Master=new()
-                    {
-                        Id = obj.Id,
-                        EmployeeId = obj.EmployeeId,
-                        EmployeeName = obj.Employee!.FullNameAr,
-                        StartDate = obj.StartDate,
-                        EndDate = obj.EndDate,
-                        TotalSalary = obj.TotalSalary,
-                        FixedSalary = obj.FixedSalary,
-                        HousingAllowance = obj.HousingAllowance,
-                        ContractFile =
-                            ManageFilesHelper.ConvertFileToBase64(GoRootPath.HRFilesPath + obj.FileName),
-                        Details = obj.ListOfAllowancesDetails.Select(detail => new GetAllContractDetailsResponse()
-                        {
-                            AllowanceId = detail.AllowanceId,
-                            Value = detail.Value,
-                            IsPercent = detail.IsPercent
-                        }).ToList(),
-                        
-                    },
+                    Master = obj,
                     allowances =await unitOfWork.Allowances.GetAllowancesDataAsLookUp(lang:lang),
                     employees = await unitOfWork.Employees.GetEmployeesDataAsLookUp(lang)
                 },
