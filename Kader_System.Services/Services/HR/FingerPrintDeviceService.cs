@@ -15,7 +15,12 @@ namespace Kader_System.Services.Services.HR
         public async Task<Response<GetAllFingerPrintDevicesResponse>> GetAllFingerPrintDevicesAsync(string lang,
             GetAllFingerPrintDevicesFilterrationRequest model,string host)
         {
-            Expression<Func<HrFingerPrint, bool>> filter = x => x.IsDeleted == model.IsDeleted;
+            Expression<Func<HrFingerPrint, bool>> filter = x => x.IsDeleted == model.IsDeleted
+                && (string.IsNullOrEmpty(model.Word)
+                ||x.NameAr.Contains(model.Word)
+                ||x.NameEn.Contains(model.Word)
+                ||x.IPAddress.Contains(model.Word)
+                ||x.Port.Contains(model.Word));
 
             var totalRecords = await unitOfWork.FingerPrints.CountAsync(filter);
             int page = 1;
