@@ -173,6 +173,7 @@ public static class SD
         {
             public const string ListOfContracts = "contract/getListOfContracts";
             public const string GetAllContracts = "contract";
+            public const string GetAllEndContracts = "getAllEndContracts";
             public const string CreateContract = "contract/create";
             public const string UpdateContract = "contract/update/{id}";
             public const string RestoreContract = "contract/restore/{id}";

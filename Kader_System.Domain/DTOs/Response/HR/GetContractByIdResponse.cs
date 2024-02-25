@@ -19,6 +19,8 @@
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public string ContractFile { get; set; }
+        public string FileName { get; set; }
+        public string? AddedByUser { get; set; }
         public List<GetAllContractDetailsResponse>? Details { get; set; } = [];
     }
 

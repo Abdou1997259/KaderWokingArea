@@ -50,6 +50,10 @@ public static class ManageFilesHelper
             // Convert Base64 string to byte array
             byte[] fileBytes = Convert.FromBase64String(base64String);
             var extension= GetFileExtension(fileBytes);
+            if (fileName.Contains('.'))
+            {
+                extension = "";
+            }
             string createdFileName = Guid.NewGuid() + "_" + fileName + extension;
             string finalFilePath = Path.Combine(Directory.GetCurrentDirectory() + filePath, createdFileName);
             if (Directory.Exists(Directory.GetCurrentDirectory()+filePath))
@@ -59,7 +63,7 @@ public static class ManageFilesHelper
 
                 return new GetFileNameAndExtension
                 {
-                    FileName = createdFileName+ extension,
+                    FileName = createdFileName,
                     FileExtension = extension
                 };
             }

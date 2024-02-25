@@ -14,6 +14,12 @@
         [HttpGet(ApiRoutes.Contract.GetAllContracts)]
         public async Task<IActionResult> GetAllAsync([FromQuery] GetAlFilterationForContractRequest request) =>
             Ok(await contractService.GetAllContractAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
+
+        [HttpGet(ApiRoutes.Contract.GetAllEndContracts)]
+        public async Task<IActionResult> GetAllEndContracts([FromQuery] GetAlFilterationForContractRequest request) =>
+            Ok(await contractService.GetAllEndContractsAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
+
+
         [HttpGet(ApiRoutes.Contract.GetContractById)]
         public async Task<IActionResult> GetByIdAsync(int id)
         {

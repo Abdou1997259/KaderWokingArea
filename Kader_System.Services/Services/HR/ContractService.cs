@@ -1,5 +1,7 @@
 ﻿
 using Kader_System.Domain.DTOs;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static Kader_System.Domain.Constants.SD.ApiRoutes;
 
 namespace Kader_System.Services.Services.HR
@@ -74,6 +76,78 @@ namespace Kader_System.Services.Services.HR
                 TotalRecords = totalRecords,
 
                 Items = ( unitOfWork.Contracts.GetAllContractsAsync
+                (contractFilter: filter,
+                    lang: lang,
+                    take: model.PageSize,
+                    skip: (model.PageNumber - 1) * model.PageSize)),
+                CurrentPage = model.PageNumber,
+                FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
+                From = (page - 1) * model.PageSize + 1,
+                To = Math.Min(page * model.PageSize, totalRecords),
+                LastPage = totalPages,
+                LastPageUrl = host + $"?PageSize={model.PageSize}&PageNumber={totalPages}&IsDeleted={model.IsDeleted}",
+                PreviousPage = page > 1 ? host + $"?PageSize={model.PageSize}&PageNumber={page - 1}&IsDeleted={model.IsDeleted}" : null,
+                NextPageUrl = page < totalPages ? host + $"?PageSize={model.PageSize}&PageNumber={page + 1}&IsDeleted={model.IsDeleted}" : null,
+                Path = host,
+                PerPage = model.PageSize,
+                Links = pageLinks,
+            };
+
+            if (result.TotalRecords is 0)
+            {
+                string resultMsg = shareLocalizer[Localization.NotFoundData];
+
+                return new()
+                {
+                    Data = new()
+                    {
+                        Items = []
+                    },
+                    Error = resultMsg,
+                    Msg = resultMsg
+                };
+            }
+
+            return new()
+            {
+                Data = result,
+                Check = true
+            };
+
+
+
+
+        }
+
+
+        public async Task<Response<GetAllContractsResponse>> GetAllEndContractsAsync(string lang,
+            GetAlFilterationForContractRequest model, string host)
+        {
+
+            Expression<Func<HrContract, bool>> filter = x => x.IsDeleted == model.IsDeleted
+
+                                                             && x.EndDate < DateOnly.FromDateTime(DateTime.UtcNow)
+                                                             && x.IsDeleted == model.IsDeleted
+                                                             && (string.IsNullOrEmpty(model.Word) ||
+                                                                 x.Employee!.FullNameEn!.Contains(model.Word)
+                                                                 || x.Employee!.FullNameAr!.Contains(model.Word)
+                                                                 || x.StartDate.ToString().Contains(model.Word)
+                                                                 || x.EndDate.ToString().Contains(model.Word));
+            var totalRecords = await unitOfWork.Contracts.CountAsync(filter: filter);
+            int page = 1;
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (model.PageSize == 0 ? 10 : model.PageSize));
+            if (model.PageNumber < 1)
+                page = 1;
+            else
+                page = model.PageNumber;
+            var pageLinks = Enumerable.Range(1, totalPages)
+                .Select(p => new Link() { label = p.ToString(), url = host + $"?PageSize={model.PageSize}&PageNumber={p}&IsDeleted={model.IsDeleted}", active = p == model.PageNumber })
+                .ToList();
+            var result = new GetAllContractsResponse
+            {
+                TotalRecords = totalRecords,
+
+                Items = (unitOfWork.Contracts.GetAllContractsAsync
                 (contractFilter: filter,
                     lang: lang,
                     take: model.PageSize,
@@ -244,10 +318,14 @@ namespace Kader_System.Services.Services.HR
                     };
                 }
 
-                if (!string.IsNullOrEmpty(obj.FileName))
+                if (!model.FileName.Contains(GoRootPath.HRFilesPath)  || model.ContractFile==null)
                 {
-                    ManageFilesHelper.RemoveFile(Path.Combine(GoRootPath.HRFilesPath, obj.FileName));
+                    if (!string.IsNullOrEmpty(obj.FileName))
+                    {
+                        ManageFilesHelper.RemoveFile(Path.Combine(GoRootPath.HRFilesPath, obj.FileName));
+                    }
                 }
+                
 
                 obj.EmployeeId = model.EmployeeId;
                 obj.EndDate = model.EndDate;
@@ -328,11 +406,12 @@ namespace Kader_System.Services.Services.HR
                     {
                         contractFile = ManageFilesHelper.SaveBase64StringToFile(model.ContractFile, GoRootPath.HRFilesPath, model.FileName);
                     }
+                    obj.FileName = contractFile?.FileName;
+                    obj.FileExtension = contractFile?.FileExtension;
 
                 }
 
-                obj.FileName = contractFile?.FileName;
-                obj.FileExtension = contractFile?.FileExtension;
+               
                 unitOfWork.Contracts.Update(obj);
                 await unitOfWork.CompleteAsync();
                 transaction.Commit();
