@@ -15,13 +15,17 @@
         [HttpGet(ApiRoutes.FingerPrint.GetAllFingerPrintDevices)]
         public async Task<IActionResult> ListOfDevices([FromQuery]GetAllFingerPrintDevicesFilterrationRequest request)
             => Ok(await fingerPrintDeviceService.GetAllFingerPrintDevicesAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
+        [HttpGet(ApiRoutes.FingerPrint.GetLookups)]
+        public async Task<IActionResult> GetLookUps()
+            => Ok(await fingerPrintDeviceService.GetFingerPrintsLookUpsData(GetCurrentRequestLanguage()));
         [HttpGet(ApiRoutes.FingerPrint.GetFingerPrintDeviceById)]
         public async Task<IActionResult> GetFingerPrintDeviceById(int id)
         {
             var response = await fingerPrintDeviceService.GetFingerPrintDeviceByIdAsync(id);
             if (response.Check)
             {
-                response.LookUps = await companyService.ListOfCompaniesAsync(GetCurrentRequestLanguage());
+                var lookups = await fingerPrintDeviceService.GetFingerPrintsLookUpsData(GetCurrentRequestLanguage());
+                response.LookUps = lookups.Data;
                 return Ok(response);
             }
                
@@ -30,19 +34,6 @@
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
         }
 
-        [HttpGet(ApiRoutes.FingerPrint.GetLookup)]
-        public async Task<IActionResult> GetLookup()
-        {
-            var response = await companyService.ListOfCompaniesAsync(GetCurrentRequestLanguage());
-            if (response.Check)
-            {
-                return Ok(response);
-            }
-
-            else if (!response.Check)
-                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
-            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
-        }
         #endregion
 
         #region Post Method

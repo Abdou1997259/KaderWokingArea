@@ -299,6 +299,7 @@ public static class SD
         {
             public const string ListOfFingerPrintDevices = "fingerPrint/getListOfFingerPrintDevices";
             public const string GetAllFingerPrintDevices = "fingerPrint/getAll";
+            public const string GetLookups = "fingerPrint/getLookups";
             public const string CreateFingerPrintDevice = "fingerPrint/create";
             public const string GetLookup = "fingerPrint/getLookup";
             public const string UpdateFingerPrintDevice = "fingerPrint/update/{id}";

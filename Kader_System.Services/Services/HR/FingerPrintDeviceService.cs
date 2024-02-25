@@ -1,5 +1,6 @@
 ﻿
 using Kader_System.Domain.DTOs;
+using Kader_System.Domain.DTOs.Response;
 using Kader_System.Domain.DTOs.Response.HR;
 using Microsoft.Extensions.Hosting;
 
@@ -142,6 +143,46 @@ namespace Kader_System.Services.Services.HR
             };
         }
 
+
+        public async Task<Response<FingerPrintLookupDataResponse>> GetFingerPrintsLookUpsData(string lang)
+        {
+            try
+            {
+                var companies = await unitOfWork.Companies.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+
+                    });
+
+
+                return new Response<FingerPrintLookupDataResponse>()
+                {
+                    Check = true,
+                    IsActive = true,
+                    Error = "",
+                    Msg = "",
+                    Data = new FingerPrintLookupDataResponse()
+                    {
+                        companies = companies.ToArray(),
+                       
+                    }
+                };
+            }
+            catch (Exception exception)
+            {
+                return new Response<FingerPrintLookupDataResponse>()
+                {
+                    Error = exception.Message,
+                    Msg = "Can not able to Get Data",
+                    Check = false,
+                    Data = null,
+                    IsActive = false
+                };
+            }
+
+        }
         #endregion
 
 
