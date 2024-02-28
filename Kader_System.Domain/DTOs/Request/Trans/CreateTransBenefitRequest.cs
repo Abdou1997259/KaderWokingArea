@@ -7,7 +7,7 @@
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
         public double Amount { get; set; }
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
-        public int AmountTypeId { get; set; }
+        public int increase_type_id { get; set; }
         [Required(ErrorMessage = Annotations.FieldIsRequired)]
         public int SalaryEffectId { get; set; }
         [Required(ErrorMessage = Annotations.FieldIsRequired)]

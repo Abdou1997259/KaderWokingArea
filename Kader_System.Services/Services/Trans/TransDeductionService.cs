@@ -65,7 +65,7 @@ namespace Kader_System.Services.Services.Trans
                 (string.IsNullOrEmpty(model.Word)
                  || x.DeductionName.Contains(model.Word)
                  || x.EmployeeName.Contains(model.Word)
-                 || x.ValueTypeName.Contains(model.Word));
+                 || x.DiscountType.Contains(model.Word));
 
             var totalRecords = await unitOfWork.TransDeductions.CountAsync(filter: filter,
                 includeProperties: $"{nameof(_insatance.Deduction)},{nameof(_insatance.Employee)}," +
@@ -247,8 +247,9 @@ namespace Kader_System.Services.Services.Trans
                     SalaryEffect = lang==Localization.Arabic?obj.SalaryEffect!.Name: obj.SalaryEffect!.NameInEnglish,
                     SalaryEffectId = obj.SalaryEffectId,
                     Notes = obj.Notes,
-                    ValueTypeId = obj.AmountTypeId,
-                    
+                    AmountTypeId = obj.AmountTypeId,
+                    Amount = obj.Amount,
+                    discount_type =lang==Localization.Arabic ? obj.AmountType.Name:obj.AmountType.NameInEnglish,
                     
                 },
                 Check = true

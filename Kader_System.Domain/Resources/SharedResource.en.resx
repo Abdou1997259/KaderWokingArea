@@ -120,6 +120,9 @@
   <data name="Allowance" xml:space="preserve">
     <value>Allowance</value>
   </data>
+  <data name="BalanceNotEnough" xml:space="preserve">
+    <value>Balance Not Enough</value>
+  </data>
   <data name="Benefit" xml:space="preserve">
     <value>Benefit</value>
   </data>

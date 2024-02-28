@@ -42,15 +42,17 @@ public class TransDeductionRepository(KaderDbContext context) : BaseRepository<T
                         Notes = trans.Notes,
                         SalaryEffect = lang == Localization.Arabic ? salary.Name : salary.NameInEnglish,
                         SalaryEffectId = trans.SalaryEffectId,
-                        ValueTypeName = lang == Localization.Arabic ? amountType.Name : amountType.NameInEnglish,
+                        DiscountType = lang == Localization.Arabic ? amountType.Name : amountType.NameInEnglish,
                     };
 
         if (filterSearch != null)
             query = query.Where(filterSearch);
-        if (take.HasValue)
-            query = query.Take(take.Value);
+
         if (skip.HasValue)
             query = query.Skip(skip.Value);
+        if (take.HasValue)
+            query = query.Take(take.Value);
+       
 
         return query.ToList();
 

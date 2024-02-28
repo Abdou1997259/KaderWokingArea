@@ -50,6 +50,17 @@ public class DeductionsController(IDeductionService service) : ControllerBase
         return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
     }
 
+
+    [HttpPut(ApiRoutes.Deduction.RestoreDeduction)]
+    public async Task<IActionResult> RestoreDeduction([FromRoute] int id)
+    {
+        var response = await _service.RestoreDeductionAsync(id);
+        if (response.Check)
+            return Ok(response);
+        else if (!response.Check)
+            return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+        return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+    }
     [HttpDelete(ApiRoutes.Deduction.DeleteDeduction)]
     public async Task<IActionResult> DeleteDeductionAsync(int id)
     {

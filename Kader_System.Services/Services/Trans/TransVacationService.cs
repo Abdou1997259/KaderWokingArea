@@ -1,5 +1,5 @@
 ﻿using Kader_System.Domain.DTOs;
-using Kader_System.Domain.DTOs.Response;
+
 
 
 namespace Kader_System.Services.Services.Trans
@@ -119,33 +119,37 @@ namespace Kader_System.Services.Services.Trans
         {
             try
             {
-                var employees = await unitOfWork.Employees.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
-                    select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn
-                    });
 
-                var vacations = await unitOfWork.Vacations.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
-                    select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
-                    });
+                return await unitOfWork.TransVacations.GetTransVacationLookUpsData(lang);
 
-                return new Response<TransVacationLookUpsData>()
-                {
-                    Check = true,
-                    IsActive = true,
-                    Error = "",
-                    Msg = "",
-                    Data = new TransVacationLookUpsData()
-                    {
-                        vacayions = vacations.ToArray(),
-                        employees = employees.ToArray(),
+                //var employees = await unitOfWork.Employees.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                //    select: x => new
+                //    {
+                //        Id = x.Id,
+                //        Name = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn,
+                        
+                //    });
+
+                //var vacations = await unitOfWork.Vacations.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                //    select: x => new
+                //    {
+                //        Id = x.Id,
+                //        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn
+                //    });
+
+                //return new Response<TransVacationLookUpsData>()
+                //{
+                //    Check = true,
+                //    IsActive = true,
+                //    Error = "",
+                //    Msg = "",
+                //    Data = new TransVacationLookUpsData()
+                //    {
+                //        vacations = vacations.ToArray(),
+                //        employees = employees.ToArray(),
                       
-                    }
-                };
+                //    }
+                //};
             }
             catch (Exception exception)
             {
@@ -164,7 +168,26 @@ namespace Kader_System.Services.Services.Trans
 
         public async Task<Response<CreateTransVacationRequest>> CreateTransVacationAsync(CreateTransVacationRequest model)
         {
+
             var newTrans = mapper.Map<TransVacation>(model);
+
+            var usedDays = 
+                await unitOfWork.TransVacations.GetVacationDaysUsedByEmployee(model.EmployeeId, model.VacationId);
+            var totalBalance =
+                await unitOfWork.TransVacations.GetVacationTotalBalance( model.VacationId);
+            var reminderDays = totalBalance - usedDays;
+            if (model.DaysCount > reminderDays)
+            {
+                return new()
+                {
+                    Error = string.Empty,
+                    Check = false,
+                    Data = model,
+                    LookUps = null,
+                    Msg = sharLocalizer[Localization.BalanceNotEnough],
+                    
+                };
+            }
 
             if (!string.IsNullOrEmpty(model.Attachment))
             {
@@ -193,10 +216,9 @@ namespace Kader_System.Services.Services.Trans
 
         public async Task<Response<GetTransVacationById>> GetTransVacationByIdAsync(int id,string lang)
         {
-            var obj = await unitOfWork.TransVacations.GetFirstOrDefaultAsync(v=>v.Id==id
-                ,includeProperties: $"{nameof(_insatance.Vacation)},{nameof(_insatance.Employee)}");
+            var obj = await unitOfWork.TransVacations.GetTransVacationByIdAsync(id, lang);
 
-            if (obj is null)
+            if (obj ==null)
             {
                 string resultMsg = sharLocalizer[Localization.NotFoundData];
 
@@ -210,18 +232,7 @@ namespace Kader_System.Services.Services.Trans
 
             return new()
             {
-                Data = new GetTransVacationById()
-                {
-                    DaysCount = obj.DaysCount,
-                    EmployeeId = obj.EmployeeId,
-                    EmployeeName =lang==Localization.Arabic? obj.Employee!.FullNameAr : obj.Employee!.FullNameEn,
-                    StartDate = obj.StartDate,
-                    Id = obj.Id,
-                    Notes = obj.Notes,
-                    VacationId = obj.VacationId,
-                    VacationName =lang==Localization.Arabic? obj.Vacation!.NameAr : obj.Vacation!.NameEn,
-                    
-                },
+                Data = obj,
                 Check = true
             };
         }
@@ -240,7 +251,23 @@ namespace Kader_System.Services.Services.Trans
                     Msg = resultMsg
                 };
             }
+            var usedDays =
+                await unitOfWork.TransVacations.GetVacationDaysUsedByEmployee(model.EmployeeId, model.VacationId);
+            var totalBalance =
+                await unitOfWork.TransVacations.GetVacationTotalBalance(model.VacationId);
+            var reminderDays = totalBalance +obj.DaysCount - usedDays;
+            if (model.DaysCount > reminderDays)
+            {
+                return new()
+                {
+                    Error = string.Empty,
+                    Check = false,
+                    Data = mapper.Map<GetTransVacationById>(obj),
+                    LookUps = null,
+                    Msg = sharLocalizer[Localization.BalanceNotEnough],
 
+                };
+            }
             if (!string.IsNullOrEmpty(obj.Attachment))
             {
                 ManageFilesHelper.RemoveFile(Path.Combine(GoRootPath.TransFilesPath, obj.Attachment));

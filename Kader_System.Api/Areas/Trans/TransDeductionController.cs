@@ -98,6 +98,18 @@ namespace Kader_System.Api.Areas.Trans
             return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
         }
 
+        [HttpDelete(ApiRoutes.TransDeduction.DeleteTransDeduction)]
+        public async Task<IActionResult> DeleteTransDeduction([FromRoute] int id)
+        {
+
+            var response = await service.DeleteTransDeductionAsync(id);
+            if (response.Check)
+                return Ok(response);
+            else if (!response.Check)
+                return StatusCode(statusCode: StatusCodes.Status400BadRequest, response);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, response);
+        }
+
         #region Helpers
         private string GetCurrentRequestLanguage() =>
             Request.Headers.AcceptLanguage.ToString().Split(',').First();

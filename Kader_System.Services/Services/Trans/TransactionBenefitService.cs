@@ -245,10 +245,12 @@ namespace Kader_System.Services.Services.Trans
                     EmployeeId = obj.EmployeeId,
                     EmployeeName = lang == Localization.Arabic ? obj.Employee!.FullNameAr : obj.Employee.FullNameEn,
                     Id = obj.Id,
-                    SalaryEffect = lang == Localization.Arabic ? obj.SalaryEffect!.Name : obj.SalaryEffect!.NameInEnglish,
+                    benefits_type = lang == Localization.Arabic ? obj.SalaryEffect!.Name : obj.SalaryEffect!.NameInEnglish,
                     SalaryEffectId = obj.SalaryEffectId,
                     Notes = obj.Notes,
-                    ValueTypeId = obj.AmountTypeId,
+                    increase_type_id = obj.AmountTypeId,
+                    increase_type = lang==Localization.Arabic ? obj.AmountType!.Name : obj.AmountType!.NameInEnglish,
+                    Amount = obj.Amount
                 },
                 Check = true
             };
@@ -289,7 +291,7 @@ namespace Kader_System.Services.Services.Trans
             }
 
             obj.Amount = model.Amount;
-            obj.AmountTypeId=model.AmountTypeId;
+            obj.AmountTypeId=model.increase_type_id;
             obj.SalaryEffectId=model.SalaryEffectId;
             obj.BenefitId=model.BenefitId;
             obj.ActionMonth=model.ActionMonth;

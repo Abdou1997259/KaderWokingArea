@@ -270,6 +270,7 @@ public static class SD
             public const string GetAllBenefits = "benefit/getAll";
             public const string CreateBenefit = "benefit/create";
             public const string UpdateBenefit = "benefit/update/{id}";
+            public const string RestoreBenefit = "benefit/restore/{id}";
             public const string GetBenefitById = "benefit/getById/{id}";
             public const string DeleteBenefit = "benefit/delete/{id}";
         }
@@ -280,6 +281,7 @@ public static class SD
             public const string GetAllDeductions = "deduction/getAll";
             public const string CreateDeduction = "deduction/create";
             public const string UpdateDeduction = "deduction/update/{id}";
+            public const string RestoreDeduction = "deduction/restore/{id}";
             public const string GetDeductionById = "deduction/getById/{id}";
             public const string DeleteDeduction = "deduction/delete/{id}";
         }
@@ -301,7 +303,6 @@ public static class SD
             public const string GetAllFingerPrintDevices = "fingerPrint/getAll";
             public const string GetLookups = "fingerPrint/getLookups";
             public const string CreateFingerPrintDevice = "fingerPrint/create";
-            public const string GetLookup = "fingerPrint/getLookup";
             public const string UpdateFingerPrintDevice = "fingerPrint/update/{id}";
             public const string RestoreFingerPrint = "fingerPrint/restore/{id}";
             public const string GetFingerPrintDeviceById = "fingerPrint/getById/{id}";
@@ -367,6 +368,7 @@ public static class SD
         public const string EmployeeVacation = "EmployeeVacation";
         public const string DepartmentManager = "DepartmentManager";
         public const string Done = "Done";
+        public const string BalanceNotEnough = "BalanceNotEnough";
         public const string Error = "Error";
         public const string ThisAmountCannotBePaidFromTheMainTreasuryDueToItsAvailability = "ThisAmountCannotBePaidFromTheMainTreasuryDueToItsAvailability";
         public const string ThisAmountCannotBePaidFromTheTreasuryBranchDueToItsAvailability = "ThisAmountCannotBePaidFromTheTreasuryBranchDueToItsAvailability";

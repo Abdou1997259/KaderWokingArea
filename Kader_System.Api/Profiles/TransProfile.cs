@@ -23,11 +23,17 @@ namespace Kader_System.Api.Profiles
             #region Benefit
 
             CreateMap<TransBenefit, CreateTransBenefitRequest>()
-                      .ReverseMap();
+                .ForMember(dest => dest.increase_type_id
+                    , opt =>
+                        opt.MapFrom(src => src.AmountTypeId))
+                .ReverseMap();
             CreateMap<GetTransBenefitById, TransBenefit>()
                 .ForMember(dest => dest.Add_date
                     , opt =>
                         opt.MapFrom(src => src.AddedOn))
+                .ForMember(dest => dest.AmountTypeId
+                    , opt =>
+                        opt.MapFrom(src => src.increase_type_id))
                 .ReverseMap();
 
             #endregion

@@ -9,6 +9,7 @@
         public string EmployeeName { get; set; }
         public int VacationId { get; set; }
         public string VacationName { get; set; }
+        public string VacationType { get; set; }
         public string? Notes { get; set; }
         
     }

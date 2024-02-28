@@ -66,7 +66,8 @@ namespace Kader_System.Services.Services.HR
                 Items = ( unitOfWork.Vacations.GetVacationInfo
                     (   filter,
                         take: model.PageSize,
-                        skip: (model.PageNumber - 1) * model.PageSize)),
+                        skip: (model.PageNumber - 1) * model.PageSize,
+                        lang: lang)),
                 CurrentPage = model.PageNumber,
                 FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
@@ -103,10 +104,10 @@ namespace Kader_System.Services.Services.HR
             };
         }
 
-        public async Task<Response<GetVacationDetailsByIdResponse>> GetVacationByIdAsync(int id)
+        public async Task<Response<GetVacationDetailsByIdResponse>> GetVacationByIdAsync(int id )
         {
 
-            var obj = await unitOfWork.Vacations.GetFirstOrDefaultAsync(v => v.Id == id, nameof(instanceVacation.VacationType));
+            var obj = await unitOfWork.Vacations.GetFirstOrDefaultAsync(v => v.Id == id, $"{nameof(instanceVacation.VacationType)},{nameof(instanceVacation.VacationDistributions)}");
 
             if (obj is null)
             {
@@ -129,7 +130,16 @@ namespace Kader_System.Services.Services.HR
                     ApplyAfterMonth = obj.ApplyAfterMonth,
                     CanTransfer = obj.CanTransfer,
                     VacationType = obj.VacationType.Name,
-                    Balance = obj.TotalBalance
+                    TotalBalance = obj.TotalBalance,
+                    VacationTypeId = obj.VacationTypeId,
+                    Details = obj.VacationDistributions.Select(d=>new VacationDistributionResponseData()
+                    {
+                        DaysCount = d.DaysCount,
+                        Id = d.Id,
+                        NameAr = d.NameAr,
+                        NameEn = d.NameEn,
+                        SalaryCalculatorId = d.SalaryCalculatorId
+                    } ).ToList()
                 },
                 Check = true
             };
@@ -256,7 +266,6 @@ namespace Kader_System.Services.Services.HR
                             oldObj.NameAr = updatedItem.NameAr;
                             oldObj.DaysCount = updatedItem.DaysCount;
                             oldObj.SalaryCalculatorId = updatedItem.SalaryCalculatorId;
-                            oldObj.VacationId = updatedItem.VacationId;
                             unitOfWork.VacationDistributions.Update(oldObj);
                         }
                     }

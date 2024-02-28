@@ -13,7 +13,7 @@ public class TransVacation : BaseEntity
 
     public int VacationId { get; set; }
     [ForeignKey(nameof(VacationId))]
-    public HrVacation Vacation { get; set; } = default!;
+    public HrVacationDistribution Vacation { get; set; } = default!;
     public string? Notes { get; set; }
     public string? Attachment { get; set; }
     public string? AttachmentExtension { get; set; }

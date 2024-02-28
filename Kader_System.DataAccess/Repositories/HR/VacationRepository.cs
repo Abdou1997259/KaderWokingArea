@@ -1,5 +1,6 @@
 ﻿
 using Kader_System.Domain.DTOs.Response.HR;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Kader_System.DataAccess.Repositories.HR;
 
@@ -11,44 +12,38 @@ public class VacationRepository(KaderDbContext context) : BaseRepository<HrVacat
     public List<VacationData> GetVacationInfo(
         Expression<Func<HrVacation, bool>> vacationFilter,
     int? skip = null,
-    int? take = null)
+    int? take = null 
+        ,string lang="ar")
     {
-        var query = context.Set<HrVacation>()
-            .Include(v => v.VacationType)
-            .Where(vacationFilter)
+        var query = from vac in context.Vacations.Where(vacationFilter)
+            join vacationType in context.VacationTypes on vac.VacationTypeId equals vacationType.Id into vtGroup
+            from vt in vtGroup.DefaultIfEmpty()
+            join user in context.Users on vac.Added_by equals user.Id into userGroup
+            from u in userGroup.DefaultIfEmpty()
+            join employeeCount in context.Employees.GroupBy(e => e.VacationId).Select(g => new { VacationId = g.Key, Count = g.Count() })
+                on vac.Id equals employeeCount.VacationId into ecGroup
+            from ec in ecGroup.DefaultIfEmpty()
+            select new VacationData()
+            {
+                Id = vac.Id,
+                Name = lang == Localization.Arabic ? vac.NameAr : vac.NameEn,
+                ApplyAfterMonth = vac.ApplyAfterMonth,
+                CanTransfer = vac.CanTransfer,
+                TotalBalance = vac.TotalBalance,
+                VacationType = vt != null ? (lang == Localization.Arabic ? vt.Name : vt.NameInEnglish) : null,
+                AddedBy = u != null ? u.UserName : null,
+                EmployeesCount = ec != null ? ec.Count : 0
+            };
 
-            .GroupJoin(
-                context.Set<HrEmployee>(),
-                v => v.Id,
-                e => e.VacationId,
-                (v, employees) => new { Vacation = v, Employees = employees })
-            .SelectMany(
-                x => x.Employees.DefaultIfEmpty(),
-                (vacation, employee) => new { vacation.Vacation, Employee = employee });
+        var result = query.ToList();
 
-
-        var groupedQuery= query
-                 .GroupBy(x => new { x.Vacation.Id, x.Vacation.NameAr, x.Vacation.NameEn,x.Vacation.ApplyAfterMonth,x.Vacation.TotalBalance,x.Vacation.CanTransfer ,x.Vacation.VacationType.Name })
-                 .OrderByDescending(c=>c.Key.Id)
-    
-                 .Select(group => new VacationData()
-                 {
-                     Id = group.Key.Id,
-                     Name = group.Key.NameAr,
-                     EmployeesCount = group.Count(x => x.Employee != null),
-                     VacationType = group.Key.Name,
-                     ApplyAfterMonth = group.Key.ApplyAfterMonth,
-                     CanTransfer = group.Key.CanTransfer,
-                     TotalBalance = group.Key.TotalBalance,
-                     
-                 }).ToList();
         if (skip.HasValue)
-            groupedQuery = groupedQuery.Skip(skip.Value).ToList();
+            result = result.Skip(skip.Value).ToList();
 
         if (take.HasValue)
-            groupedQuery = groupedQuery.Take(take.Value).ToList();
-       
-        return groupedQuery.ToList();
+            result = result.Take(take.Value).ToList();
+
+        return result;
 
     }
 

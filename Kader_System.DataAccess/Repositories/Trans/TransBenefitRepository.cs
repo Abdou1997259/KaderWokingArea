@@ -49,10 +49,12 @@ public class TransBenefitRepository(KaderDbContext context) : BaseRepository<Tra
 
         if (filterSearch != null)
             query = query.Where(filterSearch);
-        if (take.HasValue)
-            query = query.Take(take.Value);
+
         if (skip.HasValue)
             query = query.Skip(skip.Value);
+        if (take.HasValue)
+            query = query.Take(take.Value);
+      
 
         return query.ToList();
 

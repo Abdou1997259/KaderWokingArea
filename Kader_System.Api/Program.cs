@@ -16,12 +16,15 @@ using Kader_System.Services.Services.Setting;
 using Kader_System.Services.Services.Trans;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DateTimeConverter = Kader_System.Api.Helpers.DateTimeConverter;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = new ConfigurationBuilder()
@@ -66,6 +69,8 @@ builder.Services.AddControllersWithViews().AddJsonOptions(x =>
     {
         x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+        //x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        //x.JsonSerializerOptions.Converters.Add(new DateTimeConverter("yyyy-MM-dd"));
     }
     );
 

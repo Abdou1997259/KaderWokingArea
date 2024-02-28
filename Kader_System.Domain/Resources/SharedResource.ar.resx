@@ -120,6 +120,9 @@
   <data name="Allowance" xml:space="preserve">
     <value>البدل</value>
   </data>
+  <data name="BalanceNotEnough" xml:space="preserve">
+    <value>الرصيد غير كافي</value>
+  </data>
   <data name="Benefit" xml:space="preserve">
     <value>اسم المستحق</value>
   </data>

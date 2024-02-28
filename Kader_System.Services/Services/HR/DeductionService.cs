@@ -195,6 +195,45 @@ public class DeductionService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
         };
     }
 
+
+    public async Task<Response<HrGetDeductionByIdResponse>> RestoreDeductionAsync(int id)
+    {
+        var obj = await _unitOfWork.Deductions.GetByIdAsync(id);
+
+        if (obj == null)
+        {
+            string resultMsg = string.Format(_sharLocalizer[Localization.CannotBeFound],
+                _sharLocalizer[Localization.Deduction]);
+
+            return new()
+            {
+                Data = null,
+                Error = resultMsg,
+                Msg = resultMsg
+            };
+        }
+
+        obj.IsDeleted = false;
+
+        unitOfWork.Deductions.Update(obj);
+
+        await _unitOfWork.CompleteAsync();
+        return new()
+        {
+            Check = true,
+            Error = string.Empty,
+            LookUps = null,
+            Data = new HrGetDeductionByIdResponse()
+            {
+                Id = obj.Id,
+                Name_ar = obj.Name_ar,
+                Name_en = obj.Name_en
+            },
+            Msg = string.Format(_sharLocalizer[Localization.Updated],
+                _sharLocalizer[Localization.Deduction]),
+
+        };
+    }
     public Task<Response<string>> UpdateActiveOrNotDeductionAsync(int id)
     {
         throw new NotImplementedException();

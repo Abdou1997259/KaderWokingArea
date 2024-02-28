@@ -10,7 +10,7 @@
         public DateOnly ActionMonth { get; set; }
         public DateTime? AddedOn { get; set; }
         public int AmountTypeId { get; set; }
-        public string ValueTypeName { get; set; }
+        public string DiscountType { get; set; }
         public int SalaryEffectId { get; set; }
         public string SalaryEffect { get; set; } = default!;
         public int EmployeeId { get; set; }

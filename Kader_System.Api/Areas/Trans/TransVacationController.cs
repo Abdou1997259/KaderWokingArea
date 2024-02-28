@@ -22,7 +22,7 @@ namespace Kader_System.Api.Areas.Trans
             Ok(await service.GetAllTransVacationsAsync(GetCurrentRequestLanguage(), request, GetCurrentHost()));
 
         [HttpGet(ApiRoutes.TransVacation.GetTransVacationsLookUps)]
-        public async Task<IActionResult> GetTransVacationLookUpsData([FromQuery] GetAllFilterationForTransVacationRequest request) =>
+        public async Task<IActionResult> GetTransVacationLookUpsData() =>
             Ok(await service.GetTransVacationLookUpsData(GetCurrentRequestLanguage()));
 
         [HttpGet(ApiRoutes.TransVacation.GetTransVacationById)]

@@ -9,7 +9,7 @@
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public string AddedBy { get; set; }=string.Empty;
+        public string? AddedBy { get; set; }=string.Empty;
         public int ApplyAfterMonth { get; set; }
         public int TotalBalance { get; set; }
         public bool CanTransfer { get; set; }

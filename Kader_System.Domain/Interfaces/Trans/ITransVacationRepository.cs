@@ -8,5 +8,10 @@
             int? skip = null,
             int? take = null, string lang = "ar"
         );
+
+        Task<GetTransVacationById> GetTransVacationByIdAsync(int id, string lang);
+        Task<Response<TransVacationLookUpsData>> GetTransVacationLookUpsData(string lang);
+        Task<double> GetVacationDaysUsedByEmployee(int empId, int vacationId);
+        Task<double> GetVacationTotalBalance(int vacationId);
     }
 }
