@@ -1,9 +1,9 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿
+using System.Text.Json;
 
 namespace Kader_System.Api.Helpers
 {
-    public class DateTimeConverter : JsonConverter<DateTime>
+    public class DateTimeConverter : System.Text.Json.Serialization.JsonConverter<DateTime>
     {
         private readonly string _format;
 
@@ -23,4 +23,7 @@ namespace Kader_System.Api.Helpers
             writer.WriteStringValue(value.ToString(_format));
         }
     }
-}
+ }
+
+
+

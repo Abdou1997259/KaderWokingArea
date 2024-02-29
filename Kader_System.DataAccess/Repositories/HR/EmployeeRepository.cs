@@ -169,6 +169,16 @@ public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmplo
             }).ToListAsync();
     }
 
+    public async Task<object> GetEmployeesDataNameAndIdAsLookUp(string lang)
+    {
+        return await context.Employees.
+            Where(e => !e.IsDeleted && e.IsActive)
+            .Select(e => new
+            {
+                id = e.Id,
+                employee_name = lang == Localization.Arabic ? e.FullNameAr : e.FullNameEn,
+            }).ToArrayAsync();
+    }
 
 
 

@@ -240,6 +240,7 @@ public static class SD
         {
             public const string ListOfTransCovenants = "transCovenant/getListOftransCovenants";
             public const string GetTransCovenants = "transCovenant/getAll";
+            public const string GetLookUps = "transCovenant/getLookUps";
             public const string CreateTransCovenant = "transCovenant/create";
             public const string UpdateTransCovenant = "transCovenant/update/{id}";
             public const string RestoreTransCovenant = "transCovenant/restore/{id}";

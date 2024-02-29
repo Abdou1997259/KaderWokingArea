@@ -6,6 +6,8 @@ public class AuthLoginUserResponse
     public List<string> RoleNames { get; set; } = new();
     public string Email { get; set; } = string.Empty;
     public string Token { get; set; } = string.Empty;
+    [DisplayFormat(DataFormatString = "yyyy-MM-dd HH:mm:ss")]
+    [JsonConverter(typeof(DateTimeConverter), "yyyy-MM-dd HH:mm:ss")]
     public DateTime ExpiresOn { get; set; }
     public int Company_Id { get; set; }
     public int? Department_Id { get; set; }

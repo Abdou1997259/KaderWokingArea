@@ -801,5 +801,19 @@ namespace Kader_System.Services.Services.HR
             }
             
         }
+
+        public async Task<Response<object>> GetEmployeesDataNameAndIdAsLookUp(string lang)
+        {
+           var result= await unitOfWork.Employees.GetEmployeesDataNameAndIdAsLookUp(lang);
+
+           return new()
+           {
+               Check = true,
+               Error = string.Empty,
+               Data = result,
+               LookUps = null,
+               Msg = string.Empty
+           };
+        }
     }
 }

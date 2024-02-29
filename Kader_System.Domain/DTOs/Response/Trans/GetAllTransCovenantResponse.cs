@@ -16,5 +16,6 @@
         public double Amount { get; set; }
         public string? Notes { get; set; }
         public string? AddedBy { get; set; }
+        public string? JobName { get; set; }
     }
 }

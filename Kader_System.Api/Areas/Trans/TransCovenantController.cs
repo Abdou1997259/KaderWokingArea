@@ -7,7 +7,7 @@ namespace Kader_System.Api.Areas.Trans
     [ApiExplorerSettings(GroupName = Modules.Trans)]
     [ApiController]
     [Route("api/v1/")]
-    public class TransCovenantController(ITransCovenantService service) : ControllerBase
+    public class TransCovenantController(ITransCovenantService service,IEmployeeService employeeService) : ControllerBase
     {
         #region Get
 
@@ -18,6 +18,28 @@ namespace Kader_System.Api.Areas.Trans
         [HttpGet(ApiRoutes.TransCovenant.GetTransCovenants)]
         public async Task<IActionResult> GetAllTransCovenants([FromQuery] GetAllFilterationForTransCovenant request) =>
             Ok(await service.GetAllTransCovenantsAsync(GetCurrentRequestLanguage(),request, GetCurrentHost()));
+
+        [HttpGet(ApiRoutes.TransCovenant.GetTransCovenantById)]
+        public async Task<IActionResult> GetTransCovenantById([FromRoute] int id)
+        {
+            var result =await service.GetTransCovenantByIdAsync(id, GetCurrentRequestLanguage());
+            if (result.Check)
+                return Ok(result);
+            else if (!result.Check)
+                return BadRequest(result);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, result);
+        }
+
+        [HttpGet(ApiRoutes.TransCovenant.GetLookUps)]
+        public async Task<IActionResult> GetLookUps()
+        {
+            var result = await employeeService.GetEmployeesDataNameAndIdAsLookUp(GetCurrentRequestLanguage());
+            if (result.Check)
+                return Ok(result);
+            else if (!result.Check)
+                return BadRequest(result);
+            return StatusCode(statusCode: StatusCodes.Status500InternalServerError, result);
+        }
         #endregion
 
         #region Create

@@ -152,6 +152,8 @@ namespace Kader_System.Services.Services.Trans
             var obj = await unitOfWork.TransCovenants.GetFirstOrDefaultAsync(c=>c.Id==id, 
                 includeProperties: $"{nameof(_insatance.Employee)}");
 
+
+
             if (obj is null)
             {
                 string resultMsg = sharLocalizer[Localization.NotFoundData];
@@ -164,6 +166,7 @@ namespace Kader_System.Services.Services.Trans
                 };
             }
 
+            var lookups =await unitOfWork.Employees.GetEmployeesDataNameAndIdAsLookUp(lang);
             return new()
             {
                 Data = new GetTransCovenantById()
@@ -178,7 +181,8 @@ namespace Kader_System.Services.Services.Trans
                     EmployeeName =lang==Localization.Arabic? obj.Employee!.FullNameAr:obj.Employee!.FullNameEn,
                     Id = obj.Id
                 },
-                Check = true
+                Check = true,
+                LookUps = lookups
             };
         }
 

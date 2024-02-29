@@ -162,12 +162,7 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
     {
         try
         {
-            var employees = await unitOfWork.Employees.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
-                select: x => new
-                {
-                    Id = x.Id,
-                    Name = lang == Localization.Arabic ? x.FullNameAr : x.FullNameEn
-                });
+            var employees = await unitOfWork.Employees.GetEmployeesDataNameAndIdAsLookUp(lang);
 
             var allowances = await unitOfWork.Allowances.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
                 select: x => new
@@ -193,7 +188,7 @@ public class TransAllowanceService(IUnitOfWork unitOfWork, IStringLocalizer<Shar
                 Data = new TransAllowanceLookUpsData()
                 {
                     allowances = allowances.ToArray(),
-                    employees = employees.ToArray(),
+                    employees = employees,
                     salary_effects = salaryEffect.ToArray(),
                 }
             };

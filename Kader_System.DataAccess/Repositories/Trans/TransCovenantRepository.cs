@@ -12,16 +12,13 @@ public class TransCovenantRepository(KaderDbContext context) : BaseRepository<Tr
       )
     {
 
-        var transBenefits = context.TransCovenants.Where(filter);
-
-
-        var query = from trans in transBenefits
+        var query = from trans in context.TransCovenants.Where(filter)
                     join employee in context.Employees on trans.EmployeeId equals employee.Id into empGroup
                     from employee in empGroup.DefaultIfEmpty()
+                    join job in context.HrJobs on employee.JobId equals job.Id into jobGroup
+                    from job in jobGroup.DefaultIfEmpty()
                     join u in context.Users on trans.Added_by equals u.Id into userGroup
                     from u in userGroup.DefaultIfEmpty()
-            
-
                     select new TransCovenantData()
                     {
                         
@@ -34,15 +31,18 @@ public class TransCovenantRepository(KaderDbContext context) : BaseRepository<Tr
                         Notes = trans.Notes,
                         NameAr = trans.NameAr,
                         NameEn = trans.NameEn,
-                        Date = trans.Date
+                        Date = trans.Date,
+                        JobName = lang==Localization.Arabic ? job.NameAr : job.NameEn,
                     };
 
         if (filterSearch != null)
             query = query.Where(filterSearch);
-        if (take.HasValue)
-            query = query.Take(take.Value);
+
         if (skip.HasValue)
             query = query.Skip(skip.Value);
+        if (take.HasValue)
+            query = query.Take(take.Value);
+       
 
         return query.ToList();
 
