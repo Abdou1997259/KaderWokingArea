@@ -57,7 +57,7 @@ namespace Kader_System.Services.Services.HR
         public async Task<Response<GetEmployeeByIdResponse>> GetEmployeeByIdAsync(int id, string lang)
         {
             Expression<Func<HrEmployee, bool>> filter = x => x.Id == id;
-            var obj = await unitOfWork.Employees.GetFirstOrDefaultAsync(filter, 
+            var obj = await unitOfWork.Employees.GetFirstOrDefaultAsync(filter,
                 includeProperties: $"{nameof(_instanceEmployee.Management)},{nameof(_instanceEmployee.Job)}," +
                                    $"{nameof(_instanceEmployee.User)},{nameof(_instanceEmployee.Company)}," +
                                    $"{nameof(_instanceEmployee.Qualification)},{nameof(_instanceEmployee.Management)}," +
@@ -120,12 +120,12 @@ namespace Kader_System.Services.Services.HR
                     TotalSalary = obj.TotalSalary,
                     Username = obj.User!.UserName,
                     EmployeeImage = $"{ReadRootPath.EmployeeImagesPath}{obj.EmployeeImage}",
-                    qualification_name =lang==Localization.Arabic?  obj.Qualification!.NameAr : obj.Qualification!.NameEn,
-                    company_name = lang==Localization.Arabic?obj.Company!.NameAr:obj.Company!.NameEn,
-                    management_name = lang==Localization.Arabic?obj.Management!.NameAr:obj.Management!.NameEn,
+                    qualification_name = lang == Localization.Arabic ? obj.Qualification!.NameAr : obj.Qualification!.NameEn,
+                    company_name = lang == Localization.Arabic ? obj.Company!.NameAr : obj.Company!.NameEn,
+                    management_name = lang == Localization.Arabic ? obj.Management!.NameAr : obj.Management!.NameEn,
                     employee_loans_count = 0,
                     vacation_days_count = 0,
-                    job_name = lang==Localization.Arabic?obj.Job!.NameAr:obj.Job!.NameEn,
+                    job_name = lang == Localization.Arabic ? obj.Job!.NameAr : obj.Job!.NameEn,
                     department_name = lang == Localization.Arabic ? obj.Department!.NameAr : obj.Department!.NameEn,
                     marital_status_name = lang == Localization.Arabic ? obj.MaritalStatus!.Name : obj.MaritalStatus!.NameInEnglish,
                     nationality_name = lang == Localization.Arabic ? obj.Nationality!.Name : obj.Nationality!.NameInEnglish,
@@ -142,9 +142,9 @@ namespace Kader_System.Services.Services.HR
             return unitOfWork.Employees.GetEmployeeByIdAsync(id, lang);
         }
         public async Task<Response<GetAllEmployeesResponse>> GetAllEmployeesAsync(string lang,
-            GetAllEmployeesFilterRequest model,string host)
+            GetAllEmployeesFilterRequest model, string host)
         {
-            Expression<Func<HrEmployee, bool>> filter = x => x.IsDeleted == model.IsDeleted ;
+            Expression<Func<HrEmployee, bool>> filter = x => x.IsDeleted == model.IsDeleted;
 
             Expression<Func<EmployeesData, bool>> filterSearch = x =>
                 (string.IsNullOrEmpty(model.Word)
@@ -207,11 +207,11 @@ namespace Kader_System.Services.Services.HR
 
 
         public async Task<Response<GetAllEmployeesResponse>> GetAllEmployeesByCompanyIdAsync(string lang,
-           GetAllEmployeesFilterRequest model, string host,int companyId)
+           GetAllEmployeesFilterRequest model, string host, int companyId)
         {
-            Expression<Func<HrEmployee, bool>> filter = x => x.IsDeleted == model.IsDeleted && x.CompanyId== companyId ;
+            Expression<Func<HrEmployee, bool>> filter = x => x.IsDeleted == model.IsDeleted && x.CompanyId == companyId;
 
-            Expression<Func<EmployeesData, bool>> filterSearch = x=>
+            Expression<Func<EmployeesData, bool>> filterSearch = x =>
                                                              (string.IsNullOrEmpty(model.Word)
                                                               || x.FullName.Contains(model.Word)
                                                               || x.Job.Contains(model.Word)
@@ -235,7 +235,7 @@ namespace Kader_System.Services.Services.HR
             {
                 TotalRecords = totalRecords,
 
-                Items = unitOfWork.Employees.GetEmployeesInfo(filter:filter,filterSearch:filterSearch,skip: (model.PageNumber - 1) * model.PageSize, take:model.PageSize),
+                Items = unitOfWork.Employees.GetEmployeesInfo(filter: filter, filterSearch: filterSearch, skip: (model.PageNumber - 1) * model.PageSize, take: model.PageSize),
                 CurrentPage = model.PageNumber,
                 FirstPageUrl = host + $"?PageSize={model.PageSize}&PageNumber=1&IsDeleted={model.IsDeleted}",
                 From = (page - 1) * model.PageSize + 1,
@@ -270,7 +270,156 @@ namespace Kader_System.Services.Services.HR
                 Check = true
             };
         }
+        public async Task<Response<EmployeesLookUps>> GetEmployeesLookUpsData(string lang)
+        {
+            try
+            {
+                var companies = await unitOfWork.Companies.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
+                    select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
 
+                    });
+
+                var departments = await unitOfWork.Departments.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+                        ManagementId = x.ManagementId
+
+                    });
+                var jobs = await unitOfWork.Jobs.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+
+                    });
+                var vacations = await unitOfWork.Vacations.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+                    });
+                var qualifications = await unitOfWork.Qualifications.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+                    });
+                var managements = await unitOfWork.Managements.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
+                        CompanyId = x.CompanyId,
+                    });
+                var nationalities = await unitOfWork.Nationalities.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+                    });
+                var shifts = await unitOfWork.Shifts.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en,
+                    });
+                var documents = new List<object>();
+
+                var maritals = await unitOfWork.MaritalStatus.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+                    });
+                var genders = await unitOfWork.Genders.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+                    });
+                var relegions = await unitOfWork.Religions.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+                    });
+                var salary_payments_ways = await unitOfWork.SalaryPaymentWays.GetSpecificSelectAsync(
+                    filter: filter => filter.IsDeleted == false
+                    , select: x => new
+                    {
+                        Id = x.Id,
+                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
+                    });
+
+                return new Response<EmployeesLookUps>()
+                {
+                    Check = true,
+                    IsActive = true,
+                    Error = "",
+                    Msg = "",
+                    Data = new EmployeesLookUps()
+                    {
+                        companies = companies.ToArray(),
+                        departments = departments.ToArray(),
+                        documents = documents.ToArray(),
+                        genders = genders.ToArray(),
+                        jobs = jobs.ToArray(),
+                        managements = managements.ToArray(),
+                        maritals = maritals.ToArray(),
+                        nationalities = nationalities.ToArray(),
+                        qualifications = qualifications.ToArray(),
+                        relegions = relegions.ToArray(),
+                        salary_payments_ways = salary_payments_ways.ToArray(),
+                        shifts = shifts.ToArray(),
+                        vacations = vacations.ToArray(),
+                    }
+                };
+            }
+            catch (Exception exception)
+            {
+                return new Response<EmployeesLookUps>()
+                {
+                    Error = exception.Message,
+                    Msg = "Can not able to Get Data",
+                    Check = false,
+                    Data = null,
+                    IsActive = false
+                };
+            }
+
+        }
+
+        public async Task<Response<object>> GetEmployeesDataNameAndIdAsLookUp(string lang)
+        {
+            var result = new
+            {
+                employees = await unitOfWork.Employees.GetEmployeesDataNameAndIdAsLookUp(lang)
+            };
+
+            return new()
+            {
+                Check = true,
+                Error = string.Empty,
+                Data = result,
+                LookUps = null,
+                Msg = string.Empty
+            };
+        }
 
         #endregion
 
@@ -349,7 +498,7 @@ namespace Kader_System.Services.Services.HR
                     });
                 }
 
-               
+
                 await unitOfWork.CompleteAsync();
                 transaction.Commit();
                 return new()
@@ -369,7 +518,7 @@ namespace Kader_System.Services.Services.HR
                         shareLocalizer[Localization.Employee]),
                     Check = false,
                     Data = model,
-                    Error = ex.InnerException!=null ? ex.InnerException.ToString() :ex.Message
+                    Error = ex.InnerException != null ? ex.InnerException.ToString() : ex.Message
                 };
             }
 
@@ -504,7 +653,7 @@ namespace Kader_System.Services.Services.HR
                 }
                 else
                 {
-                   var newUser=await unitOfWork.Users.AddAsync(new ApplicationUser()
+                    var newUser = await unitOfWork.Users.AddAsync(new ApplicationUser()
                     {
                         VisiblePassword = model.password,
                         Email = obj.Email,
@@ -512,16 +661,16 @@ namespace Kader_System.Services.Services.HR
                         NormalizedEmail = obj.Email.ToUpper(),
                         PhoneNumber = obj.Phone,
                         IsActive = true,
-                        PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!,model.password),
+                        PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!, model.password),
                         Id = Guid.NewGuid().ToString(),
                         UserName = model.username,
                         NormalizedUserName = model.username.ToUpper(),
-                        
+
                     });
                     if (newUser != null)
                     {
-                        obj.UserId= newUser.Id;
-                       await unitOfWork.UserRoles.AddAsync(new ApplicationUserRole()
+                        obj.UserId = newUser.Id;
+                        await unitOfWork.UserRoles.AddAsync(new ApplicationUserRole()
                         {
                             RoleId = UserRole.Id,
                             UserId = newUser.Id,
@@ -549,7 +698,7 @@ namespace Kader_System.Services.Services.HR
                     Msg = shareLocalizer[Localization.Error],
                     Check = false,
                     Data = model,
-                    Error =e.InnerException!=null ? e.InnerException.Message:e.Message
+                    Error = e.InnerException != null ? e.InnerException.Message : e.Message
                 };
             }
         }
@@ -558,7 +707,7 @@ namespace Kader_System.Services.Services.HR
 
         public async Task<Response<CreateEmployeeRequest>> RestoreEmployeeAsync(int id)
         {
-            var obj =await unitOfWork.Employees.GetByIdAsync(id);
+            var obj = await unitOfWork.Employees.GetByIdAsync(id);
             if (obj is null)
             {
 
@@ -594,6 +743,8 @@ namespace Kader_System.Services.Services.HR
             throw new NotImplementedException();
         }
 
+        #region Delete
+
         public async Task<Response<string>> DeleteEmployeeAsync(int id)
         {
             var transaction = unitOfWork.BeginTransaction();
@@ -601,7 +752,8 @@ namespace Kader_System.Services.Services.HR
 
             {
                 Expression<Func<HrEmployee, bool>> filter = x => x.Id == id;
-                var obj = await unitOfWork.Employees.GetFirstOrDefaultAsync(filter, includeProperties: $"{nameof(_instanceEmployee.ListOfAttachments)}");
+                var obj = await unitOfWork.Employees.GetFirstOrDefaultAsync(filter,
+                    includeProperties: $"{nameof(_instanceEmployee.ListOfAttachments)}");
 
                 if (obj == null)
                 {
@@ -616,17 +768,38 @@ namespace Kader_System.Services.Services.HR
                     };
                 }
 
-                if (!string.IsNullOrEmpty(obj.EmployeeImage))
+                var transactionAllowance = await unitOfWork.TransAllowances.ExistAsync(t => t.EmployeeId == id);
+                var transactionVacations = await unitOfWork.TransVacations.ExistAsync(t => t.EmployeeId == id);
+                var transactionBenefits = await unitOfWork.TransBenefits.ExistAsync(t => t.EmployeeId == id);
+                var transactionDeductions = await unitOfWork.TransDeductions.ExistAsync(t => t.EmployeeId == id);
+                var transactionCovenants = await unitOfWork.TransCovenants.ExistAsync(t => t.EmployeeId == id);
+                if (transactionAllowance || transactionVacations || transactionBenefits || transactionDeductions ||
+                    transactionCovenants)
                 {
-                    string file = Path.Combine(GoRootPath.EmployeeImagesPath, obj.EmployeeImage);
-                    ManageFilesHelper.RemoveFile(file);
+                    return new()
+                    {
+                        Check = false,
+                        Error = string.Format(shareLocalizer[Localization.CannotDeleteItemHasRelativeData], shareLocalizer[Localization.Employee]),
+                        Msg = string.Format(shareLocalizer[Localization.CannotDeleteItemHasRelativeData], shareLocalizer[Localization.Employee])
+                    };
                 }
 
-                if (obj.ListOfAttachments.Any())
+
+                if (obj.IsDeleted)
                 {
-                    ManageFilesHelper.RemoveFiles(obj.ListOfAttachments.Select(f => Path.Combine(GoRootPath.HRFilesPath, f.FileName)).ToList());
-                    unitOfWork.EmployeeAttachments.RemoveRange(obj.ListOfAttachments);
+                    if (!string.IsNullOrEmpty(obj.EmployeeImage))
+                    {
+                        string file = Path.Combine(GoRootPath.EmployeeImagesPath, obj.EmployeeImage);
+                        ManageFilesHelper.RemoveFile(file);
+                    }
+
+                    if (obj.ListOfAttachments.Any())
+                    {
+                        ManageFilesHelper.RemoveFiles(obj.ListOfAttachments.Select(f => Path.Combine(GoRootPath.HRFilesPath, f.FileName)).ToList());
+                        unitOfWork.EmployeeAttachments.RemoveRange(obj.ListOfAttachments);
+                    }
                 }
+
 
                 unitOfWork.Employees.Remove(obj);
                 if (!string.IsNullOrEmpty(obj.UserId))
@@ -642,7 +815,7 @@ namespace Kader_System.Services.Services.HR
                         unitOfWork.Users.Remove(userData);
                     }
                 }
-              
+
                 await unitOfWork.CompleteAsync();
 
 
@@ -666,154 +839,10 @@ namespace Kader_System.Services.Services.HR
                 };
             }
         }
+        #endregion
 
 
-        public async Task<Response<EmployeesLookUps>> GetEmployeesLookUpsData(string lang)
-        {
-            try
-            {
-                var companies = await unitOfWork.Companies.GetSpecificSelectAsync(filter => filter.IsDeleted == false,
-                    select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
 
-                    });
 
-                var departments = await unitOfWork.Departments.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
-                        ManagementId =x.ManagementId
-
-                    });
-                var jobs = await unitOfWork.Jobs.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
-
-                    });
-                var vacations = await unitOfWork.Vacations.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
-                    });
-                var qualifications = await unitOfWork.Qualifications.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
-                    });
-                var managements = await unitOfWork.Managements.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.NameAr : x.NameEn,
-                        CompanyId =x.CompanyId,
-                    });
-                var nationalities = await unitOfWork.Nationalities.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
-                    });
-                var shifts = await unitOfWork.Shifts.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.Name_ar : x.Name_en,
-                    });
-                var documents = new List<object>();
-
-                var maritals = await unitOfWork.MaritalStatus.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
-                    });
-                var genders = await unitOfWork.Genders.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
-                    });
-                var relegions = await unitOfWork.Religions.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
-                    });
-                var salary_payments_ways = await unitOfWork.SalaryPaymentWays.GetSpecificSelectAsync(
-                    filter: filter => filter.IsDeleted == false
-                    , select: x => new
-                    {
-                        Id = x.Id,
-                        Name = lang == Localization.Arabic ? x.Name : x.NameInEnglish,
-                    });
-
-                return new Response<EmployeesLookUps>()
-                {
-                    Check = true,
-                    IsActive = true,
-                    Error = "",
-                    Msg = "",
-                    Data = new EmployeesLookUps()
-                    {
-                        companies = companies.ToArray(),
-                        departments = departments.ToArray(),
-                        documents = documents.ToArray(),
-                        genders = genders.ToArray(),
-                        jobs = jobs.ToArray(),
-                        managements = managements.ToArray(),
-                        maritals = maritals.ToArray(),
-                        nationalities = nationalities.ToArray(),
-                        qualifications = qualifications.ToArray(),
-                        relegions = relegions.ToArray(),
-                        salary_payments_ways = salary_payments_ways.ToArray(),
-                        shifts = shifts.ToArray(),
-                        vacations = vacations.ToArray(),
-                    }
-                };
-            }
-            catch (Exception exception)
-            {
-                return new Response<EmployeesLookUps>()
-                {
-                    Error = exception.Message,
-                    Msg = "Can not able to Get Data",
-                    Check = false,
-                    Data = null,
-                    IsActive = false
-                };
-            }
-            
-        }
-
-        public async Task<Response<object>> GetEmployeesDataNameAndIdAsLookUp(string lang)
-        {
-           var result= await unitOfWork.Employees.GetEmployeesDataNameAndIdAsLookUp(lang);
-
-           return new()
-           {
-               Check = true,
-               Error = string.Empty,
-               Data = result,
-               LookUps = null,
-               Msg = string.Empty
-           };
-        }
     }
 }
