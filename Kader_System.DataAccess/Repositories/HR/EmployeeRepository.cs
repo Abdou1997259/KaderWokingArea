@@ -9,8 +9,8 @@ public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmplo
     {
         try
         {
-            var employeeAllowances = context.TransAllowances.Where(e => e.EmployeeId == id).ToList();
-            var employeeVacations = context.TransVacations.Where(e => e.EmployeeId == id).ToList();
+            var employeeAllowances = context.TransAllowances.Where(e => e.EmployeeId == id && !e.IsDeleted);
+            var employeeVacations = context.TransVacations.Where(e => e.EmployeeId == id && !e.IsDeleted);
 
 
             var result = from employee in context.Employees
@@ -89,7 +89,11 @@ public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmplo
                              company_name = lang == Localization.Arabic ? com.NameAr : com.NameEn,
                              management_name = lang == Localization.Arabic ? man.NameAr : man.NameEn,
                              employee_loans_count = 0,
-                             vacation_days_count = employeeVacations.Any()? employeeVacations.Sum(v => v.DaysCount):0,
+                             vacation_days_count = employeeVacations
+                                 
+                                 .AsEnumerable()
+                                 .Where(v => v != null) // Optional: Filter out null values to avoid runtime exceptions
+                                 .Sum(v => v.DaysCount ),
                              job_name = lang == Localization.Arabic ? j.NameAr : j.NameEn,
                              department_name = lang == Localization.Arabic ? dept.NameAr : dept.NameEn,
                              marital_status_name = lang == Localization.Arabic ? ms.Name : ms.NameInEnglish,
@@ -97,7 +101,7 @@ public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmplo
                              religion_name = lang == Localization.Arabic ? r.Name : r.NameInEnglish,
                              note = employee.Note,
                              shift_name = lang == Localization.Arabic ? sh.Name_ar : sh.Name_en,
-                             allowances_sum = employeeAllowances.Any()? employeeAllowances.Sum(a => a.Amount):0,
+                             allowances_sum = employeeAllowances.Any()? employeeAllowances.AsEnumerable().Sum(a => a.Amount):0,
                              employee_loans_sum = 0
                          };
             if (result?.FirstOrDefault()?.Id == null || result?.FirstOrDefault()?.Id == 0)
@@ -171,6 +175,7 @@ public class EmployeeRepository(KaderDbContext context) : BaseRepository<HrEmplo
 
     public async Task<object> GetEmployeesDataNameAndIdAsLookUp(string lang)
     {
+
         return await context.Employees.
             Where(e => !e.IsDeleted && e.IsActive)
             .Select(e => new
