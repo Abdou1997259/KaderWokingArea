@@ -12,7 +12,7 @@ public class TransCovenantRepository(KaderDbContext context) : BaseRepository<Tr
       )
     {
 
-        var query = from trans in context.TransCovenants.Where(filter)
+        var query = from trans in context.TransCovenants.Where(filter).OrderByDescending(c=>c.Id)
                     join employee in context.Employees on trans.EmployeeId equals employee.Id into empGroup
                     from employee in empGroup.DefaultIfEmpty()
                     join job in context.HrJobs on employee.JobId equals job.Id into jobGroup

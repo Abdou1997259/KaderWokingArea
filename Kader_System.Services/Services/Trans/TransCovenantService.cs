@@ -182,7 +182,10 @@ namespace Kader_System.Services.Services.Trans
                     Id = obj.Id
                 },
                 Check = true,
-                LookUps = lookups
+                LookUps =new
+                {
+                    employees= lookups
+                } 
             };
         }
 
