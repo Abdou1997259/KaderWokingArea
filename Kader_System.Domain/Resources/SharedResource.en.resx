@@ -129,6 +129,9 @@
   <data name="CannotBeFound" xml:space="preserve">
     <value>{0} cannot be found</value>
   </data>
+  <data name="CannotDeleteItemHasRelativeData" xml:space="preserve">
+    <value>Cannot Delete {0} Has Relative Data</value>
+  </data>
   <data name="Company" xml:space="preserve">
     <value>Company</value>
   </data>
