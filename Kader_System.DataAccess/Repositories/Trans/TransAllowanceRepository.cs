@@ -13,10 +13,7 @@ public class TransAllowanceRepository(KaderDbContext context) : BaseRepository<T
     )
     {
 
-        var transBenefits = context.TransAllowances.Where(filter);
-
-
-        var query = from trans in transBenefits
+        var query = from trans in context.TransAllowances.Where(filter)
                     join employee in context.Employees on trans.EmployeeId equals employee.Id into empGroup
                     from employee in empGroup.DefaultIfEmpty()
                     join u in context.Users on trans.Added_by equals u.Id into userGroup
@@ -44,10 +41,11 @@ public class TransAllowanceRepository(KaderDbContext context) : BaseRepository<T
 
         if (filterSearch != null)
             query = query.Where(filterSearch);
-        if (take.HasValue)
-            query = query.Take(take.Value);
         if (skip.HasValue)
             query = query.Skip(skip.Value);
+        if (take.HasValue)
+            query = query.Take(take.Value);
+        
 
         return query.ToList();
 
