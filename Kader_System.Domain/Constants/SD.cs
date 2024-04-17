@@ -115,6 +115,16 @@ public static class SD
             public const string DeleteMainScreen = "screen_cat/{id}";
         }
 
+        public class Screen
+        {
+            public const string GetAllScreens = "screen/getAllScreens";
+            public const string CreateScreen = "screen/create";
+            public const string UpdateScreen = "screen/update/{id}";
+            public const string GetScreenById = "screen/getById/{id}";
+            public const string DeleteScreen = "screen/delete/{id}";
+            public const string RestoreScreen = "screen/restore/{id}";
+        }
+
         public class SubMainScreen
         {
             public const string ListOfSubMainScreens = "screen_sub/getListOfSubMainScreens";
@@ -385,6 +395,7 @@ public static class SD
 
         public const string MainScreenCategory = "MainScreenCategory";
         public const string MainScreen = "MainScreen";
+        public const string Screen = "Screen";
         public const string SubMainScreen = "SubMainScreen";
 
         public const string DepartmentsExist = "DepartmentsExist";

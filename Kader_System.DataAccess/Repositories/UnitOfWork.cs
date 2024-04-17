@@ -1,5 +1,6 @@
 ﻿using Kader_System.Domain.Models;
 using Kader_System.Domain.Models.HR;
+using Kader_System.Domain.Models.Setting;
 
 namespace Kader_System.DataAccess.Repositories;
 
@@ -18,7 +19,8 @@ public class UnitOfWork : IUnitOfWork
     public ISubMainScreenActionRepository SubMainScreenActions { get; private set; }
     public IMainScreenRepository MainScreens { get; private set; }
     public IMainScreenCategoryRepository MainScreenCategories { get; private set; }
-
+    public IScreenRepository Screens { get; private set; }
+    public IScreenActionRepository ScreenActions { get; private set; }
     public IAccountingWayRepository AccountingWays { get; private set; }
     public IAllowanceRepository Allowances { get; private set; }
     public IBenefitRepository Benefits { get; private set; }
@@ -74,6 +76,8 @@ public class UnitOfWork : IUnitOfWork
         SubMainScreens = new SubMainScreenRepository(_context);
         SubMainScreenActions = new SubMainScreenActionRepository(_context);
         MainScreens = new MainScreenRepository(_context);
+        Screens=new ScreenRepository(_context);
+        ScreenActions=new ScreenActionRepository(_context);
         MainScreenCategories = new MainScreenCategoryRepository(_context);
         Titles=new TitleRepository(_context);
         AccountingWays = new AccountingWayRepository(_context);

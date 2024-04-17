@@ -34,5 +34,7 @@ global using Kader_System.Domain.Interfaces.Trans;
 global using Kader_System.DataAccess.Repositories.HR;
 global using Kader_System.DataAccess.Repositories.Trans;
 global using Kader_System.Domain.DTOs.Response.Setting;
+global using Kader_System.Domain.Constants;
+global using Kader_System.Domain.Extensions;
 
 

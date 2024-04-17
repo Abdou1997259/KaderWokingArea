@@ -3,6 +3,7 @@ using Kader_System.DataAccess.Repositories.Logging;
 using Kader_System.DataAccess.Repositories.StaticDataRepository;
 using Kader_System.DataAccesss.DbContext;
 using Kader_System.Domain;
+using Kader_System.Domain.Customization.Attributes;
 using Kader_System.Domain.Customization.Middleware;
 using Kader_System.Domain.Interfaces;
 using Kader_System.Domain.Interfaces.Logging;
@@ -210,6 +211,7 @@ builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHand
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProviderService>();
 builder.Services.AddSingleton<IStaticDataRepository, StaticDataRepository>();
 
+builder.Services.AddScoped<IScreenService, ScreenService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDbInitSeedsService, DbInitSeedsService>();
 builder.Services.AddScoped<IPermService, PermService>();
@@ -322,7 +324,7 @@ app.UseSwaggerUI(x =>
 //     Log.Information("end of swagger");
 //}
 
-
+app.UseMiddleware<ExceptionMiddleware>();
 app.ConfigureExceptionHandler(loggingRepository);    // custom as a global exception
 app.UseHttpsRedirection();
 app.UseRouting();

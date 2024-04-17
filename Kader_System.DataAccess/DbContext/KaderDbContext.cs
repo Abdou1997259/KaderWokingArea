@@ -11,6 +11,7 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<ApplicationUserDevice> UserDevices { get; set; }
     public DbSet<ComLog> Logs { get; set; }
     public DbSet<StMainScreen> MainScreenCategories { get; set; }
+    public DbSet<Screen> Screens { get; set; }
     public DbSet<StMainScreenCat> MainScreens { get; set; }
     public DbSet<StScreenSub> SubMainScreens { get; set; }
     public DbSet<StAction> Actions { get; set; }

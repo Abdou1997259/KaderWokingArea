@@ -3,5 +3,5 @@
 [Table("St_Actions")]
 public class StAction : SelectList
 {
-    public ICollection<StSubMainScreenAction> ListOfSubMainScreen { get; set; } = [];
+    
 }
