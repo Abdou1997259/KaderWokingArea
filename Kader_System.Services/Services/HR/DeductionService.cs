@@ -1,5 +1,4 @@
 ﻿using Kader_System.Domain.DTOs;
-using Microsoft.Extensions.Hosting;
 
 namespace Kader_System.Services.Services.HR;
 
@@ -41,7 +40,7 @@ public class DeductionService(IUnitOfWork unitOfWork, IStringLocalizer<SharedRes
         };
     }
 
-    public async Task<Response<HrGetAllDeductionsResponse>> GetAllDeductionsAsync(string lang, HrGetAllFiltrationsForDeductionsRequest model,string host)
+    public async Task<Response<HrGetAllDeductionsResponse>> GetAllDeductionsAsync(string lang, HrGetAllFiltrationsForDeductionsRequest model, string host)
     {
         Expression<Func<HrDeduction, bool>> filter = x => x.IsDeleted == model.IsDeleted &&
                                                           (string.IsNullOrEmpty(model.Word) || x.Name_ar.Contains(model.Word) || x.Name_en.Contains(model.Word));
