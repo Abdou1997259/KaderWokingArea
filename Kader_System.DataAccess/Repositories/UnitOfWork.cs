@@ -1,8 +1,4 @@
-﻿using Kader_System.Domain.Models;
-using Kader_System.Domain.Models.HR;
-using Kader_System.Domain.Models.Setting;
-
-namespace Kader_System.DataAccess.Repositories;
+﻿namespace Kader_System.DataAccess.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
@@ -59,33 +55,37 @@ public class UnitOfWork : IUnitOfWork
     public IMaritalStatusRepository MaritalStatus { get; private set; }
     public IGenderRepository Genders { get; private set; }
     public IReligionRepository Religions { get; private set; }
+
+    public ILoanRepository LoanRepository { get; private set; }
+
     public UnitOfWork(KaderDbContext context, IConfiguration config)
     {
         _context = context;
         _config = config;
+        LoanRepository = new LoanRepository(_context);
         Nationalities = new NationalityRepository(_context);
         MaritalStatus = new MaritalStatusRepository(_context);
-        Genders=new GenderRepository(_context);
-        Religions=new ReligionRepository(_context);
-          Users = new UserRepository(_context);
+        Genders = new GenderRepository(_context);
+        Religions = new ReligionRepository(_context);
+        Users = new UserRepository(_context);
         RoleClaims = new RoleClaimRepository(_context);
         UserDevices = new UserDeviceRepository(_context);
         Roles = new RoleRepository(_context);
         UserRoles = new UserRoleRepository(_context);
-        UserClaims=new UserClaimRepository(_context);
+        UserClaims = new UserClaimRepository(_context);
         SubMainScreens = new SubMainScreenRepository(_context);
         SubMainScreenActions = new SubMainScreenActionRepository(_context);
         MainScreens = new MainScreenRepository(_context);
-        Screens=new ScreenRepository(_context);
-        ScreenActions=new ScreenActionRepository(_context);
+        Screens = new ScreenRepository(_context);
+        ScreenActions = new ScreenActionRepository(_context);
         MainScreenCategories = new MainScreenCategoryRepository(_context);
-        Titles=new TitleRepository(_context);
+        Titles = new TitleRepository(_context);
         AccountingWays = new AccountingWayRepository(_context);
         Allowances = new AllowanceRepository(_context);
         Benefits = new BenefitRepository(_context);
         Companies = new CompanyRepository(_context);
         Managements = new ManagementRepository(_context);
-        CompanyContracts =new CompanyContractsRepository(_context);
+        CompanyContracts = new CompanyContractsRepository(_context);
         CompanyLicenses = new CompanyLicenseRepository(_context);
         CompanyTypes = new CompanyTypeRepository(_context);
         ContractAllowancesDetails = new ContractAllowancesDetailRepository(_context);
@@ -112,7 +112,7 @@ public class UnitOfWork : IUnitOfWork
         TransBenefits = new TransBenefitRepository(_context);
         TransDeductions = new TransDeductionRepository(_context);
         TransCovenants = new TransCovenantRepository(_context);
-        TransVacations=new TransVacationRepository(_context);
+        TransVacations = new TransVacationRepository(_context);
     }
 
     public IDatabaseTransaction BeginTransaction() =>

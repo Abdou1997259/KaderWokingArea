@@ -29,6 +29,7 @@ public class KaderDbContext(DbContextOptions<KaderDbContext> options, IHttpConte
     public DbSet<HrDeduction> Deductions { get; set; }
     public DbSet<HrDepartment> Departments { get; set; }
     public DbSet<HrEmployee> Employees { get; set; }
+    public DbSet<HrLoan> Loans { get; set; }
     public DbSet<HrEmployeeAttachment> EmployeeAttachments { get; set; }
     public DbSet<HrEmployeeType> EmployeeTypes { get; set; }
     public DbSet<HrFingerPrint> FingerPrints { get; set; }
